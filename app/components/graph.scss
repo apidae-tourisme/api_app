@@ -1,0 +1,571 @@
+/* ============ Afficheurs ============ */
+
+/* ------------ Vue Réseau------------- */
+
+.VizNet {
+  height:calc(100vh - 160px) ;
+}
+
+/* ------------ Vue Liste ------------- */
+
+table.list {
+  margin-bottom:160px !important;
+}
+
+/* ------------ Vue More ------------- */
+
+.more {
+  width: calc(100% - 40px);
+  height:calc(100vh - 160px);
+  margin: 0px 10px 160px 30px;
+  color:#6083AF;
+  letter-spacing:0.05em;
+}
+.graines {
+  margin:auto;
+  text-align:center;
+  width:200px;
+  font-size:80%;
+  color:#FFF;
+  background: #7FB0F0; /* Old browsers */
+  background: -moz-linear-gradient(top,  #384858 0%, #7FB0F0 100%); /* FF3.6-15 */
+  background: -webkit-linear-gradient(top,  #384858 0%,#7FB0F0 100%); /* Chrome10-25,Safari5.1-6 */
+  background: linear-gradient(to bottom,  #384858 0%,#7FB0F0 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#384858', endColorstr='#7FB0F0',GradientType=0 ); /* IE6-9 */
+}
+.graines td {
+  padding:3px;
+}
+.more img {
+  border-radius: 20px;
+}
+.more img.start {
+  border:1px solid #999;
+}
+
+/* ========== Sélecteur v2 ============ */
+
+/* ------------- Onglets -------------- */
+
+.nav-tabs {
+  padding-bottom:1px !important;
+  border-bottom:1px dotted #999 !important;
+  margin-bottom:2px !important;
+}
+
+.nav-tabs>li>a {
+  border:1px solid #465C75 !important;
+  margin-right:1px !important;
+  border-radius:20px !important;
+}
+.nav>li>a {
+  padding: 6px 8px 4px 8px !important;
+  color:#FFF !important;
+}
+.nav-tabs>li.active>a, .nav-tabs>li.active>a:focus {
+  background-color:#FFF !important;
+  color:rgb(51,122,183) !important;
+}
+.nav-tabs>li>a:hover {
+  color:rgb(51,122,183) !important;
+}
+
+/* ------------- Sélecteur -------------- */
+
+.selector {
+  position:fixed;
+  left:0px;
+  bottom:0px;
+  width:100%;
+  height:160px; /* 221px;*/
+  text-align:center;
+  background:#999;
+  /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#7d7e7d+0,0e0e0e+100;Black+3D */
+  background: #7FB0F0; /* Old browsers */
+  background: -moz-linear-gradient(top,  #384858 0%, #7FB0F0 100%); /* FF3.6-15 */
+  background: -webkit-linear-gradient(top,  #384858 0%,#7FB0F0 100%); /* Chrome10-25,Safari5.1-6 */
+  background: linear-gradient(to bottom,  #384858 0%,#7FB0F0 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#384858', endColorstr='#7FB0F0',GradientType=0 ); /* IE6-9 */
+}
+.selector a {
+  color:rgb(51,122,183) !important;
+}
+input.checkbox{
+  display:none; /* car traitées graphiquement */
+}
+input[type="checkbox"] {
+  margin-top:-2px !important
+}
+
+.selector .node {
+  width:40px;
+  height:40px;
+  margin:0;
+  padding-top:15px;
+  border-radius: 20px;
+  text-align:center;
+  color:#000;
+  font-weight:bold;
+  font-size:60%;
+}
+/* ------------ Tableau des Types ------------ */
+.nodeTypes  {
+  width: 160px;
+  margin:auto;
+  /*	padding-right:30px;*/
+}
+.nodeTypes label {
+  margin: 0 3px 2px 0px;
+}
+.selector .node.AllType {
+  background: rgb(88,88,88) !important;
+  display:inline-block;
+  color:#fff !important;
+}
+.selector .node.AllType,.selector .node.Concept,.selector .node.Schema {
+  /*	display:none;*/
+  position:absolute;
+  left:2px;
+}
+.selector .node.Concept {
+  bottom: 43px;
+}
+.selector .node.Schema {
+  bottom: 1px;
+}
+.node.AllType a {
+  color:#fff !important;
+}
+.selector .node.ng-valid {
+  font-color:red !important
+}
+.selector .node.Event::before {
+  content:"Ki.Fé.Koi";
+  color:#FFF !important;
+}
+
+/* ------------ Noeud consulté ------------ */
+
+.selector input {
+  position:absolute;
+  text-align:center;
+  bottom:60px;
+  right:2px;
+  width:60px;
+  margin:0.3em 0 0.3em 0;
+  background-color: Transparent;
+  color:#ccc !important;
+}
+
+/* ----- View GRAPH ----- */
+
+.node {
+  font: 300 11px "Helvetica Neue", Helvetica, Arial, sans-serif;
+  fill: #404040;
+}
+/* Color-reference : https://www.google.com/design/spec/style/color.html#color-color-palette */
+.node.Person		{fill: #fbc02d;} /* Yellow 700 */
+.node.Organization	{fill: #512da8;} /* Deep Purple 700 */
+.node.Competence 	{fill: #c0ca33;} /* Lime 600 */
+.node.Event			{fill: #a1887f;} /* Brown 300 */
+.node.Project 		{fill: #388e3c;} /* Green 700 */
+.node.Action 		{fill: #c62828;} /* Red 800 */
+.node.CreativeWork	{fill: #3f51b5;} /* Indigo 500 */
+.node.Product		{fill: #ef6c00;} /* Orange 800 */
+.node.Idea 			{fill: #1e88e5;} /* Blue 600 */
+.node.Concept 		{fill: #727272;} /* 54% Opacity - secondary text */
+.node.Schema 		{fill: #202020;} /* 87% Opacity - text */
+
+.node:hover {
+  fill: #d62728;
+}
+.link {
+  stroke: steelblue;
+  stroke-opacity: .4;
+  fill: none;
+  pointer-events: none;
+}
+.node:hover,
+.node--source,
+.node--target {
+  font-weight: 700;
+}
+.node--source {
+  fill: #404040;
+}
+.node--target {
+  fill: #004489;
+}
+.link--source,.link--target {
+  stroke-opacity: 1;
+  stroke-width: 2px;
+}
+.link--source {
+  stroke: #004489;
+}
+.link--target {
+  stroke: #404040;
+}
+.msg {color:#404040;font-size:80%;font-family:Helvetica, Arial}
+
+/* ----- ANGULAR ----- */
+
+body {
+  margin: 0;
+  padding: 0px;
+  margin-right:32px !important;
+  border-right: 1px dotted #ccc !important;
+  font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+  font-size: 14px;
+  line-height: 20px;
+  color: #333;
+  background-color: #fff;
+}
+input, select {
+  font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+  /*    background-color: #fff;*/
+  border: 0px solid #666;
+  width: 200px;
+  /*    height: 2em;*/
+  padding: 4px 6px;
+  font-size: 0.8em !important;
+  line-height: 20px;
+  color: #555;
+  border-radius: 4px;
+  vertical-align: middle;
+  margin:0 auto;
+}
+input:focus, select:focus {
+  border: 0px solid #0088cc;
+  outline:none;
+}
+input[type="checkbox"] {
+  width: auto;
+}
+select {
+  height: 30px;
+  width: 220px;
+}
+
+.error {
+  color: saddlebrown;
+}
+
+input.ng-invalid.blur, input.ng-invalid.ng-dirty {
+  border: 1px solid #c99;
+}
+input.ng-invalid.blur:focus, input.ng-invalid.ng-dirty:focus {
+  border: 1px solid #c55;
+}
+
+/* --------- Slider --------- */
+
+.zoom .slider {
+  /*    display: inline-block;*/
+  display:none;
+  padding: 0 0.5em;
+  width: 100px
+}
+rzslider .rz-pointer {
+  background-color: rgb(255,92,92) !important;
+  top:-10px !important;
+  width:24px !important;
+  height:24px !important;
+}
+rzslider .rz-pointer:after {
+  top:8px !important;
+  left:8px !important;
+}
+rzslider .rz-ticks .tick {
+  background: rgb(255,92,92) !important; /*#d8e0f3;*/
+}
+rzslider .rz-bubble,rzslider .rz-bubble.rz-limit {
+  color: rgb(102,102,102) !important;
+}
+rzslider  {
+  margin:0 !important;
+  color: rgb(255,92,92) !important;
+}
+.tick-value {
+  display:none;
+}
+rzslider .rz-pointer.rz-active:after{
+  background-color:rgb(102,102,102) !important;
+}
+
+.path {
+  font-size:80%;
+}
+.path input {
+  width:4em;
+}
+.ctxhelp {
+  display: inline-block;
+  color:#aaa;
+  font-size:80%;
+  font-style:italic;
+  padding-left:6px;
+}
+
+/* ----- loading ----- */
+.loading {
+  font-size: 3em;
+  color: grey;
+  padding: 2em;
+}
+
+/* ========== View LIST ============ */
+
+/* ----- header -----  */
+.header {background-color:#BEC2C3;color:#333;width:100%;text-align:center;font-weight:normal;}
+.olex {text-align:right;font-style:italic;font-size:80%;color:#fff;margin:0;padding:0.2em 1em 0 0;}
+img.schemalogo {float:left;border-radius:12px;height:100px;padding:10px;}
+h1 {font-family:"Lucida Grande","Lucida","Lucida Bright",sans-serif !important;letter-spacing:0.1em;margin:0 !important;color:#ffec00 !important}
+.subtitle {font-family:"Lucida Grande","Lucida","Lucida Bright",sans-serif !important;margin:0;padding:0.5em 1em 1em 1em;color:#333}
+
+.tel, .mailto, .facebook, .twitter, .linkedin, .instagram, .slideshare, .delicious, .bitbucket, .dropbox, .viadeo, .pinterest, .flickr, .youtube, .vimeo, .plus\.google {padding-right: 1em;font-size:80%}
+.fa {padding-right:3px;}
+
+/* ----- table ----- */
+
+table {width:100%;}
+table.list img.thumbnail {
+  width:60px;
+  margin:0 14px 10px 6px;
+  border-radius: 30px;
+}
+input.filter:active,input.filter:focus,input.filter:hover {
+  right:3px;
+  width:120px;
+  color:rgb(51,122,183) !important;
+  background-color:#eee;
+}
+input.filter {
+  right:20px;
+  width:100px;
+  position:fixed;
+  bottom:132px;
+  font-size: 16px;
+  border-radius: 16px;
+  color:transparent !important;
+  background-color:transparent;
+  z-index:100;
+}
+
+
+.clearfilter {
+  /*    position: absolute !important;*/
+  width:0px;
+  /*    right:50px; */
+  /*    bottom: -105px !important;*/
+  height: 17px;
+  margin: auto;
+  font-size: 16px;
+  cursor: pointer;
+  z-index:200;
+}
+.glyphicon {
+  top: inherit !important;
+  position: absolute !important;
+}
+.glyphicon-search {
+  position : fixed !important;
+  bottom:135px !important;
+  color: rgb(255,255,255);
+  right: 24px;
+  z-index:100;
+  font-size:120%;
+}
+.glyphicon-remove {
+  position : fixed !important;
+  bottom:135px !important;
+  color: rgb(255,92,92);
+  right: 25px;
+}
+
+/* --------- clear input -------------- */
+
+.glyphicon-home {
+  padding:45px 0px 0px 0px !important;
+}
+.clearinput {
+  position: absolute;
+  right: 2px;
+  width:60px;
+  background-image:url("http://lacombe.eu/logo/Apidae.png");
+  background-size: 60px 60px;
+  border-radius: 30px;
+  bottom: 2px;
+  height: 60px;
+  margin: auto;
+  font-size: 16px;
+  cursor: pointer;
+  color: rgb(255,92,92);
+}
+
+/* --------- me YouAreHere -------------- */
+
+.me {
+  position: absolute;
+  right: 2px;
+  width:60px;
+  background-image:url("http://www.apidae-tourisme.com/wp-content/themes/sitra/img/photos/F.jpg");
+  background-size: 60px 60px;
+  border-radius: 30px;
+  bottom: 65px;
+  height: 60px;
+  margin: auto;
+  font-size: 16px;
+  cursor: pointer;
+  color: rgb(255,92,92);
+}
+
+span.index {display:none;}
+.id,.location {font-size:80%}
+table.list div.node {
+  width:60px;
+  height:60px;
+  background:#E9E9E9;
+  text-align:center;
+  border-radius: 30px;
+  font-size:80%;
+  padding-top:24px;
+  margin:0 14px 10px 6px;
+}
+table.list th {vertical-align: top;width:80px;}
+
+/* ---------- label node ----------- */
+
+.Organization {background:#b5739d !important;}
+.Project 	{background:#61bd4f !important}
+.Product 	{background:#e67e22 !important}
+.Schema 	{background:#666 !important}
+.Person 	{background:#c8c88c !important}
+.Event 		{background:#c9b6b7 !important}
+.CreativeWork {background:#A2C2C4 !important}
+.Concept 	{background:#cccccc !important}
+.Competence {background:#ffcf10 !important}
+.Action 	{background:#ff5c5c !important}
+.Idea 		{background:#7AA9E7 !important}
+
+
+.selector .Organization.checked {
+  background-image: url("http://lacombe.eu/picto/Customers.png") !important;
+  background-size: 40px 40px !important;
+  opacity: 1;
+}
+.selector .Project.checked {
+  background-image: url("http://lacombe.eu/picto/Creation.png") !important;
+  background-size: 40px 40px !important;
+  opacity: 1;
+}
+.selector .Product.checked {
+  background-image: url("http://lacombe.eu/picto/Reflection.png") !important;
+  background-size: 40px 40px !important;
+  opacity: 1;
+}
+.selector .Schema.checked {
+  background-image: url("http://lacombe.eu/picto/AgileDevelopment.png") !important;
+  background-size: 40px 40px !important;
+  opacity: 1;
+}
+.selector .Person.checked {
+  background-image: url("http://lacombe.eu/picto/User.png") !important;
+  background-size: 40px 40px !important;
+  opacity: 1;
+}
+.selector .Event.checked {
+  opacity: 1;
+  background:#7E90AF !important; /* c9b6b7*/
+}
+.selector .CreativeWork.checked {
+  background-image: url("http://lacombe.eu/picto/Exploration.png") !important;
+  background-size: 40px 40px !important;
+  opacity: 1;
+}
+.selector .Concept.checked {
+  background-image: url("http://lacombe.eu/picto/Storyboard.png") !important;
+  background-size: 40px 40px;
+  opacity: 1;
+}
+.selector .Competence.checked {
+  background-image: url("http://lacombe.eu/picto/Persona.png") !important;
+  background-size: 40px 40px !important;
+  opacity:1;
+}
+.selector .Action.checked {
+  background-image: url("http://lacombe.eu/picto/ServicePrototype.png") !important;
+  background-size: 40px 40px !important;
+  opacity: 1;
+}
+.selector .Idea.checked {
+  background-image: url("http://lacombe.eu/picto/Storytelling.png") !important;
+  background-size: 40px 40px !important;
+  opacity: 1;
+}
+
+.selector .Organization {
+  background-image: url("http://lacombe.eu/picto/Customers.png") !important;
+  background-size: 40px 40px !important;
+  opacity: 0.25;
+  /*background:rgba(181,115,157,0.3) !important*/}
+.selector .Project {
+  background-image: url("http://lacombe.eu/picto/Creation.png") !important;
+  background-size: 40px 40px !important;
+  opacity: 0.25;
+  /*background:#61bd4f !important*/}
+.selector .Product {
+  background-image: url("http://lacombe.eu/picto/Reflection.png") !important;
+  background-size: 40px 40px !important;
+  opacity: 0.25;
+  /*background:rgba(230,126,34,0.3) !important*/}
+.selector .Schema {
+  background-image: url("http://lacombe.eu/picto/AgileDevelopment.png") !important;
+  background-size: 40px 40px !important;
+  opacity: 0.25;
+  /*background:rgba(102,102,102,0.3) !important*/}
+.selector .Person {
+  background-image: url("http://lacombe.eu/picto/User.png") !important;
+  background-size: 40px 40px !important;
+  opacity: 0.25;
+  /*background:rgba(200,200,140,0.3) !important*/}
+.selector .Event {
+  background:rgba(201,182,183,0.3) !important}
+.selector .CreativeWork {
+  background-image: url("http://lacombe.eu/picto/Exploration.png") !important;
+  background-size: 40px 40px !important;
+  opacity: 0.25;
+  /*background:rgba(159,190,192,0.3) !important*/}
+.selector .Concept {
+  background-image: url("http://lacombe.eu/picto/Storyboard.png") !important;
+  background-size: 40px 40px !important;
+  opacity: 0.25;
+  /*background:rgba(204,204,204,0.3) !important*/}
+.selector .Competence {
+  background-image: url("http://lacombe.eu/picto/Persona.png") !important;
+  background-size: 40px 40px !important;
+  opacity: 0.25;
+  /*background:rgba(255,207,16,0.3) !important*/}
+.selector .Action {
+  background-image: url("http://lacombe.eu/picto/ServicePrototype.png") !important;
+  background-size: 40px 40px !important;
+  opacity: 0.25;
+  /*background:rgba(255,92,92,0.3) !important*/}
+.selector .Idea {
+  background-image: url("http://lacombe.eu/picto/Storytelling.png") !important;
+  background-size: 40px 40px !important;
+  opacity: 0.25;
+  /*background:rgba(122,269,131,0.3) !important*/}
+
+/* ------ label text --------- */
+.txtPerson 		{color:#fbc02d !important;} /* Yellow 700 */
+.txtOrganization{color:#512da8 !important;} /* Deep Purple 700 */
+.txtCompetence 	{color:#c0ca33 !important;} /* Lime 600 */
+.txtEvent 		{color:#8d6e63;} /* Brown 400 */
+.txtProject 	{color:#388e3c;} /* Green 700 */
+.txtAction 		{color:#c62828;} /* Red 800 */
+.txtCreativeWork{color:#3f51b5;} /* Indigo 500 */
+.txtProduct 	{color:#ef6c00;} /* Orange 800 */
+.txtIdea 		{color:#1e88e5;} /* Blue 600 */
+.txtConcept 	{color:#909090;} /* 54% Opacity - secondary text */
+.txtSchema 		{color:#202020;} /* 87% Opacity - text */

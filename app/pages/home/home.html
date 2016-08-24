@@ -1,0 +1,11 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>
+      Network
+    </ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content>
+  <network *ngIf="networkData" [networkData]="networkData" [networkContext]="networkContext" (rootChange)="rootNodeChange($event);"></network>
+</ion-content>

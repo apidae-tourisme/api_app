@@ -1,0 +1,916 @@
+{
+  "name": "olex",
+  "description": "Open Link Explorer",
+  "version": "0.0.1",
+  "homepage": "",
+  "license": "MIT",
+  "private": true,
+  "poles": ["Organization", "Project", "Product", "Schema", "Person", "Event", "CreativeWork", "Concept", "Competence", "Action", "Idea"],
+  "pole": {
+    "Organization": "Organisations",
+    "Project": "Projets",
+    "Product": "Services",
+    "Schema": "Schémas",
+    "Person": "Acteurs",
+    "Event": "Expériences",
+    "CreativeWork": "Réalisations",
+    "Concept": "Descripteurs",
+    "Competence": "Roles",
+    "Action": "Actions",
+    "Idea": "Idées"
+  },
+  "dataset": {
+    "CPCLR": {
+      "schema": "GoogleSpreadsheet",
+      "id": "1g2rgAjNC8c1khKN7JWsLlQr1o9TnCBpLwhYnL3y-HGY/1",
+      "name": "CPC LR",
+      "description": "Chambre Professionnelle du Conseil en Languedoc-Roussillon",
+      "thumbnail": "http://conseil-lr.com/site/download/CPCLanguedocRoussillon/Skin/CPCLRlogoBandeau.jpg",
+      "root": "CPCLR",
+      "pole": {
+        "Concept": "Mots-clés",
+        "Person": "Annuaire",
+        "Organization": "Organisations",
+        "Competence": "Compétences",
+        "Event": "Agenda",
+        "Project": "Projets",
+        "Action": "Actions",
+        "CreativeWork": "Documents",
+        "Product": "Publications",
+        "Idea": "Propositions",
+        "Schema": "Schémas"
+      },
+      "style": {
+        "olex": "color:#ccc",
+        "header": "background-color:#004489",
+        "h1": "color:#fff !important",
+        "subtitle": "color:#ffec00"
+      }
+    },
+    "S2Y": {
+      "schema": "GoogleSpreadsheet",
+      "id": "1g2rgAjNC8c1khKN7JWsLlQr1o9TnCBpLwhYnL3y-HGY/2",
+      "name": "START 2you",
+      "description": "Programme Collaboratif d'Accélération",
+      "thumbnail": "http://schematic.fr/sc.png",
+      "pole": {
+        "Concept": "Mots-clés",
+        "Person": "Annuaire",
+        "Organization": "Organisations",
+        "Competence": "Compétences",
+        "Event": "Agenda",
+        "Project": "Projets",
+        "Action": "Actions",
+        "CreativeWork": "Documents",
+        "Product": "Produits/Services",
+        "Idea": "Idées",
+        "Schema": "Schémas"
+      },
+      "style": {
+        "olex": "color:#ccc",
+        "header": "background-color:#004489",
+        "h1": "color:#fff !important",
+        "subtitle": "color:#ffec00"
+      }
+    },
+    "MTO": {
+      "schema": "GoogleSpreadsheet",
+      "id": "1uHl8kr-caP05ZvfDqgiwZNACVBZNm7cSBw2nNEBsjcY/1",
+      "name": "MTO",
+      "description": "Management des Technologies Organisationnelles",
+      "thumbnail": "http://conseil-lr.com/site/download/MTO/Skin/LogoMTO.png",
+      "pole": {
+        "Concept": "Mots-clés",
+        "Person": "Auteurs",
+        "Organization": "Organisations",
+        "Competence": "Compétences",
+        "Event": "Agenda",
+        "Project": "Editions",
+        "Action": "Actions",
+        "CreativeWork": "Communications",
+        "Product": "Publications",
+        "Idea": "Propositions",
+        "Schema": "Schémas"
+      },
+      "style": {
+        "olex": "color:#ccc",
+        "header": "background-color:#0C3182",
+        "h1": "color:#0C3182 !important",
+        "subtitle": "color:#0C3182"
+      }
+    },
+    "openlab3S": {
+      "schema": "GoogleSpreadsheet",
+      "id": "1WZXreeber2huz0LsVhD-w9YHX_93Sj44YOcobd1OJ5E/1",
+      "name": "Table-ronde Open-Lab 3S",
+      "description": "jeudi 8 octobre 2015 à 17h45 - Petit amphithéâtre – Montpellier Business School",
+      "thumbnail": "http://lacombe.eu/openlab3S/logos3SenLR.png",
+      "pole": {
+        "Concept": "Mots-clés",
+        "Person": "Personnes",
+        "Organization": "Organisations",
+        "Competence": "Rôles",
+        "Event": "Evénements",
+        "Project": "Projets",
+        "Action": "Actions",
+        "CreativeWork": "Ressources",
+        "Product": "Offres",
+        "Idea": "Sujets",
+        "Schema": "Schémas"
+      },
+      "style": {
+        "olex": "color:#ccc",
+        "header": "background-color:#fff",
+        "h1": "color:#000 !important",
+        "subtitle": "color:#e2001A"
+      }
+    },
+    "EBM10": {
+      "schema": "GoogleSpreadsheet",
+      "id": "1UrEDEEWutFQLxOtAA6n3wkqYUSlsusX3_4lDFn_j-xY/1",
+      "name": "10ème entretiens de Bibracte - Morvan",
+      "description": "Les Ressources Numériques comme instrument de connaissance et de développement du territoire",
+      "thumbnail": "http://schematic.fr/sc.png",
+      "pole": {
+        "Concept": "Thèmes",
+        "Person": "Participants",
+        "Organization": "Organisations",
+        "Competence": "Atouts",
+        "Event": "Agenda",
+        "Project": "Projets",
+        "Action": "Actions",
+        "CreativeWork": "Ressources",
+        "Product": "Produits/Services",
+        "Idea": "Objectifs",
+        "Schema": "Schémas"
+      },
+      "style": {
+        "olex": "color:#ccc",
+        "header": "background-color:#413535",
+        "h1": "color:#FFF !important",
+        "subtitle": "color:#ffec00"
+      }
+    },
+    "GNM": {
+      "schema": "GoogleSpreadsheet",
+      "id": "1zlitGcPKhVk50aCvzcNZmQ6KeuE8txQZxH77zwuUblA/1",
+      "name": "Galerie Numérique du Morvan",
+      "description": "Ressources du Projet",
+      "thumbnail": "http://schematic.fr/sc.png",
+      "pole": {
+        "Concept": "Index",
+        "Person": "Annuaire",
+        "Organization": "Organisations",
+        "Competence": "Compétences",
+        "Event": "Agenda",
+        "Project": "Projets",
+        "Action": "Actions",
+        "CreativeWork": "Ressources",
+        "Product": "Produits/Services",
+        "Idea": "Objectifs",
+        "Schema": "Schémas"
+      },
+      "style": {
+        "olex": "color:#ccc",
+        "header": "background-color:#004D40",
+        "h1": "color:#FFF !important",
+        "subtitle": "color:#ffec00"
+      }
+    },
+    "BIB": {
+      "schema": "GoogleSpreadsheet",
+      "id": "1UrEDEEWutFQLxOtAA6n3wkqYUSlsusX3_4lDFn_j-xY/3",
+      "name": "Centre Européen d'Archéologie",
+      "description": "Chantiers Numériques",
+      "thumbnail": "http://schematic.fr/sc.png"
+    },
+    "BIOM": {
+      "schema": "GoogleSpreadsheet",
+      "id": "1ckmGQ0FY3iJ5Bm-ErH5EbuciBS-J-ldDgnys_OMOBfo/1",
+      "name": "Biomimétisme",
+      "description": "...",
+      "thumbnail": "http://schematic.fr/sc.png"
+    },
+    "HOL": {
+      "schema": "GoogleSpreadsheet",
+      "id": "1CklNFU5u1RoW3nEdvhlKGX9JaFxmBGrlbSl4IBDeY2A/1",
+      "name": "Holacratie",
+      "description": "...",
+      "thumbnail": "http://schematic.fr/sc.png"
+    },
+    "OLEX": {
+      "schema": "GoogleSpreadsheet",
+      "id": "1CNOGSq0fXvUPWFSxolJVSeO8LZRgzIhQ3v9Mjd0FYKk/1",
+      "name": "OLEx",
+      "description": "Ressources relatives au projet Open Link Explorer",
+      "thumbnail": "http://lacombe.eu/logo/olex.png"
+    },
+    "CONFIG": {
+      "schema": "GoogleSpreadsheet",
+      "id": "1CNOGSq0fXvUPWFSxolJVSeO8LZRgzIhQ3v9Mjd0FYKk/2",
+      "name": "OLEx Config",
+      "description": "Test pour paramétrage de la configuration via GIST",
+      "thumbnail": "http://lacombe.eu/logo/olex.png"
+    },
+    "PRV": {
+      "schema": "GoogleSpreadsheet",
+      "id": "1-DhXZ544NJvUqzjT_VYlEheJI_xU8MCT1LxY4ndzsck/1",
+      "name": "Récits de Voyages",
+      "description": "Gestion du projet",
+      "thumbnail": "http://schematic.fr/sc.png"
+    },
+    "REV": {
+      "schema": "GoogleSpreadsheet",
+      "id": "1-DhXZ544NJvUqzjT_VYlEheJI_xU8MCT1LxY4ndzsck/2",
+      "name": "Récits de Voyages",
+      "description": "Les Révolutions françaises de 1789, 1830, 1848 (projet de recherche)",
+      "thumbnail": "http://lacombe.eu/logo/olex9a.png",
+      "pole": {
+        "Concept": "Index",
+        "Person": "Auteurs",
+        "Organization": "Bibliothèques",
+        "Competence": "Qualités",
+        "Event": "Evénements",
+        "Project": "Projets",
+        "Action": "Actions",
+        "CreativeWork": "Bibliographie sélective",
+        "Product": "Produits",
+        "Idea": "Idées",
+        "Schema": "Schémas"
+      },
+      "style": {
+        "olex": "color:#ccc",
+        "header": "background-color:#48452F",
+        "h1": "color:#fff !important",
+        "subtitle": "color:#ffcc00"
+      }
+    },
+    "BUV": {
+      "schema": "GoogleSpreadsheet",
+      "id": "1-DhXZ544NJvUqzjT_VYlEheJI_xU8MCT1LxY4ndzsck/3",
+      "name": "Récits de Voyages",
+      "description": "Travaux des étudiants",
+      "thumbnail": "http://www.babelio.com/users/liste_Recits-de-voyage_4788.jpeg"
+    },
+    "TEST": {
+      "schema": "GoogleSpreadsheet",
+      "id": "1-DhXZ544NJvUqzjT_VYlEheJI_xU8MCT1LxY4ndzsck/4",
+      "name": "Récits de Voyages",
+      "description": "Base des auteurs (TEST)",
+      "thumbnail": "http://schematic.fr/sc.png"
+    },
+    "BIO": {
+      "schema": "GoogleSpreadsheet",
+      "id": "1-DhXZ544NJvUqzjT_VYlEheJI_xU8MCT1LxY4ndzsck/5",
+      "name": "Récits de Voyages",
+      "description": "Biographies",
+      "thumbnail": "http://lacombe.eu/logo/olex9a.png",
+      "style": {
+        "olex": "color:#ccc",
+        "header": "background-color:#48452F",
+        "h1": "color:#fff !important",
+        "subtitle": "color:#ffcc00"
+      }
+    },
+    "STC": {
+      "schema": "GoogleSpreadsheet",
+      "id": "1PT7oBrrFOS58u4qg30EjPYVQxehsdF7JxEyuGVwfByc/1",
+      "name": "Transformation",
+      "description": "Accompagnement au changement",
+      "thumbnail": "http://schematic.fr/sc.png",
+      "pole": {
+        "Concept": "Mots-clés",
+        "Person": "Annuaire",
+        "Organization": "Organisations",
+        "Competence": "Points d'appui",
+        "Event": "Agenda",
+        "Project": "Projets",
+        "Action": "Actions",
+        "CreativeWork": "Ressources",
+        "Product": "Produits/Services",
+        "Idea": "Enjeux/Idées",
+        "Schema": "Schémas"
+      },
+      "style": {
+        "olex": "color:#ccc",
+        "header": "background-color:#135483",
+        "h1": "color:#fff !important",
+        "subtitle": "color:#ffcc00"
+      }
+    },
+    "CTI": {
+      "schema": "GoogleSpreadsheet",
+      "id": "1FcpxvO2_EQYIyCdhcB0RlsehtD7h_d7cRzS8Yak7RqA/1",
+      "name": "Chantier « Méthode de travail »",
+      "description": "Mission CTI : Conseiller Technique et Innovation",
+      "thumbnail": "http://www.apidae-tourisme.com/wp-content/uploads/2013/05/logo-Apidae-760x350.jpg",
+      "root" : "Apidae",
+      "pole": {
+        "Concept": "Descripteurs",
+        "Person": "Acteurs",
+        "Organization": "Communautés",
+        "Competence": "Rôles",
+        "Event": "Expériences",
+        "Project": "Chantiers",
+        "Action": "Actions",
+        "CreativeWork": "UV",
+        "Product": "Services",
+        "Idea": "Idées",
+        "Schema": "Schémas"
+      },
+      "style": {
+        "olex": "color:#ccc",
+        "header": "background-color:#7BABE9",
+        "h1": "color:#fff !important",
+        "subtitle": "color:#fff"
+      }
+    },
+    "CTI2": {
+      "schema": "GoogleSpreadsheet",
+      "id": "1FcpxvO2_EQYIyCdhcB0RlsehtD7h_d7cRzS8Yak7RqA/3",
+      "name": "Chantier « Méthode de travail »",
+      "description": "Mission CTI : Conseiller Technique et Innovation",
+      "thumbnail": "http://www.apidae-tourisme.com/wp-content/uploads/2013/05/logo-Apidae-760x350.jpg",
+      "root" : "Chantier",
+      "pole": {
+        "Concept": "Descripteurs",
+        "Person": "Acteurs",
+        "Organization": "Communautés",
+        "Competence": "Rôles",
+        "Event": "Expériences",
+        "Project": "Chantiers",
+        "Action": "Actions",
+        "CreativeWork": "UV",
+        "Product": "Services",
+        "Idea": "Idées",
+        "Schema": "Schémas"
+      },
+      "style": {
+        "olex": "color:#ccc",
+        "header": "background-color:#7BABE9",
+        "h1": "color:#fff !important",
+        "subtitle": "color:#fff"
+      }
+    },
+    "ME": {
+      "schema": "GoogleSpreadsheet",
+      "id": "1Hozlh0OT55Bzy1w4j6yetHiSh0kinvOe831QDNV3lmc/1",
+      "name": "MAMA",
+      "description": "Mon Application Mobile Apidae (WIP)",
+      "thumbnail": "http://www.apidae-tourisme.com/wp-content/uploads/2013/05/logo-Apidae-760x350.jpg",
+      "root" : "ME",
+      "pole": {
+        "Concept": "Descripteurs",
+        "Person": "Acteurs",
+        "Organization": "Communautés",
+        "Competence": "Rôles",
+        "Event": "Expériences",
+        "Project": "Chantiers",
+        "Action": "Actions",
+        "CreativeWork": "UV",
+        "Product": "Services",
+        "Idea": "Idées",
+        "Schema": "Schémas"
+      },
+      "style": {
+        "olex": "color:#ccc",
+        "header": "background-color:#7BABE9",
+        "h1": "color:#fff !important",
+        "subtitle": "color:#fff"
+      }
+    },
+    "MAMA": {
+      "schema": "GoogleSpreadsheet",
+      "id": "1Hozlh0OT55Bzy1w4j6yetHiSh0kinvOe831QDNV3lmc/2",
+      "name": "MAMA",
+      "description": "Mon Application Mobile Apidae (WIP)",
+      "thumbnail": "http://www.apidae-tourisme.com/wp-content/uploads/2013/05/logo-Apidae-760x350.jpg",
+      "root" : "MAMA",
+      "pole": {
+        "Concept": "Descripteurs",
+        "Person": "Acteurs",
+        "Organization": "Communautés",
+        "Competence": "Rôles",
+        "Event": "Expériences",
+        "Project": "Chantiers",
+        "Action": "Actions",
+        "CreativeWork": "UV",
+        "Product": "Services",
+        "Idea": "Idées",
+        "Schema": "Schémas"
+      },
+      "style": {
+        "olex": "color:#ccc",
+        "header": "background-color:#7BABE9",
+        "h1": "color:#fff !important",
+        "subtitle": "color:#fff"
+      }
+    },
+    "DESIGN": {
+      "schema": "GoogleSpreadsheet",
+      "id": "1avwgQ9dHBytW81if9uwF62EYFz2nV4ByHjm8vJ0mHGw/1",
+      "name": "D-E-S-I-G-N",
+      "description": "Ressources",
+      "thumbnail": "http://schematic.fr/sc.png"
+    },
+    "STI": {
+      "schema": "GoogleSpreadsheet",
+      "id": "148Z6W3HG7yIz2v27kBJpKwwvEjRyfLh9nTNbpQxjY4M/1",
+      "name": "Formation",
+      "description": "Devenir acteur de la « métamorphose numérique »",
+      "thumbnail": "http://schematic.fr/sc.png",
+      "pole": {
+        "Concept": "Sujets",
+        "Person": "Annuaire",
+        "Organization": "Organisations",
+        "Competence": "Compétences",
+        "Event": "Agenda",
+        "Project": "Projets",
+        "Action": "Actions",
+        "CreativeWork": "Ressources",
+        "Product": "Produits/Services",
+        "Idea": "Points clés",
+        "Schema": "Schémas"
+      },
+      "style": {
+        "olex": "color:#ccc",
+        "header": "background-color:#7AB7F2",
+        "h1": "color:#102030 !important",
+        "subtitle": "color:#ffffff"
+      }
+    },
+    "IRL": {
+      "schema": "GoogleSpreadsheet",
+      "id": "1w2l61sL_vXE-uDti22el1_JbmlL7pQVJZERea8xPAKY/1",
+      "name": "IRL 2015",
+      "description": "In Real Life / à l'Intérieur de nos Réseaux Locaux : la Responsabilité Sociétale des entreprises en Réseaux",
+      "thumbnail": "http://lacombe.eu/logo/cdp.jpg",
+      "pole": {
+        "Concept": "Mots-clés",
+        "Person": "Annuaire",
+        "Organization": "Organisations",
+        "Competence": "Ressources",
+        "Event": "Agenda",
+        "Project": "Projets",
+        "Action": "Actions",
+        "CreativeWork": "Références",
+        "Product": "Produits/Services",
+        "Idea": "Enjeux/Idées",
+        "Schema": "Schémas"
+      },
+      "style": {
+        "olex": "color:#ccc",
+        "header": "background-color:#135483",
+        "h1": "color:#fff !important",
+        "subtitle": "color:#ffcc00"
+      }
+    },
+    "A0": {
+      "schema": "GoogleSpreadsheet",
+      "id": "1ZQht2Jpivnm46b_U6DfbcbXH6O7inzgU9hh5UjuXIik/1",
+      "name": "IRL 2015 - Atelier 0",
+      "description": "In Real Life / à l'Intérieur de nos Réseaux Locaux : la Responsabilité Sociétale des entreprises en Réseaux",
+      "thumbnail": "http://lacombe.eu/logo/cdp.jpg",
+      "pole": {
+        "Concept": "Mots-clés",
+        "Person": "Personnes",
+        "Organization": "Organisations",
+        "Competence": "Compétences",
+        "Event": "Evènements",
+        "Project": "Projets",
+        "Action": "Actions",
+        "CreativeWork": "Réalisations",
+        "Product": "Produits/Services",
+        "Idea": "Idées",
+        "Schema": "Schémas"
+      },
+      "style": {
+        "olex": "color:#ccc",
+        "header": "background-color:#135483",
+        "h1": "color:#fff !important",
+        "subtitle": "color:#ffcc00"
+      }
+    },
+    "A1": {
+      "schema": "GoogleSpreadsheet",
+      "id": "1qNoTke16ezY1phjJEATLNrGyjfy7BGG5cdwhPiUdDZ4/1",
+      "name": "IRL 2015 - Atelier 1",
+      "description": "In Real Life / à l'Intérieur de nos Réseaux Locaux : la Responsabilité Sociétale des entreprises en Réseaux",
+      "thumbnail": "http://lacombe.eu/logo/cdp.jpg",
+      "pole": {
+        "Concept": "Mots-clés",
+        "Person": "Personnes",
+        "Organization": "Organisations",
+        "Competence": "Compétences",
+        "Event": "Evènements",
+        "Project": "Projets",
+        "Action": "Actions",
+        "CreativeWork": "Réalisations",
+        "Product": "Produits/Services",
+        "Idea": "Idées",
+        "Schema": "Schémas"
+      },
+      "style": {
+        "olex": "color:#ccc",
+        "header": "background-color:#135483",
+        "h1": "color:#fff !important",
+        "subtitle": "color:#ffcc00"
+      }
+    },
+    "A2": {
+      "schema": "GoogleSpreadsheet",
+      "id": "11uvo0Swjzx4x0yeGfChU-9EqKdF-lPu4W4Aq2fuj3Qc/1",
+      "name": "IRL 2015 - Atelier 2",
+      "description": "In Real Life / à l'Intérieur de nos Réseaux Locaux : la Responsabilité Sociétale des entreprises en Réseaux",
+      "thumbnail": "http://lacombe.eu/logo/cdp.jpg",
+      "pole": {
+        "Concept": "Mots-clés",
+        "Person": "Personnes",
+        "Organization": "Organisations",
+        "Competence": "Compétences",
+        "Event": "Evènements",
+        "Project": "Projets",
+        "Action": "Actions",
+        "CreativeWork": "Réalisations",
+        "Product": "Produits/Services",
+        "Idea": "Idées",
+        "Schema": "Schémas"
+      },
+      "style": {
+        "olex": "color:#ccc",
+        "header": "background-color:#135483",
+        "h1": "color:#fff !important",
+        "subtitle": "color:#ffcc00"
+      }
+    },
+    "A3": {
+      "schema": "GoogleSpreadsheet",
+      "id": "1EDmY2jfh7rcWlT8ViKRFJ5u7FYb4-Z5h24IyOomjpXw/1",
+      "name": "IRL 2015 - Atelier 3",
+      "description": "In Real Life / à l'Intérieur de nos Réseaux Locaux : la Responsabilité Sociétale des entreprises en Réseaux",
+      "thumbnail": "http://lacombe.eu/logo/cdp.jpg",
+      "pole": {
+        "Concept": "Mots-clés",
+        "Person": "Personnes",
+        "Organization": "Organisations",
+        "Competence": "Compétences",
+        "Event": "Evènements",
+        "Project": "Projets",
+        "Action": "Actions",
+        "CreativeWork": "Réalisations",
+        "Product": "Produits/Services",
+        "Idea": "Idées",
+        "Schema": "Schémas"
+      },
+      "style": {
+        "olex": "color:#ccc",
+        "header": "background-color:#135483",
+        "h1": "color:#fff !important",
+        "subtitle": "color:#ffcc00"
+      }
+    },
+    "A4": {
+      "schema": "GoogleSpreadsheet",
+      "id": "1IIVxFEcd14KNPH5UbtNIAXtY4IrgZDADDeRUtaQ0dVA/1",
+      "name": "IRL 2015 - Atelier 4",
+      "description": "In Real Life / à l'Intérieur de nos Réseaux Locaux : la Responsabilité Sociétale des entreprises en Réseaux",
+      "thumbnail": "http://lacombe.eu/logo/cdp.jpg",
+      "pole": {
+        "Concept": "Mots-clés",
+        "Person": "Personnes",
+        "Organization": "Organisations",
+        "Competence": "Compétences",
+        "Event": "Evènements",
+        "Project": "Projets",
+        "Action": "Actions",
+        "CreativeWork": "Réalisations",
+        "Product": "Produits/Services",
+        "Idea": "Idées",
+        "Schema": "Schémas"
+      },
+      "style": {
+        "olex": "color:#ccc",
+        "header": "background-color:#135483",
+        "h1": "color:#fff !important",
+        "subtitle": "color:#ffcc00"
+      }
+    },
+    "A5": {
+      "schema": "GoogleSpreadsheet",
+      "id": "1HQ0wNuFofJxy-khllaEGZmpT0fN3Fzs5P62wJCE1xEs/1",
+      "name": "IRL 2015 - Atelier 5",
+      "description": "In Real Life / à l'Intérieur de nos Réseaux Locaux : la Responsabilité Sociétale des entreprises en Réseaux",
+      "thumbnail": "http://lacombe.eu/logo/cdp.jpg",
+      "pole": {
+        "Concept": "Mots-clés",
+        "Person": "Personnes",
+        "Organization": "Organisations",
+        "Competence": "Compétences",
+        "Event": "Evènements",
+        "Project": "Projets",
+        "Action": "Actions",
+        "CreativeWork": "Réalisations",
+        "Product": "Produits/Services",
+        "Idea": "Idées",
+        "Schema": "Schémas"
+      },
+      "style": {
+        "olex": "color:#ccc",
+        "header": "background-color:#135483",
+        "h1": "color:#fff !important",
+        "subtitle": "color:#ffcc00"
+      }
+    },
+    "A6": {
+      "schema": "GoogleSpreadsheet",
+      "id": "1j7om8MCwn0mCTlkQ8i1exrMRX_Biq8w_FWj96tXT8Jo/1",
+      "name": "IRL 2015 - Atelier 6",
+      "description": "In Real Life / à l'Intérieur de nos Réseaux Locaux : la Responsabilité Sociétale des entreprises en Réseaux",
+      "thumbnail": "http://lacombe.eu/logo/cdp.jpg",
+      "pole": {
+        "Concept": "Mots-clés",
+        "Person": "Personnes",
+        "Organization": "Organisations",
+        "Competence": "Compétences",
+        "Event": "Evènements",
+        "Project": "Projets",
+        "Action": "Actions",
+        "CreativeWork": "Réalisations",
+        "Product": "Produits/Services",
+        "Idea": "Idées",
+        "Schema": "Schémas"
+      },
+      "style": {
+        "olex": "color:#ccc",
+        "header": "background-color:#135483",
+        "h1": "color:#fff !important",
+        "subtitle": "color:#ffcc00"
+      }
+    },
+    "A7": {
+      "schema": "GoogleSpreadsheet",
+      "id": "1zl3qi1T9H7ixWEOrP7-PNd1ngrpKvjL18G-Rtx75Sws/1",
+      "name": "IRL 2015 - Atelier 7",
+      "description": "In Real Life / à l'Intérieur de nos Réseaux Locaux : la Responsabilité Sociétale des entreprises en Réseaux",
+      "thumbnail": "http://lacombe.eu/logo/cdp.jpg",
+      "pole": {
+        "Concept": "Mots-clés",
+        "Person": "Personnes",
+        "Organization": "Organisations",
+        "Competence": "Compétences",
+        "Event": "Evènements",
+        "Project": "Projets",
+        "Action": "Actions",
+        "CreativeWork": "Réalisations",
+        "Product": "Produits/Services",
+        "Idea": "Idées",
+        "Schema": "Schémas"
+      },
+      "style": {
+        "olex": "color:#ccc",
+        "header": "background-color:#135483",
+        "h1": "color:#fff !important",
+        "subtitle": "color:#ffcc00"
+      }
+    },
+    "ELIN": {
+      "schema": "GoogleSpreadsheet",
+      "id": "1JA1X6C2Q03pOuDdUYLiRVuGeWuBZ5wVzvC_K4SB1IG0/1",
+      "name": "EL - IN",
+      "description": "Sources d'information diverses : référentiels, revues, blog, ...",
+      "thumbnail": "http://schematic.fr/sc.png"
+    },
+    "ELWIP": {
+      "schema": "GoogleSpreadsheet",
+      "id": "1JA1X6C2Q03pOuDdUYLiRVuGeWuBZ5wVzvC_K4SB1IG0/2",
+      "name": "EL - WIP",
+      "description": "Carnet - Work in Progress...",
+      "thumbnail": "http://schematic.fr/sc.png"
+    },
+    "ELOUT": {
+      "schema": "GoogleSpreadsheet",
+      "id": "1JA1X6C2Q03pOuDdUYLiRVuGeWuBZ5wVzvC_K4SB1IG0/3",
+      "name": "EL - OUT",
+      "description": "Présence et identité numérique",
+      "thumbnail": "http://schematic.fr/sc.png"
+    },
+    "GIST": {
+      "schema": "GoogleSpreadsheet",
+      "id": "1JA1X6C2Q03pOuDdUYLiRVuGeWuBZ5wVzvC_K4SB1IG0/4",
+      "name": "La méthode GIST",
+      "description": "Construire des Schémas de Transformations Individuelles et Collectives (WIP)",
+      "thumbnail": "http://schematic.fr/sc.png"
+    },
+    "SCH": {
+      "schema": "GoogleSpreadsheet",
+      "id": "1JA1X6C2Q03pOuDdUYLiRVuGeWuBZ5wVzvC_K4SB1IG0/5",
+      "name": "Schémas",
+      "description": "Références",
+      "thumbnail": "http://schematic.fr/sc.png"
+    },
+    "EDU": {
+      "schema": "GoogleSpreadsheet",
+      "id": "1JA1X6C2Q03pOuDdUYLiRVuGeWuBZ5wVzvC_K4SB1IG0/6",
+      "name": "EDU",
+      "description": "Ressources sur la pédagogie, l'enseignement, l'éducation, l'école, ...",
+      "thumbnail": "http://schematic.fr/sc.png"
+    },
+    "MN": {
+      "schema": "GoogleSpreadsheet",
+      "id": "1JA1X6C2Q03pOuDdUYLiRVuGeWuBZ5wVzvC_K4SB1IG0/7",
+      "name": "« Model N. »",
+      "description": "Accompagnement au changement",
+      "thumbnail": "http://schematic.fr/sc.png",
+      "pole": {
+        "Event": "Sessions",
+        "Idea": "Modèles",
+        "Schema": "Schémas",
+        "Product": "Cours"
+      },
+      "style": {
+        "olex": "color:#ccc",
+        "header": "background-color:#3D71AB",
+        "h1": "color:#fff !important",
+        "subtitle": "color:#ffcc00"
+      }
+    },
+    "CO": {
+      "schema": "GoogleSpreadsheet",
+      "id": "1JA1X6C2Q03pOuDdUYLiRVuGeWuBZ5wVzvC_K4SB1IG0/8",
+      "name": "La méthode GIST",
+      "description": "Communauté (WIP)",
+      "thumbnail": "http://schematic.fr/sc.png"
+    },
+    "COM": {
+      "schema": "GoogleSpreadsheet",
+      "id": "1JA1X6C2Q03pOuDdUYLiRVuGeWuBZ5wVzvC_K4SB1IG0/9",
+      "name": "La méthode GIST",
+      "description": "Communication",
+      "thumbnail": "http://schematic.fr/sc.png"
+    },
+    "ALGO": {
+      "schema": "GoogleSpreadsheet",
+      "id": "1JA1X6C2Q03pOuDdUYLiRVuGeWuBZ5wVzvC_K4SB1IG0/10",
+      "name": "Sciences du Design",
+      "description": "Sous les algorithmes, des « Graines d'Information » (WIP)",
+      "thumbnail": "http://schematic.fr/sc.png"
+    },
+    "TICIS": {
+      "schema": "GoogleSpreadsheet",
+      "id": "1JA1X6C2Q03pOuDdUYLiRVuGeWuBZ5wVzvC_K4SB1IG0/11",
+      "name": "TICIS 2016",
+      "description": "Communication EL (wip)",
+      "thumbnail": "http://schematic.fr/sc.png"
+    },
+    "MTO14": {
+      "schema": "GoogleSpreadsheet",
+      "id": "1JA1X6C2Q03pOuDdUYLiRVuGeWuBZ5wVzvC_K4SB1IG0/12",
+      "name": "MTO 2014 EL",
+      "description": "Communication MTO 2014 - EL (WIP)",
+      "thumbnail": "http://schematic.fr/sc.png"
+    },
+    "MTO15": {
+      "schema": "GoogleSpreadsheet",
+      "id": "1JA1X6C2Q03pOuDdUYLiRVuGeWuBZ5wVzvC_K4SB1IG0/13",
+      "name": "MTO 2015 EL",
+      "description": "Communication MTO 2015 - EL (WIP)",
+      "thumbnail": "http://schematic.fr/sc.png"
+    },
+    "MTO15B": {
+      "schema": "GoogleSpreadsheet",
+      "id": "1JA1X6C2Q03pOuDdUYLiRVuGeWuBZ5wVzvC_K4SB1IG0/14",
+      "name": "MTO 2015 EL2",
+      "description": "Communication MTO 2015 - EL+EL (WIP)",
+      "thumbnail": "http://schematic.fr/sc.png"
+    },
+    "MOOC": {
+      "schema": "GoogleSpreadsheet",
+      "id": "1JA1X6C2Q03pOuDdUYLiRVuGeWuBZ5wVzvC_K4SB1IG0/15",
+      "name": "MOOC",
+      "description": "Ressources sur une sélection de MOOC de France Université Numérique (FUN)",
+      "thumbnail": "http://www.france-universite-numerique.fr/local/cache-vignettes/L250xH109/siteon0-38e4a.jpg"
+    },
+    "EL": {
+      "schema": "GoogleSpreadsheet",
+      "id": "1JA1X6C2Q03pOuDdUYLiRVuGeWuBZ5wVzvC_K4SB1IG0/16",
+      "name": "Organiser l'information",
+      "description": "et accompagner la transformation numérique des organisations",
+      "thumbnail": "",
+      "pole": {
+        "Person": "Annuaire",
+        "Action": "Actualité",
+        "Competence": "Prestations",
+        "Organization": "Partenaires",
+        "Event": "Agenda",
+        "Project": "Projets",
+        "Product": "Réalisations",
+        "CreativeWork": "Publications",
+        "Idea": "Outils",
+        "Concept": "Index",
+        "Schema": "Schémas"
+      },
+      "style": {
+        "olex": "color:#ccc",
+        "header": "background-color:#00ABF0",
+        "h1": "color:#fff !important",
+        "subtitle": "color:#fff"
+      }
+    },
+    "LIB": {
+      "schema": "GoogleSpreadsheet",
+      "id": "0AveF--sxmBhIdGU5RzRsWXJwNkpGUFRSM0xIaEVtdUE/1",
+      "name": "Bibliothèque",
+      "description": "Catalogue de ressources documentaires",
+      "thumbnail": "http://schematic.fr/sc.png",
+      "pole": {
+        "Person": "Auteurs",
+        "Action": "Actions",
+        "Competence": "Ressources",
+        "Organization": "Organisations",
+        "Event": "Agenda",
+        "Project": "Chantiers",
+        "Product": "Produits",
+        "CreativeWork": "Ouvrages",
+        "Idea": "Définitions",
+        "Concept": "Thèmes",
+        "Schema": "Schémas"
+      },
+      "style": {
+        "olex": "color:#ccc",
+        "header": "background-color:#183B81",
+        "h1": "color:#fff !important",
+        "subtitle": "color:#fff"
+      }
+    },
+    "INSPIRE": {
+      "schema": "GoogleSpreadsheet",
+      "id": "1XuYhN8G-0Ti4Axq8h9-Wo0m4n_9xIlRQYpeT1cH9TXk/1",
+      "name": "Institut INSPIRE",
+      "description": "Expérimentation",
+      "thumbnail": "http://schematic.fr/sc.png"
+    },
+    "FBI": {
+      "schema": "GoogleSpreadsheet",
+      "id": "1XuYhN8G-0Ti4Axq8h9-Wo0m4n_9xIlRQYpeT1cH9TXk/2",
+      "name": "Institut INSPIRE",
+      "description": "Feed-Back de l'expérimentation",
+      "thumbnail": "http://schematic.fr/sc.png"
+    },
+    "DOC": {
+      "schema": "GoogleSpreadsheet",
+      "id": "1XuYhN8G-0Ti4Axq8h9-Wo0m4n_9xIlRQYpeT1cH9TXk/3",
+      "name": "Institut INSPIRE",
+      "description": "Documentation du dispositif",
+      "thumbnail": "http://schematic.fr/sc.png"
+    },
+    "JLE": {
+      "schema": "GoogleSpreadsheet",
+      "id": "1u4EbbkjF0uUAt_TX_DvPLUD3wae_WB8Zyfn5pKfM9i0/1",
+      "name": "John Locke",
+      "description": "Expérimentation",
+      "thumbnail": "http://schematic.fr/sc.png"
+    },
+    "S": {
+      "schema": "GoogleSpreadsheet",
+      "id": "1nRkj_fAZwguV5nXHLRaoh7wJSv_YCcDZP1SPdjH44nU/1",
+      "name": "La méthode GIST",
+      "description": "Graine d'Information et Schéma de Transformation - SandBox",
+      "thumbnail": "http://schematic.fr/sc.png"
+    },
+    "CGY": {
+      "schema": "GoogleSpreadsheet",
+      "id": "1G2b7JEf4cF6NLQXOPq_7N8ENPB0G1OKXeGCNYaRfk8Q/1",
+      "name": "Réaliser son site Web",
+      "description": "...",
+      "thumbnail": "http://schematic.fr/sc.png"
+    }
+  },
+  "views": {
+    "view1": {
+      "type": "searchable list",
+      "lib": "angular",
+      "size": ""
+    },
+    "view3": {
+      "type": "hierarchical edge bundling",
+      "lib": "d3",
+      "source": "https://gist.github.com/mbostock/1044242",
+      "size": ""
+    },
+    "view63": {
+      "type": "network",
+      "lib": "vis",
+      "size": ""
+    },
+    "view2": {
+      "type": "timeline",
+      "lib": "vis",
+      "size": ""
+    },
+    "view64": {
+      "type": "map",
+      "lib": "leaflet",
+      "size": ""
+    }
+  }
+}
