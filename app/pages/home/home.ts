@@ -16,6 +16,7 @@ export class HomePage {
 
   private networkContext: NetworkContext;
   private networkData: any;
+  private isLoading: boolean;
 
   constructor(public navCtrl: NavController, private explorerService: ExplorerService,
               private dataService: DataService) {
@@ -33,6 +34,7 @@ export class HomePage {
   }
 
   exploreCurrentNode(): void {
+    this.isLoading = true;
     this.explorerService.explore(this.networkContext.root, this.networkContext.path).subscribe(nodes => {
 
       let updatedData: any = {
@@ -121,6 +123,7 @@ export class HomePage {
         }
       }
       this.networkData = updatedData;
+      this.isLoading = false;
     });
   }
 }

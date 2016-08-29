@@ -43,15 +43,12 @@ export class DataService {
 
   getData() : Observable<any> {
     // return this.http.get('config.json').map(this.parseDataset).map(this.loadDataset);
-    console.log(this.data);
     if(this.data) {
-      console.log('returning cache');
       return Observable.of(this.data);
     } else {
       let config = this.config;
       let url = 'https://spreadsheets.google.com/feeds/list/' + config.id + '/public/values?alt=json'; //OLEx
       return this.http.get(url).map(resp => {
-        console.log('retrieving spreadsheet data');
         var data = new SpreadsheetService(resp.json()).readSpreadsheet();
         data.dataset = config;
         data.dataset.root = data.dataset.root || (data.nodes[0] && data.nodes[0].id);

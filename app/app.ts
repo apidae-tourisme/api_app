@@ -5,15 +5,19 @@ import {HomePage} from './pages/home/home';
 
 
 @Component({
-  template: '<ion-nav [root]="rootPage"></ion-nav>'
+  template: `<ion-tabs tabsPlacement="bottom" primary>
+      <ion-tab [root]="tab1Root" tabTitle="Réseau" tabIcon="git-network"></ion-tab>
+      <ion-tab [root]="tab2Root" tabTitle="Carte" tabIcon="pin"></ion-tab>
+      <ion-tab [root]="tab3Root" tabTitle="Liste" tabIcon="list"></ion-tab>
+     </ion-tabs>`
 })
 export class MyApp {
-  rootPage: any = HomePage;
+  tab1Root: any = HomePage;
+  tab2Root: any = HomePage;
+  tab3Root: any = HomePage;
 
   constructor(platform: Platform) {
     platform.ready().then(() => {
-      // Okay, so the platform is ready and our plugins are available.
-      // Here you can do any higher level native things you might need.
       StatusBar.styleDefault();
     });
   }

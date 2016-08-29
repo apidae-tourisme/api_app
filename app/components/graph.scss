@@ -2,8 +2,10 @@
 
 /* ------------ Vue Réseau------------- */
 
-.VizNet {
-  height:calc(100vh - 160px) ;
+network > * {
+  height: 100%;
+  background-image: url('../../img/bg_graph.png');
+  background-size: 100% 100%;
 }
 
 /* ------------ Vue Liste ------------- */
@@ -208,111 +210,6 @@ input[type="checkbox"] {
 }
 .msg {color:#404040;font-size:80%;font-family:Helvetica, Arial}
 
-/* ----- ANGULAR ----- */
-
-body {
-  margin: 0;
-  padding: 0px;
-  margin-right:32px !important;
-  border-right: 1px dotted #ccc !important;
-  font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
-  font-size: 14px;
-  line-height: 20px;
-  color: #333;
-  background-color: #fff;
-}
-input, select {
-  font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
-  /*    background-color: #fff;*/
-  border: 0px solid #666;
-  width: 200px;
-  /*    height: 2em;*/
-  padding: 4px 6px;
-  font-size: 0.8em !important;
-  line-height: 20px;
-  color: #555;
-  border-radius: 4px;
-  vertical-align: middle;
-  margin:0 auto;
-}
-input:focus, select:focus {
-  border: 0px solid #0088cc;
-  outline:none;
-}
-input[type="checkbox"] {
-  width: auto;
-}
-select {
-  height: 30px;
-  width: 220px;
-}
-
-.error {
-  color: saddlebrown;
-}
-
-input.ng-invalid.blur, input.ng-invalid.ng-dirty {
-  border: 1px solid #c99;
-}
-input.ng-invalid.blur:focus, input.ng-invalid.ng-dirty:focus {
-  border: 1px solid #c55;
-}
-
-/* --------- Slider --------- */
-
-.zoom .slider {
-  /*    display: inline-block;*/
-  display:none;
-  padding: 0 0.5em;
-  width: 100px
-}
-rzslider .rz-pointer {
-  background-color: rgb(255,92,92) !important;
-  top:-10px !important;
-  width:24px !important;
-  height:24px !important;
-}
-rzslider .rz-pointer:after {
-  top:8px !important;
-  left:8px !important;
-}
-rzslider .rz-ticks .tick {
-  background: rgb(255,92,92) !important; /*#d8e0f3;*/
-}
-rzslider .rz-bubble,rzslider .rz-bubble.rz-limit {
-  color: rgb(102,102,102) !important;
-}
-rzslider  {
-  margin:0 !important;
-  color: rgb(255,92,92) !important;
-}
-.tick-value {
-  display:none;
-}
-rzslider .rz-pointer.rz-active:after{
-  background-color:rgb(102,102,102) !important;
-}
-
-.path {
-  font-size:80%;
-}
-.path input {
-  width:4em;
-}
-.ctxhelp {
-  display: inline-block;
-  color:#aaa;
-  font-size:80%;
-  font-style:italic;
-  padding-left:6px;
-}
-
-/* ----- loading ----- */
-.loading {
-  font-size: 3em;
-  color: grey;
-  padding: 2em;
-}
 
 /* ========== View LIST ============ */
 

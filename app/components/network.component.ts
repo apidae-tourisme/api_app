@@ -23,7 +23,10 @@ export class NetworkComponent implements DoCheck, OnChanges {
 
   ngAfterViewInit() {
     this.networkInstance = new vis.Network(this.networkContainer.nativeElement, this.networkData,
-      {layout: {improvedLayout: true}});
+      {
+        layout: {improvedLayout: true},
+        nodes: {}
+      });
     this.networkInstance.on('select', properties => {
       this.previousRoot = this.networkContext.root;
       this.networkContext.changeRoot(properties.nodes[0]);
