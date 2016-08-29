@@ -16,7 +16,7 @@
   </ion-navbar>
 </ion-header>
 
-<ion-content>
+<ion-content id="graph_wrapper">
   <div id="loading_spinner" *ngIf="isLoading" text-center><ion-spinner name="dots"></ion-spinner><span light>Chargement en cours</span></div>
   <network *ngIf="networkData" [networkData]="networkData" [networkContext]="networkContext" (rootChange)="rootNodeChange($event);"></network>
 </ion-content>
