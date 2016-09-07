@@ -1,3 +1,66 @@
+// SVG
+.links line {
+  stroke: #999;
+  stroke-opacity: 0.6;
+}
+
+.nodes circle {
+  stroke: #fff;
+  stroke-width: 1.5px;
+}
+
+network-svg {
+  height: 100%;
+}
+
+network-svg text.icon {
+  font-family: 'Ionicons';
+}
+
+network-svg text.icon.concept {
+  fill: #7e7665;
+}
+
+network-svg text.icon.idea {
+  fill: #edc141;
+}
+
+network-svg text.icon.organization {
+  fill: #6eb1c6;
+}
+
+network-svg text.icon.action {
+  fill: #edc141;
+}
+
+network-svg text.icon.event {
+  fill: #d67c7d;
+}
+
+network-svg text.icon.competence {
+  fill: #d67c7d;
+}
+
+network-svg text.icon.product {
+  fill: #7e7665;
+}
+
+network-svg text.icon.project {
+  fill: #7e7665;
+}
+
+network-svg text.icon.creativework {
+  fill: #bfce81;
+}
+
+network-svg text.icon.schema {
+  fill: #bfce81;
+}
+
+network-svg text.icon.person {
+  fill: #86c7e8;
+}
+
 /* ============ Afficheurs ============ */
 
 /* ------------ Vue Réseau------------- */

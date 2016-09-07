@@ -1,5 +1,5 @@
 <ion-header>
-  <ion-navbar primary>
+  <ion-navbar danger>
     <ion-buttons left>
       <button>
         <ion-img id="header_logo" src="img/logo_white.png" srcset="img/logo_white.png 2x"></ion-img>
@@ -17,6 +17,6 @@
 </ion-header>
 
 <ion-content id="graph_wrapper">
-  <div id="loading_spinner" *ngIf="isLoading" text-center><ion-spinner name="dots"></ion-spinner><span light>Chargement en cours</span></div>
-  <network *ngIf="networkData" [networkData]="networkData" [networkContext]="networkContext" (rootChange)="rootNodeChange($event);"></network>
+  <div id="loading_spinner" *ngIf="!networkData" text-center><ion-spinner name="dots"></ion-spinner><span light>Chargement en cours</span></div>
+  <network-svg *ngIf="networkData" [networkData]="networkData" [networkContext]="networkContext" (rootChange)="rootNodeChange($event);"></network-svg>
 </ion-content>

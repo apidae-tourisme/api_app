@@ -36,16 +36,13 @@
     "cordova-plugin-whitelist",
     "cordova-plugin-splashscreen",
     "cordova-plugin-statusbar",
-    "ionic-plugin-keyboard"
+    "ionic-plugin-keyboard",
+    "cordova-plugin-crosswalk-webview"
   ],
   "cordovaPlatforms": [
-    "ios",
-    {
-      "platform": "ios",
-      "version": "",
-      "locator": "ios"
-    }
+    "android",
+    "ios"
   ],
   "name": "api_app",
-  "description": "api_app: An Ionic project"
+  "description": "api_app"
 }
