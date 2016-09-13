@@ -69,16 +69,13 @@ export class SvgComponent implements DoCheck, OnChanges {
   drawGraph(): void {
     let simulation = d3.forceSimulation()
       .alphaMin(0.1)
-      .force("link", d3.forceLink().id(function (d) { return d.id; }).distance(function () { return 100; }))
-      .force("charge", d3.forceManyBody())
-      .force("center", d3.forceCenter(window.innerWidth / 2, (window.innerHeight - 49) / 2))
-      .force("collision", d3.forceCollide(40));
+      .force("link", d3.forceLink().id(function (d) { return d.id; }).distance(function (link, index) { return computeDistance(index); }))
+      .force("charge", d3.forceManyBody().strength(function() { return -500; }))
+      .force("center", d3.forceCenter(window.innerWidth / 2, (window.innerHeight - 49) / 2));
 
     let linkData = this.linksContainer
       .selectAll("line")
       .data(this.networkData.edges);
-
-    // linkData.exit().remove();
 
     let linkEnter = linkData
       .enter().append("line")
@@ -87,8 +84,6 @@ export class SvgComponent implements DoCheck, OnChanges {
     let textData = this.nodesContainer
       .selectAll("text")
       .data(this.networkData.nodes);
-
-    // textData.exit().remove();
 
     let textEnter = textData.enter();
 
@@ -130,6 +125,16 @@ export class SvgComponent implements DoCheck, OnChanges {
       .links(this.networkData.edges);
 
     let that = this;
+
+    function computeDistance(index) {
+      if(index < 8) {
+        return 70;
+      } else if(index < 20) {
+        return 110;
+      } else {
+        return 150;
+      }
+    }
 
     function changeRootNode() {
       var newRoot = d3.select(this).datum().id;

@@ -43,8 +43,13 @@ export class HomePage {
             id: node.id,
             label: node.name,
             category: node.label,
-            code: '\uf446'
+            code: '\uf446',
+            picture: null
           };
+
+          if (node.thumbnail && node.thumbnail.indexOf("jpg") != -1) {
+            networkNode.picture = node.thumbnail;
+          }
 
           switch (node.label) {
             case 'Person' :

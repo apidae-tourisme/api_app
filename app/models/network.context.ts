@@ -8,7 +8,7 @@ export class NetworkContext {
 
   constructor(defaultRoot) {
     this.root = [defaultRoot];
-    this.path = 'R1D1';
+    this.path = 'B1';
   }
 
   changeRoot(newRoot): void {
