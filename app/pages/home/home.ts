@@ -27,6 +27,11 @@ export class HomePage {
     this.exploreCurrentNode();
   }
 
+  homeNode(): void {
+    this.networkContext.changeRoot('Apidae');
+    this.exploreCurrentNode();
+  }
+
   exploreCurrentNode(): void {
     this.explorerService.explore(this.networkContext.root, this.networkContext.path).subscribe(nodes => {
 

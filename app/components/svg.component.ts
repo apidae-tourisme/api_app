@@ -1,4 +1,4 @@
-import {Component, ElementRef, Input, OnChanges, EventEmitter, Output, DoCheck} from "@angular/core";
+import {Component, ElementRef, Input, OnChanges, EventEmitter, Output, DoCheck, forwardRef} from "@angular/core";
 import {NetworkContext} from "../models/network.context";
 
 declare var d3: any;
@@ -26,12 +26,13 @@ export class SvgComponent implements DoCheck, OnChanges {
   }
 
   ngAfterViewInit() {
+
     this.svg = this.host.append("svg")
       .attr("width", window.innerWidth)
       .attr("height", '100%')
       .call(d3.zoom().on("zoom", zoomed));
 
-    var zoomContainer = this.svg.append("g");
+    let zoomContainer = this.svg.append("g");
 
     zoomContainer.append("defs")
       .append("font-face")
@@ -39,11 +40,22 @@ export class SvgComponent implements DoCheck, OnChanges {
       .append("font-face-src")
       .append("font-face-uri")
       .attr("xlink:href", "ionicons.svg#Ionicons");
+      // .append("pattern")
+      // .attr("id", "test")
+      // .attr("patternUnits", "userSpaceOnUse");
+    // <defs>
+    //   <pattern id="img1" patternUnits="userSpaceOnUse" width="600" height="450">
+    //   <image xlink:href="daisy-grass-repeating-background.jpg" x="0" y="0"
+    // width="600" height="450" /><!-- Image from http://silviahartmann.com/background-tile/6-grass-meadow-tile.php-->
+    //   </pattern>
+    //   </defs>
 
     this.linksContainer = zoomContainer.append("g")
       .attr("class", "links");
     this.nodesContainer = zoomContainer.append("g")
       .attr("class", "nodes");
+
+    // this.nodesContainer.call(d3.zoom().on("zoom", zoomed));
 
     function zoomed() {
       zoomContainer.attr("transform", d3.event.transform);
@@ -67,6 +79,8 @@ export class SvgComponent implements DoCheck, OnChanges {
   }
 
   drawGraph(): void {
+    var labelSize = 12, nodeRadius = 40;
+
     let simulation = d3.forceSimulation()
       .alphaMin(0.1)
       .force("link", d3.forceLink().id(function (d) { return d.id; }).distance(function (link, index) { return computeDistance(index); }))
@@ -90,23 +104,39 @@ export class SvgComponent implements DoCheck, OnChanges {
     let nodesBg = textEnter.append("text")
       .attr("class", function(d) { return "icon " + d.category.toLowerCase(); })
       .attr("text-anchor", "middle")
-      .attr("font-size", "80px")
+      .attr("font-size", (nodeRadius * 2) + "px")
       .attr("fill", "#ddd")
       .text("\uf1f7");
 
     let nodesText = textEnter.append("text")
       .attr("class", "icon")
       .attr("text-anchor", "middle")
-      .attr("font-size", "42px")
+      .attr("font-size", (nodeRadius + 2) + "px")
       .attr("fill", "white")
       .text(function (d) { return d.code; });
 
     let nodesLabel = textEnter.append("text")
       .attr("text-anchor", "middle")
-      .attr("font-size", "12px")
-      .text(function (d) {
-        console.log(JSON.stringify(d));
-        return d.label;
+      .attr("font-size", labelSize + "px")
+      .html(function (d) {
+        var maxLength = nodeRadius * 2 / labelSize;
+        if(d.label.length > maxLength) {
+          let tspans = '',
+            words = d.label.split(/\s+/),
+            currentLine = [],
+            firstLine = true;
+          for(let i = 0; i < words.length; i++) {
+            currentLine.push(words[i]);
+            if(currentLine.join(' ').length > maxLength || i == words.length - 1) {
+              tspans += '<tspan dy="' + (firstLine ? 0 : 1) + 'em">' + currentLine.join(' ') + '</tspan>';
+              currentLine = [];
+              firstLine = false;
+            }
+          }
+          return tspans;
+        } else {
+          return d.label;
+        }
       });
 
     this.nodesContainer
@@ -128,11 +158,11 @@ export class SvgComponent implements DoCheck, OnChanges {
 
     function computeDistance(index) {
       if(index < 8) {
-        return 70;
+        return nodeRadius + 30;
       } else if(index < 20) {
-        return 110;
+        return 2 * nodeRadius + 30;
       } else {
-        return 150;
+        return 3 * nodeRadius + 30;
       }
     }
 
@@ -167,6 +197,7 @@ export class SvgComponent implements DoCheck, OnChanges {
 
       nodesLabel
         .attr("x", function (d) {
+          d3.select(this).selectAll("tspan").attr("x", d.x);
           return d.x;
         })
         .attr("y", function (d) {
