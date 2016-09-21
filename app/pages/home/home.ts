@@ -52,8 +52,8 @@ export class HomePage {
             picture: null
           };
 
-          if (node.thumbnail && node.thumbnail.indexOf("jpg") != -1) {
-            networkNode.picture = node.thumbnail;
+          if (node.thumbnail && (node.thumbnail.indexOf("jpg") != -1 || node.thumbnail.indexOf("logo") != -1)) {
+            networkNode.picture = (node.thumbnail.indexOf("http") != - 1) ? node.thumbnail : ('http://' + node.thumbnail);
           }
 
           switch (node.label) {

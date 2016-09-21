@@ -19,6 +19,8 @@ export class SvgComponent implements DoCheck, OnChanges {
   private nodesContainer;
   private linksContainer;
   private previousRoot : Array<any>;
+  private zoom;
+  private zoomContainer;
 
   constructor(private element: ElementRef) {
     this.htmlElement = this.element.nativeElement;
@@ -27,45 +29,36 @@ export class SvgComponent implements DoCheck, OnChanges {
 
   ngAfterViewInit() {
 
+    this.zoom = d3.zoom();
+
     this.svg = this.host.append("svg")
       .attr("width", window.innerWidth)
-      .attr("height", '100%')
-      .call(d3.zoom().on("zoom", zoomed));
+      .attr("height", '100%');
 
-    let zoomContainer = this.svg.append("g");
+    this.zoomContainer = this.svg.append("g");
+    this.svg.call(this.zoom.on("zoom", () => {
+      this.zoomContainer.attr("transform", d3.event.transform);
+    }));
 
-    zoomContainer.append("defs")
+    this.zoomContainer.append("defs")
       .append("font-face")
       .attr("font-family", "Ionicons")
       .append("font-face-src")
       .append("font-face-uri")
       .attr("xlink:href", "ionicons.svg#Ionicons");
-      // .append("pattern")
-      // .attr("id", "test")
-      // .attr("patternUnits", "userSpaceOnUse");
-    // <defs>
-    //   <pattern id="img1" patternUnits="userSpaceOnUse" width="600" height="450">
-    //   <image xlink:href="daisy-grass-repeating-background.jpg" x="0" y="0"
-    // width="600" height="450" /><!-- Image from http://silviahartmann.com/background-tile/6-grass-meadow-tile.php-->
-    //   </pattern>
-    //   </defs>
 
-    this.linksContainer = zoomContainer.append("g")
+    this.linksContainer = this.zoomContainer.append("g")
       .attr("class", "links");
-    this.nodesContainer = zoomContainer.append("g")
+    this.nodesContainer = this.zoomContainer.append("g")
       .attr("class", "nodes");
 
-    // this.nodesContainer.call(d3.zoom().on("zoom", zoomed));
-
-    function zoomed() {
-      zoomContainer.attr("transform", d3.event.transform);
-    }
     this.drawGraph();
   }
 
   ngOnChanges(): void {
     if(this.svg && this.nodesContainer && this.linksContainer) {
       this.drawGraph();
+      this.zoom.scaleTo(this.zoomContainer, 1);
     }
   }
 
@@ -101,19 +94,22 @@ export class SvgComponent implements DoCheck, OnChanges {
 
     let textEnter = textData.enter();
 
+    let nodesImg = textEnter.append("image")
+      .attr("class", function(d) {return d.picture ? "img-node" : '';})
+      .attr("xlink:href", function(d) {return d.picture || '';});
+
     let nodesBg = textEnter.append("text")
       .attr("class", function(d) { return "icon " + d.category.toLowerCase(); })
       .attr("text-anchor", "middle")
       .attr("font-size", (nodeRadius * 2) + "px")
-      .attr("fill", "#ddd")
-      .text("\uf1f7");
+      .text(function(d) {return d.picture ? "\uf1f6" : "\uf1f7";});
 
     let nodesText = textEnter.append("text")
       .attr("class", "icon")
       .attr("text-anchor", "middle")
       .attr("font-size", (nodeRadius + 2) + "px")
       .attr("fill", "white")
-      .text(function (d) { return d.code; });
+      .text(function (d) { return d.picture ? '' : d.code; });
 
     let nodesLabel = textEnter.append("text")
       .attr("text-anchor", "middle")
@@ -193,6 +189,14 @@ export class SvgComponent implements DoCheck, OnChanges {
         })
         .attr("y", function (d) {
           return d.y;
+        });
+
+      nodesImg
+        .attr("x", function (d) {
+          return d.x - 36;
+        })
+        .attr("y", function (d) {
+          return d.y - 64;
         });
 
       nodesLabel

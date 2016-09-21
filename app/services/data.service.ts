@@ -48,6 +48,7 @@ export class DataService {
     } else {
       let config = this.config;
       let url = 'https://spreadsheets.google.com/feeds/list/' + config.id + '/public/values?alt=json'; //OLEx
+      // let url = 'local_data.json'; // 19092016
       return this.http.get(url).map(resp => {
         var data = new SpreadsheetService(resp.json()).readSpreadsheet();
         data.dataset = config;
