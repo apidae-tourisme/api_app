@@ -18,7 +18,7 @@ export class NetworkComponent implements DoCheck, OnChanges {
 
   @ViewChild("netcontainer") networkContainer: ElementRef;
 
-  private previousRoot : Array<any>;
+  private previousRoot : string;
   private networkInstance: any;
 
   ngAfterViewInit() {

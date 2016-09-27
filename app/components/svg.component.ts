@@ -18,7 +18,7 @@ export class SvgComponent implements DoCheck, OnChanges {
   private svg;
   private nodesContainer;
   private linksContainer;
-  private previousRoot : Array<any>;
+  private previousRoot : string;
   private zoom;
   private zoomContainer;
 
@@ -86,7 +86,7 @@ export class SvgComponent implements DoCheck, OnChanges {
 
     let linkEnter = linkData
       .enter().append("line")
-      .attr("stroke-width", function (d) { return 2; });
+      .attr("stroke-width", 2);
 
     let textData = this.nodesContainer
       .selectAll("text")
@@ -95,19 +95,17 @@ export class SvgComponent implements DoCheck, OnChanges {
     let textEnter = textData.enter();
 
     let nodesImg = textEnter.append("image")
-      .attr("class", function(d) {return d.picture ? "img-node" : '';})
+      .attr("class", function(d) {return d.picture ? (d.isRoot ? "root img-node" : "img-node") : '';})
       .attr("xlink:href", function(d) {return d.picture || '';});
 
     let nodesBg = textEnter.append("text")
-      .attr("class", function(d) { return "icon " + d.category.toLowerCase(); })
+      .attr("class", function(d) { return "icon icon-bg " + d.category.toLowerCase() + (d.isRoot ? " root" : ""); })
       .attr("text-anchor", "middle")
-      .attr("font-size", (nodeRadius * 2) + "px")
       .text(function(d) {return d.picture ? "\uf1f6" : "\uf1f7";});
 
     let nodesText = textEnter.append("text")
-      .attr("class", "icon")
+      .attr("class", function(d) {return "icon" + (d.isRoot ? " root" : "");})
       .attr("text-anchor", "middle")
-      .attr("font-size", (nodeRadius + 2) + "px")
       .attr("fill", "white")
       .text(function (d) { return d.picture ? '' : d.code; });
 
@@ -193,10 +191,10 @@ export class SvgComponent implements DoCheck, OnChanges {
 
       nodesImg
         .attr("x", function (d) {
-          return d.x - 36;
+          return d.isRoot ? (d.x - 44) : (d.x - 36);
         })
         .attr("y", function (d) {
-          return d.y - 64;
+          return d.isRoot ? (d.y - 80) : (d.y - 64);
         });
 
       nodesLabel
@@ -213,7 +211,7 @@ export class SvgComponent implements DoCheck, OnChanges {
           return d.x;
         })
         .attr("y", function (d) {
-          return parseFloat(d.y) - 14;
+          return d.isRoot ? (parseFloat(d.y) - 17) : (parseFloat(d.y) - 14);
         });
     }
 

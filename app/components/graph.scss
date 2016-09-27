@@ -15,6 +15,19 @@ network-svg {
 
 network-svg text.icon {
   font-family: 'Ionicons';
+  font-size: 42px;
+}
+
+network-svg text.icon.icon-bg {
+  font-size: 80px;
+}
+
+network-svg text.icon.root {
+  font-size: 52px;
+}
+
+network-svg text.icon.icon-bg.root {
+  font-size: 96px;
 }
 
 network-svg text.icon.concept {
@@ -66,6 +79,12 @@ network-svg image.img-node {
   width: 72px;
   height: 72px;
   fill: #fff;
+}
+
+network-svg image.img-node.root {
+  clip-path: circle(38px at 44px 42px);
+  width: 88px;
+  height: 88px;
 }
 
 network-svg > * {

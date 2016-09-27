@@ -32,8 +32,8 @@ export class ListPage {
   }
 
   loadNodes(): void {
-    this.dataService.getData().subscribe(data => {
-      this.nodes = data['nodes'];
-    });
+    // this.dataService.getData().subscribe(data => {
+    //   this.nodes = data['nodes'];
+    // });
   }
 }

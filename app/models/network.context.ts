@@ -1,23 +1,23 @@
 export class NetworkContext {
 
-  root: Array<any>;
-  path: string;
-  defaultPath: string;
-  typesArray: Array<any>;
-  typesMap: any;
+  root: string;
+  // path: string;
+  // defaultPath: string;
+  // typesArray: Array<any>;
+  // typesMap: any;
 
   constructor(defaultRoot) {
-    this.root = [defaultRoot];
-    this.path = 'B1';
+    this.root = defaultRoot;
+    // this.path = 'B1';
   }
 
   changeRoot(newRoot): void {
-    if (newRoot && !Array.isArray(newRoot)) {
-      newRoot = [newRoot];
-    }
+    // if (newRoot && !Array.isArray(newRoot)) {
+    //   newRoot = [newRoot];
+    // }
     this.root = newRoot;
-    if (this.defaultPath && this.defaultPath != 'none') {
-      this.path = this.defaultPath;
-    }
+    // if (this.defaultPath && this.defaultPath != 'none') {
+    //   this.path = this.defaultPath;
+    // }
   }
 }

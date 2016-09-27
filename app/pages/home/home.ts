@@ -19,28 +19,27 @@ export class HomePage {
   constructor(public navCtrl: NavController, private explorerService: ExplorerService,
               private dataService: DataService) {
     this.networkContext = new NetworkContext(this.dataService.config.root);
-    this.exploreCurrentNode();
+    this.updateCurrentNode();
   }
 
   rootNodeChange(event): void {
     this.networkContext = event.context;
-    this.exploreCurrentNode();
+    this.updateCurrentNode();
   }
 
   homeNode(): void {
-    this.networkContext.changeRoot('Apidae');
-    this.exploreCurrentNode();
+    this.networkContext.changeRoot('root');
+    this.updateCurrentNode();
   }
 
-  exploreCurrentNode(): void {
-    this.explorerService.explore(this.networkContext.root, this.networkContext.path).subscribe(nodes => {
-
+  updateCurrentNode(): void {
+    this.explorerService.exploreGraph(this.networkContext.root).subscribe(nodeData => {
       let updatedData: any = {
         nodes: [],
         edges: []
       };
+      let nodes = nodeData.nodes;
 
-      let linkId = 0;
       for (let i = 0; i < nodes.length; i++) {
         let node = nodes[i];
         if (node.id) {
@@ -49,9 +48,9 @@ export class HomePage {
             label: node.name,
             category: node.label,
             code: '\uf446',
-            picture: null
+            picture: null,
+            isRoot: (node.id == this.networkContext.root || this.networkContext.root == 'root' && node.name == 'Apidae')
           };
-
           if (node.thumbnail && (node.thumbnail.indexOf("jpg") != -1 || node.thumbnail.indexOf("logo") != -1)) {
             networkNode.picture = (node.thumbnail.indexOf("http") != - 1) ? node.thumbnail : ('http://' + node.thumbnail);
           }
@@ -92,14 +91,7 @@ export class HomePage {
               break;
           }
           updatedData.nodes.push(networkNode);
-
-          node.linkIds.forEach(function (linkedNodeId) {
-            updatedData.edges.push({
-              id: linkId++,
-              source: node.id,
-              target: linkedNodeId
-            });
-          });
+          updatedData.edges = nodeData.links;
         }
       }
       this.networkData = updatedData;
