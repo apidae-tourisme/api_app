@@ -10,12 +10,13 @@ export class DataService {
 
   constructor(private http: Http){
     this.config = {
-      "root" : "root",
+      root: "root",
+      backEndUrl: "http://localhost:3000"
     }
   }
 
   getNodeData(rootNodeId) : Observable<any> {
-    let url = 'http://localhost:3000/graph/node/' + rootNodeId + '.json';
+    let url = this.config.backEndUrl + "/graph/node/" + rootNodeId + ".json";
     return this.http.get(url).map(resp => {
       return resp.json();
     });
