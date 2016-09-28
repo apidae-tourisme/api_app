@@ -12,6 +12,7 @@ import {SvgComponent} from "../../components/svg.component";
 })
 export class ListPage {
 
+  private cachedNodes: Array<any>;
   private nodes: Array<any>;
 
   constructor(public navCtrl: NavController, private dataService: DataService) {
@@ -19,8 +20,7 @@ export class ListPage {
   }
 
   filterNodes(ev: any) {
-    this.loadNodes();
-
+    this.nodes = this.cachedNodes;
     let val = ev.target.value;
 
     if (val && val.trim() != '') {
@@ -32,8 +32,9 @@ export class ListPage {
   }
 
   loadNodes(): void {
-    // this.dataService.getData().subscribe(data => {
-    //   this.nodes = data['nodes'];
-    // });
+    this.dataService.getAllNodesData().subscribe(data => {
+      this.cachedNodes = data.nodes;
+      this.nodes = data.nodes;
+    });
   }
 }

@@ -18,23 +18,23 @@
 
 <ion-content>
   <div id="loading_spinner" *ngIf="!nodes" text-center><ion-spinner name="dots"></ion-spinner><span light>Chargement en cours</span></div>
-  <ion-searchbar (ionInput)="filterNodes($event)" [showCancelButton]="true" [cancelButtonText]="Annuler"></ion-searchbar>
+  <ion-searchbar (ionInput)="filterNodes($event)" [showCancelButton]="true" [cancelButtonText]="Annuler" placeholder="Rechercher"></ion-searchbar>
   <ion-list [virtualScroll]="nodes">
     <ion-item-sliding *virtualItem="let node">
       <ion-item>
         <h2>{{node.name}}</h2>
         <p>{{node.description}}</p>
       </ion-item>
-      <ion-item-options side="right">
-        <button secondary>
-          <ion-icon name="call"></ion-icon>
-          Appeler
-        </button>
-        <button primary>
-          <ion-icon name="mail"></ion-icon>
-          Email
-        </button>
-      </ion-item-options>
+      <!--<ion-item-options side="right">-->
+        <!--<button secondary>-->
+          <!--<ion-icon name="call"></ion-icon>-->
+          <!--Appeler-->
+        <!--</button>-->
+        <!--<button primary>-->
+          <!--<ion-icon name="mail"></ion-icon>-->
+          <!--Email-->
+        <!--</button>-->
+      <!--</ion-item-options>-->
     </ion-item-sliding>
   </ion-list>
 </ion-content>
