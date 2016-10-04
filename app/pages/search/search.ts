@@ -35,4 +35,8 @@ export class SearchPage {
       this.nodes = data.nodes;
     });
   }
+
+  closeModal(): void {
+    this.navCtrl.pop();
+  }
 }

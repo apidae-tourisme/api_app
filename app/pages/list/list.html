@@ -1,7 +1,7 @@
 <ion-header>
   <ion-navbar danger>
     <ion-buttons left>
-      <button>
+      <button (click)="homeNode()">
         <ion-img id="header_logo" src="img/logo_white.png" srcset="img/logo_white.png 2x"></ion-img>
       </button>
     </ion-buttons>
@@ -9,7 +9,7 @@
       ApiApp
     </ion-title>
     <ion-buttons right>
-      <button id="header_search">
+      <button id="header_search" (click)="modalSearch()">
         <ion-icon name="search"></ion-icon>
       </button>
     </ion-buttons>
@@ -18,13 +18,15 @@
 
 <ion-content>
   <div id="loading_spinner" *ngIf="!explorerService.networkData" text-center><ion-spinner name="dots"></ion-spinner><span light>Chargement en cours</span></div>
-  <!--<ion-searchbar (ionInput)="filterNodes($event)" [showCancelButton]="true" [cancelButtonText]="Annuler" placeholder="Rechercher"></ion-searchbar>-->
   <ion-list *ngIf="explorerService.networkData" [virtualScroll]="explorerService.networkData.nodes">
-    <ion-item-sliding *virtualItem="let node">
-      <ion-item>
-        <h2>{{node.label}}</h2>
-        <p>{{node.description}}</p>
-      </ion-item>
-    </ion-item-sliding>
+    <ion-item *virtualItem="let node" (click)="navigateTo(node.id)">
+      <ion-thumbnail item-left>
+        <ion-img *ngIf="node.picture" src="{{node.picture}}"></ion-img>
+        <div *ngIf="!node.picture" class="font_avatar {{node.category}}" text-center>{{node.code}}</div>
+      </ion-thumbnail>
+      <h2>{{node.label}}</h2>
+      <p>{{node.description}}</p>
+      <button clear item-right><ion-icon name="arrow-forward"></ion-icon></button>
+    </ion-item>
   </ion-list>
 </ion-content>

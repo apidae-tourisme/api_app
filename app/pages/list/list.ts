@@ -1,15 +1,15 @@
 import {Component} from '@angular/core';
-import {NavController} from 'ionic-angular';
+import {NavController, ModalController} from 'ionic-angular';
 import {ExplorerService} from "../../services/explorer.service";
+import {SearchPage} from "../search/search";
 
 @Component({
   templateUrl: 'build/pages/list/list.html'
 })
 export class ListPage {
 
-  constructor(public navCtrl: NavController, public explorerService: ExplorerService) {
-    console.log("explorer service : " + this.explorerService.networkContext.root);
-    console.log("explorer service : " + this.explorerService.networkData);
+  constructor(public navCtrl: NavController, public modalCtrl: ModalController,
+              public explorerService: ExplorerService) {
   }
 
   rootNodeChange(event): void {
@@ -20,7 +20,16 @@ export class ListPage {
     this.explorerService.navigateTo('root');
   }
 
-  ionViewDidLeave(): void {
-    this.navCtrl.pop();
+  ionViewDidEnter(): void {
+    this.explorerService.exploreGraph(true);
+  }
+
+  navigateTo(node): void {
+    this.explorerService.navigateTo(node);
+  }
+
+  modalSearch() {
+    let modal = this.modalCtrl.create(SearchPage);
+    modal.present();
   }
 }

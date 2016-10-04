@@ -1,17 +1,15 @@
 <ion-header>
   <ion-navbar danger>
     <ion-buttons left>
-      <button>
+      <button (click)="homeNode()">
         <ion-img id="header_logo" src="img/logo_white.png" srcset="img/logo_white.png 2x"></ion-img>
       </button>
     </ion-buttons>
     <ion-title text-center>
-      ApiApp
+      Rechercher
     </ion-title>
     <ion-buttons right>
-      <button id="header_search">
-        <ion-icon name="search"></ion-icon>
-      </button>
+      <button id="header_close" (click)="closeModal()">Fermer</button>
     </ion-buttons>
   </ion-navbar>
 </ion-header>
@@ -25,16 +23,6 @@
         <h2>{{node.name}}</h2>
         <p>{{node.description}}</p>
       </ion-item>
-      <!--<ion-item-options side="right">-->
-        <!--<button secondary>-->
-          <!--<ion-icon name="call"></ion-icon>-->
-          <!--Appeler-->
-        <!--</button>-->
-        <!--<button primary>-->
-          <!--<ion-icon name="mail"></ion-icon>-->
-          <!--Email-->
-        <!--</button>-->
-      <!--</ion-item-options>-->
     </ion-item-sliding>
   </ion-list>
 </ion-content>

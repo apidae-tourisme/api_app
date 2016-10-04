@@ -1,7 +1,7 @@
 <ion-header>
   <ion-navbar danger>
     <ion-buttons left>
-      <button>
+      <button (click)="homeNode()">
         <ion-img id="header_logo" src="img/logo_white.png" srcset="img/logo_white.png 2x"></ion-img>
       </button>
     </ion-buttons>
@@ -9,7 +9,7 @@
       ApiApp
     </ion-title>
     <ion-buttons right>
-      <button id="header_search">
+      <button id="header_search" (click)="modalSearch()">
         <ion-icon name="search"></ion-icon>
       </button>
     </ion-buttons>

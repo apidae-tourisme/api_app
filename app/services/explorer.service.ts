@@ -18,7 +18,11 @@ export class ExplorerService {
     this.exploreGraph();
   }
 
-  exploreGraph(): void {
+  exploreGraph(resetData?: boolean): void {
+    if(resetData) {
+      this.networkData = null;
+    }
+
     this.dataService.getNodeData(this.networkContext.root).subscribe(data => {
       let parsedData: any = {
         nodes: [],
@@ -32,7 +36,8 @@ export class ExplorerService {
           let networkNode = {
             id: node.id,
             label: node.name,
-            category: node.label,
+            description: node.description,
+            category: node.label.toLowerCase(),
             code: '\uf446',
             picture: null,
             isRoot: (node.id == this.networkContext.root || this.networkContext.root == 'root' && node.name == 'Apidae')

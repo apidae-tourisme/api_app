@@ -99,7 +99,7 @@ export class SvgComponent implements DoCheck, OnChanges {
       .attr("xlink:href", function(d) {return d.picture || '';});
 
     let nodesBg = textEnter.append("text")
-      .attr("class", function(d) { return "icon icon-bg " + d.category.toLowerCase() + (d.isRoot ? " root" : ""); })
+      .attr("class", function(d) { return "icon icon-bg " + d.category + (d.isRoot ? " root" : ""); })
       .attr("text-anchor", "middle")
       .text(function(d) {return d.picture ? "\uf1f6" : "\uf1f7";});
 

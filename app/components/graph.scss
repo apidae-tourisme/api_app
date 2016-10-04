@@ -31,43 +31,43 @@ network-svg text.icon.icon-bg.root {
 }
 
 network-svg text.icon.concept {
-  fill: #7e7665;
+  fill: map-get($colors, dark);
 }
 
 network-svg text.icon.idea {
-  fill: #edc141;
+  fill: map-get($colors, bulb);
 }
 
 network-svg text.icon.organization {
-  fill: #6eb1c6;
+  fill: map-get($colors, favorite);
 }
 
 network-svg text.icon.action {
-  fill: #edc141;
+  fill: map-get($colors, bulb);
 }
 
 network-svg text.icon.event {
-  fill: #d67c7d;
+  fill: map-get($colors, danger);
 }
 
 network-svg text.icon.competence {
-  fill: #d67c7d;
+  fill: map-get($colors, danger);
 }
 
 network-svg text.icon.product {
-  fill: #7e7665;
+  fill: map-get($colors, dark);
 }
 
 network-svg text.icon.project {
-  fill: #7e7665;
+  fill: map-get($colors, dark);
 }
 
 network-svg text.icon.creativework {
-  fill: #bfce81;
+  fill: map-get($colors, secondary);
 }
 
 network-svg text.icon.schema {
-  fill: #bfce81;
+  fill: map-get($colors, secondary);
 }
 
 network-svg text.icon.person {
