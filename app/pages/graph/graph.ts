@@ -1,15 +1,16 @@
 import {Component} from '@angular/core';
 import {NavController} from 'ionic-angular';
 import {ExplorerService} from "../../services/explorer.service";
+import {SvgComponent} from "../../components/svg.component";
 
 @Component({
-  templateUrl: 'build/pages/list/list.html'
+  templateUrl: 'build/pages/graph/graph.html',
+  directives: [SvgComponent]
 })
-export class ListPage {
+export class GraphPage {
 
   constructor(public navCtrl: NavController, public explorerService: ExplorerService) {
-    console.log("explorer service : " + this.explorerService.networkContext.root);
-    console.log("explorer service : " + this.explorerService.networkData);
+    this.explorerService.exploreGraph();
   }
 
   rootNodeChange(event): void {
