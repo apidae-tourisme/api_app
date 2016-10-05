@@ -28,23 +28,21 @@ export class NetworkComponent implements DoCheck, OnChanges {
         nodes: {}
       });
     this.networkInstance.on('select', properties => {
-      this.previousRoot = this.networkContext.root;
-      this.networkContext.changeRoot(properties.nodes[0]);
-      console.log('root changed to ' + this.networkContext.root);
+      this.previousRoot = this.networkContext.node;
+      this.networkContext.changeNode(properties.nodes[0]);
+      console.log('root changed to ' + this.networkContext.node);
     });
   }
 
   ngDoCheck(): void {
-    if(this.previousRoot !== this.networkContext.root) {
-      console.log('root change detected');
+    if(this.previousRoot !== this.networkContext.node) {
       this.rootChange.emit({context: this.networkContext});
-      this.previousRoot = this.networkContext.root;
+      this.previousRoot = this.networkContext.node;
     }
   }
 
   ngOnChanges(changes: SimpleChanges): any {
     if(this.networkInstance && changes['networkData'].currentValue !== changes['networkData'].previousValue) {
-      console.log('setting data to ' + this.networkData);
       this.networkInstance.setData(this.networkData);
     }
   }

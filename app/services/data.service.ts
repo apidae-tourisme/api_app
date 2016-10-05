@@ -11,12 +11,12 @@ export class DataService {
   constructor(private http: Http){
     this.config = {
       root: "root",
-      backEndUrl: "http://localhost:3000"
+      backEndUrl: "http://apiapp-bo.hotentic.com"
     }
   }
 
   getNodeData(rootNodeId) : Observable<any> {
-    let url = this.config.backEndUrl + "/graph/node/" + rootNodeId + ".json";
+    let url = this.config.backEndUrl + "/graph/node/" + (rootNodeId || "default") + ".json";
     return this.http.get(url).map(resp => {
       return resp.json();
     });

@@ -1,5 +1,4 @@
-import {Component, ElementRef, Input, OnChanges, EventEmitter, Output, DoCheck, forwardRef} from "@angular/core";
-import {NetworkContext} from "../models/network.context";
+import {Component, ElementRef, Input, OnChanges, EventEmitter, Output, DoCheck} from "@angular/core";
 
 declare var d3: any;
 
@@ -10,7 +9,6 @@ declare var d3: any;
 export class SvgComponent implements DoCheck, OnChanges {
 
   @Input() networkData: any;
-  @Input() networkContext: NetworkContext;
   @Output() rootChange = new EventEmitter();
 
   private host;
@@ -18,7 +16,8 @@ export class SvgComponent implements DoCheck, OnChanges {
   private svg;
   private nodesContainer;
   private linksContainer;
-  private previousRoot : string;
+  private newRoot: string;
+  private rootHasChanged: boolean;
   private zoom;
   private zoomContainer;
 
@@ -57,28 +56,34 @@ export class SvgComponent implements DoCheck, OnChanges {
 
   ngOnChanges(): void {
     if(this.svg && this.nodesContainer && this.linksContainer) {
+      this.linksContainer.selectAll("*").remove();
+      this.nodesContainer.selectAll("*").remove();
       this.drawGraph();
       this.zoom.scaleTo(this.zoomContainer, 1);
     }
   }
 
   ngDoCheck(): void {
-    if(this.linksContainer && this.nodesContainer && this.previousRoot && this.previousRoot !== this.networkContext.root) {
-      this.linksContainer.selectAll("*").remove();
-      this.nodesContainer.selectAll("*").remove();
-      this.rootChange.emit({context: this.networkContext});
-      this.previousRoot = this.networkContext.root;
+    if(this.linksContainer && this.nodesContainer && this.rootHasChanged) {
+      this.rootChange.emit({newRoot: this.newRoot});
+      this.rootHasChanged = false;
     }
   }
 
   drawGraph(): void {
-    var labelSize = 12, nodeRadius = 40;
+    let labelSize = 12, nodeRadius = 40;
+    let nominalHeight = (window.innerHeight - 49) / 2;
 
     let simulation = d3.forceSimulation()
       .alphaMin(0.1)
       .force("link", d3.forceLink().id(function (d) { return d.id; }).distance(function (link, index) { return computeDistance(index); }))
-      .force("charge", d3.forceManyBody().strength(function() { return -500; }))
-      .force("center", d3.forceCenter(window.innerWidth / 2, (window.innerHeight - 49) / 2));
+      .force("charge", d3.forceManyBody().strength(function(node, index) {
+        return -500;
+      }))
+      .force("xCharge", d3.forceX(window.innerWidth).strength(function(node, index) {
+        return node.isPrevious ? 0 : 0.1;
+      }))
+      .force("center", d3.forceCenter(window.innerWidth / 2, nominalHeight));
 
     let linkData = this.linksContainer
       .selectAll("line")
@@ -95,19 +100,19 @@ export class SvgComponent implements DoCheck, OnChanges {
     let textEnter = textData.enter();
 
     let nodesImg = textEnter.append("image")
-      .attr("class", function(d) {return d.picture ? (d.isRoot ? "root img-node" : "img-node") : '';})
-      .attr("xlink:href", function(d) {return d.picture || '';});
+      .attr("class", function(d) {return d.picture ? (d.isRoot ? "root img-node" : (d.isPrevious ? "" : "img-node")) : "";})
+      .attr("xlink:href", function(d) {return (d.isPrevious || !d.picture) ? "" : d.picture;});
 
     let nodesBg = textEnter.append("text")
       .attr("class", function(d) { return "icon icon-bg " + d.category + (d.isRoot ? " root" : ""); })
       .attr("text-anchor", "middle")
-      .text(function(d) {return d.picture ? "\uf1f6" : "\uf1f7";});
+      .text(function(d) {return (d.picture && !d.isPrevious) ? "\uf1f6" : "\uf1f7";});
 
     let nodesText = textEnter.append("text")
       .attr("class", function(d) {return "icon" + (d.isRoot ? " root" : "");})
       .attr("text-anchor", "middle")
       .attr("fill", "white")
-      .text(function (d) { return d.picture ? '' : d.code; });
+      .text(function (d) { return d.isPrevious ? "\uf112" : (d.picture ? '' : d.code); });
 
     let nodesLabel = textEnter.append("text")
       .attr("text-anchor", "middle")
@@ -148,8 +153,6 @@ export class SvgComponent implements DoCheck, OnChanges {
     simulation.force("link")
       .links(this.networkData.edges);
 
-    let that = this;
-
     function computeDistance(index) {
       if(index < 8) {
         return nodeRadius + 30;
@@ -160,19 +163,25 @@ export class SvgComponent implements DoCheck, OnChanges {
       }
     }
 
+    let that = this;
+
     function changeRootNode() {
-      var newRoot = d3.select(this).datum().id;
-      that.previousRoot = that.networkContext.root;
-      that.networkContext.changeRoot(newRoot);
+      let clickedNode = d3.select(this).datum().id;
+      if(clickedNode != that.newRoot) {
+        that.newRoot = clickedNode;
+        that.rootHasChanged = true;
+      }
     }
 
     function ticked() {
       linkEnter
         .attr("x1", function (d) {
-          return parseFloat(d.source.x);
+          let x = d.source.isPrevious ? 30 : d.source.x;
+          return parseFloat(x);
         })
         .attr("y1", function (d) {
-          return parseFloat(d.source.y) - 30;
+          let y = d.source.isPrevious ? nominalHeight : d.source.y;
+          return parseFloat(y) - 30;
         })
         .attr("x2", function (d) {
           return parseFloat(d.target.x);
@@ -183,35 +192,41 @@ export class SvgComponent implements DoCheck, OnChanges {
 
       nodesBg
         .attr("x", function (d) {
-          return d.x;
+          return d.isPrevious ? 40 : d.x;
         })
         .attr("y", function (d) {
-          return d.y;
+          return d.isPrevious ? nominalHeight : d.y;
         });
 
       nodesImg
         .attr("x", function (d) {
-          return d.isRoot ? (d.x - 44) : (d.x - 36);
+          let x = d.isPrevious ? 40 : d.x;
+          return d.isRoot ? (x - 44) : (x - 36);
         })
         .attr("y", function (d) {
-          return d.isRoot ? (d.y - 80) : (d.y - 64);
+          let y = d.isPrevious ? nominalHeight : d.y;
+          return d.isRoot ? (y - 80) : (y - 64);
         });
 
       nodesLabel
         .attr("x", function (d) {
-          d3.select(this).selectAll("tspan").attr("x", d.x);
-          return d.x;
+          let x = d.isPrevious ? 40 : d.x;
+          d3.select(this).selectAll("tspan").attr("x", x);
+          return x;
         })
         .attr("y", function (d) {
-          return parseFloat(d.y) + 12;
+          let y = d.isPrevious ? nominalHeight : d.y;
+          return parseFloat(y) + 12;
         });
 
       nodesText
         .attr("x", function (d) {
-          return d.x;
+          let x = d.isPrevious ? 40 : d.x;
+          return x;
         })
         .attr("y", function (d) {
-          return d.isRoot ? (parseFloat(d.y) - 17) : (parseFloat(d.y) - 14);
+          let y = d.isPrevious ? nominalHeight : d.y;
+          return d.isRoot ? (parseFloat(y) - 17) : (parseFloat(y) - 14);
         });
     }
 

@@ -13,11 +13,11 @@ export class ListPage {
   }
 
   rootNodeChange(event): void {
-    this.explorerService.navigateTo(event.context.root);
+    this.explorerService.navigateTo(event.newRoot);
   }
 
   homeNode(): void {
-    this.explorerService.navigateTo('root');
+    this.explorerService.navigateHome();
   }
 
   ionViewDidEnter(): void {

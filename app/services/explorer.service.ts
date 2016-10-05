@@ -10,11 +10,16 @@ export class ExplorerService {
   networkData: any;
 
   constructor(private dataService: DataService) {
-    this.networkContext = new NetworkContext(this.dataService.config.root);
+    this.networkContext = new NetworkContext();
   }
 
-  navigateTo(newNode) {
-    this.networkContext.changeRoot(newNode);
+  navigateTo(newNode: string): void {
+    this.networkContext.changeNode(newNode);
+    this.exploreGraph();
+  }
+
+  navigateHome(): void {
+    this.networkContext.reset();
     this.exploreGraph();
   }
 
@@ -23,12 +28,15 @@ export class ExplorerService {
       this.networkData = null;
     }
 
-    this.dataService.getNodeData(this.networkContext.root).subscribe(data => {
+    this.dataService.getNodeData(this.networkContext.node).subscribe(data => {
       let parsedData: any = {
         nodes: [],
         edges: []
       };
       let nodes = data.nodes;
+      if(!this.networkContext.node) {
+        this.networkContext.node = nodes[0].id;
+      }
 
       for (let i = 0; i < nodes.length; i++) {
         let node = nodes[i];
@@ -40,7 +48,8 @@ export class ExplorerService {
             category: node.label.toLowerCase(),
             code: '\uf446',
             picture: null,
-            isRoot: (node.id == this.networkContext.root || this.networkContext.root == 'root' && node.name == 'Apidae')
+            isRoot: node.id == this.networkContext.node,
+            isPrevious: this.networkContext.isPrevious(node.id)
           };
           if (node.thumbnail && (node.thumbnail.indexOf("jpg") != -1 || node.thumbnail.indexOf("logo") != -1)) {
             networkNode.picture = (node.thumbnail.indexOf("http") != - 1) ? node.thumbnail : ('http://' + node.thumbnail);
