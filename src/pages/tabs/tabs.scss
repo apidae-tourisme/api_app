@@ -1,0 +1,8 @@
+#api_app_tabs .tabbar .tab-button {
+  color: map-get($colors, light);;
+}
+
+#api_app_tabs .tabbar .tab-button[aria-selected=true] {
+  color: #fff;
+  font-weight: bold;
+}

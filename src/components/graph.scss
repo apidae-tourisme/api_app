@@ -1,0 +1,94 @@
+// SVG
+.links line {
+  stroke: #999;
+  stroke-opacity: 0.6;
+}
+
+.nodes circle {
+  stroke: #fff;
+  stroke-width: 1.5px;
+}
+
+graph {
+  height: 100%;
+}
+
+graph text.icon {
+  font-family: 'Ionicons';
+  font-size: 42px;
+}
+
+graph text.icon.icon-bg {
+  font-size: 80px;
+}
+
+graph text.icon.root {
+  font-size: 52px;
+}
+
+graph text.icon.icon-bg.root {
+  font-size: 96px;
+}
+
+graph text.icon.concept {
+  fill: map-get($colors, dark);
+}
+
+graph text.icon.idea {
+  fill: map-get($colors, bulb);
+}
+
+graph text.icon.organization {
+  fill: map-get($colors, favorite);
+}
+
+graph text.icon.action {
+  fill: map-get($colors, bulb);
+}
+
+graph text.icon.event {
+  fill: map-get($colors, danger);
+}
+
+graph text.icon.competence {
+  fill: map-get($colors, danger);
+}
+
+graph text.icon.product {
+  fill: map-get($colors, dark);
+}
+
+graph text.icon.project {
+  fill: map-get($colors, dark);
+}
+
+graph text.icon.creativework {
+  fill: map-get($colors, secondary);
+}
+
+graph text.icon.schema {
+  fill: map-get($colors, secondary);
+}
+
+graph text.icon.person {
+  fill: #86c7e8;
+}
+
+graph image.img-node {
+  clip-path: circle(32px at 36px 34px);
+  width: 72px;
+  height: 72px;
+  fill: #fff;
+}
+
+graph image.img-node.root {
+  clip-path: circle(38px at 44px 42px);
+  width: 88px;
+  height: 88px;
+}
+
+graph > * {
+  height: 100%;
+  background-image: url('../assets/img/bg_graph.png');
+  background-size: 100% 100%;
+}
