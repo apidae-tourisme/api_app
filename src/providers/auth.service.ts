@@ -10,11 +10,14 @@ export class AuthService {
   private authData: any;
 
   constructor(private http: Http){
-    this.config = {};
+    this.config = {
+      backEndUrl: 'http://apiapp-bo.hotentic.com/api',
+      authPath: '/auth/apidae'
+    };
   }
 
   authenticate(): void {
-    window.location.replace('http://localhost:3000/api/auth/apidae?auth_origin_url=' + encodeURIComponent(window.location.href));
+    window.location.replace(this.config.backEndUrl + this.config.authPath + '?auth_origin_url=' + encodeURIComponent(window.location.href));
   }
 
   logOut(): void {
