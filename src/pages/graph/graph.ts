@@ -2,6 +2,7 @@ import {Component} from '@angular/core';
 import {NavController, ModalController} from 'ionic-angular';
 import {ExplorerService} from "../../providers/explorer.service";
 import {SearchPage} from "../search/search";
+import {AuthService} from "../../providers/auth.service";
 
 @Component({
   templateUrl: 'graph.html'
@@ -9,7 +10,7 @@ import {SearchPage} from "../search/search";
 export class GraphPage {
 
   constructor(public navCtrl: NavController, public modalCtrl: ModalController,
-              public explorerService: ExplorerService) {
+              public explorerService: ExplorerService, public authService: AuthService) {
   }
 
   rootNodeChange(event): void {
@@ -20,8 +21,16 @@ export class GraphPage {
     this.explorerService.navigateHome();
   }
 
+  ionViewWillEnter() {
+    if(!this.authService.isLoggedIn()) {
+      document.querySelector("div.tabbar")['style'].display = 'none';
+    }
+  }
+
   ionViewDidEnter() {
-    this.explorerService.exploreGraph(true);
+    if(this.authService.isLoggedIn()) {
+      this.explorerService.exploreGraph(true);
+    }
   }
 
   modalSearch() {

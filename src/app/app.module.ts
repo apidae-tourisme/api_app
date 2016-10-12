@@ -10,6 +10,7 @@ import {DataService} from "../providers/data.service";
 import {ExplorerService} from "../providers/explorer.service";
 import {NetworkContext} from "../providers/network.context";
 import {MapPage} from "../pages/map/map";
+import {AuthService} from "../providers/auth.service";
 
 @NgModule({
   declarations: [
@@ -34,6 +35,7 @@ import {MapPage} from "../pages/map/map";
     SearchPage
   ],
   providers: [
+    AuthService,
     DataService,
     ExplorerService,
     NetworkContext

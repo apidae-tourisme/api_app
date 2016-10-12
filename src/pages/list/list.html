@@ -19,7 +19,7 @@
 <ion-content>
   <div id="loading_spinner" *ngIf="!explorerService.networkData" text-center><ion-spinner name="dots"></ion-spinner><span light>Chargement en cours</span></div>
   <ion-list *ngIf="explorerService.networkData && explorerService.networkData.nodes" [virtualScroll]="explorerService.networkData.nodes" [approxItemHeight]="'50px'">
-    <ion-item *virtualItem="let node" (click)="navigateTo(node.id)">
+    <ion-item *virtualItem="let node" (click)="navigateTo(node.id)" longPress>
       <ion-thumbnail item-left>
         <ion-img *ngIf="node.picture" [src]="node.picture"></ion-img>
         <div *ngIf="!node.picture" class="font_avatar {{node.category}}" text-center>{{node.code}}</div>
