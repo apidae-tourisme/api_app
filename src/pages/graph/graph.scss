@@ -2,12 +2,22 @@
   overflow: hidden;
 }
 
-#auth_panel {
-  position: relative;
-  top: 25vh;
+#graph_wrapper ion-fab[top] {
+  top: 50%;
+  margin-top: -150px;
 }
 
-#auth_panel img,
-#auth_panel button {
-  width: 60%;
+#graph_wrapper ion-fab[middle] {
+  top: 50%;
+  margin-top: -90px;
+}
+
+#graph_wrapper ion-fab[bottom] {
+  top: 50%;
+  margin-top: -30px;
+}
+
+#graph_wrapper ion-fab[right] {
+  right: 50%;
+  margin-right: -110px;
 }

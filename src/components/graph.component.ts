@@ -10,6 +10,7 @@ export class GraphComponent implements DoCheck, OnChanges {
 
   @Input() networkData: any;
   @Output() rootChange = new EventEmitter();
+  @Output() nodeDetails = new EventEmitter();
 
   private host;
   private htmlElement;
@@ -29,6 +30,7 @@ export class GraphComponent implements DoCheck, OnChanges {
 
   ngAfterViewInit() {
     this.zoom = d3.zoom();
+    // Note : https://bl.ocks.org/mbostock/2b534b091d80a8de39219dd076b316cd - Combine drag & zoom
 
     this.svg = this.host.append("svg")
       .attr("width", window.innerWidth)
@@ -41,7 +43,7 @@ export class GraphComponent implements DoCheck, OnChanges {
     this.zoomContainer = this.svg.append("g");
     this.svg.call(this.zoom.on("zoom", () => {
       this.zoomContainer.attr("transform", d3.event.transform);
-    }));
+    })).on("dblclick.zoom", null);
 
     this.zoomContainer.append("defs")
       .append("font-face")
@@ -63,7 +65,6 @@ export class GraphComponent implements DoCheck, OnChanges {
       this.linksContainer.selectAll("*").remove();
       this.nodesContainer.selectAll("*").remove();
       this.drawGraph();
-      this.zoom.scaleTo(this.zoomContainer, 1);
     }
   }
 
@@ -143,39 +144,72 @@ export class GraphComponent implements DoCheck, OnChanges {
         }
       });
 
-    this.nodesContainer
-      .selectAll("text").call(d3.drag()
+    let allTexts = this.nodesContainer.selectAll("text");
+
+    d3.selection.prototype.handleTap = function(singleCallback, doubleCallback) {
+      let last = 0, wait;
+      return this.each(function() {
+        let that = this, dnd = false;
+        d3.select(this).on("touchstart", function(e) {
+          if ((d3.event.timeStamp - last) < 500) {
+            if (wait) {
+              window.clearTimeout(wait);
+              wait = null;
+            }
+            return doubleCallback(that);
+          } else {
+            wait = window.setTimeout(
+              (function(evt) { return function() {
+                if(!dnd) {
+                  singleCallback(that);
+                }
+                wait = null;
+              };
+              })(d3.event), 500
+            );
+            last = d3.event.timeStamp;
+          }
+        });
+        d3.select(this).on("touchmove", () => {dnd = true;});
+      });
+    };
+
+    allTexts.handleTap(changeRootNode, panToNode);
+
+    allTexts.call(d3.drag()
       .on("start", dragstarted)
       .on("drag", dragged)
       .on("end", dragended));
 
-    this.nodesContainer
-      .selectAll("text").on("click", changeRootNode);
-
-    simulation.nodes(this.networkData.nodes)
-      .on("tick", ticked);
-
-    simulation.force("link")
-      .links(this.networkData.edges);
+    simulation.nodes(this.networkData.nodes).on("tick", ticked);
+    simulation.force("link").links(this.networkData.edges);
 
     function computeDistance(index) {
       if(index < 9) {
-        return nodeRadius + 30;
+        return nodeRadius + 40;
       } else if(index < 20) {
-        return 2 * nodeRadius + 30;
+        return 2 * nodeRadius + 40;
       } else {
-        return 3 * nodeRadius + 30;
+        return 3 * nodeRadius + 40;
       }
     }
 
     let that = this;
 
-    function changeRootNode() {
-      let clickedNode = d3.select(this).datum().id;
+    function changeRootNode(clickedElt) {
+      let clickedNode = d3.select(clickedElt).datum().id;
       if(clickedNode != that.newRoot) {
         that.newRoot = clickedNode;
         that.rootHasChanged = true;
       }
+    }
+
+    function panToNode(clickedElt) {
+      let tappedNode = d3.select(clickedElt);
+      let t = d3.zoomIdentity.translate(nominalWidth - parseFloat(tappedNode.attr("x"))*1.5,
+        nominalHeight - parseFloat(tappedNode.attr("y"))*1.5).scale(1.5);
+      that.zoomContainer.transition().duration(300).attr("transform", "translate(" + t.x + "," + t.y + ") scale(" + t.k + ")");
+      window.setTimeout(() => {that.nodeDetails.emit({nodeId: tappedNode.datum().id});}, 300);
     }
 
     function ticked() {

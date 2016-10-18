@@ -1,30 +1,42 @@
 import {Component} from '@angular/core';
-import {NavController, ModalController} from 'ionic-angular';
+import {ModalController, Events, NavParams} from 'ionic-angular';
 import {ExplorerService} from "../../providers/explorer.service";
 import {SearchPage} from "../search/search";
 import {AuthService} from "../../providers/auth.service";
+import {DataService} from "../../providers/data.service";
+import {DetailsPage} from "../details/details";
 
 @Component({
   templateUrl: 'graph.html'
 })
 export class GraphPage {
 
-  constructor(public navCtrl: NavController, public modalCtrl: ModalController,
-              public explorerService: ExplorerService, public authService: AuthService) {
+  public targetedNode: any;
+
+  constructor(public modalCtrl: ModalController, private dataService: DataService,
+              public explorerService: ExplorerService, public authService: AuthService, public events: Events) {
+    this.events.subscribe('actions:hide', (evt) => {
+      this.hideActions(evt);
+    });
   }
 
   rootNodeChange(event): void {
     this.explorerService.navigateTo(event.newRoot);
   }
 
-  homeNode(): void {
-    this.explorerService.navigateHome();
+  showNodeActions(event): void {
+    this.dataService.getNodeDetails(event.nodeId).subscribe(data => {
+      this.targetedNode = data.node;
+    });
   }
 
-  ionViewWillEnter() {
-    if(!this.authService.isLoggedIn()) {
-      document.querySelector("div.tabbar")['style'].display = 'none';
-    }
+  hideActions(event): void {
+    this.targetedNode = null;
+  }
+
+  homeNode(): void {
+    this.targetedNode = null;
+    this.explorerService.navigateHome();
   }
 
   ionViewDidEnter() {
@@ -35,6 +47,11 @@ export class GraphPage {
 
   modalSearch() {
     let modal = this.modalCtrl.create(SearchPage);
+    modal.present();
+  }
+
+  modalDetails() {
+    let modal = this.modalCtrl.create(DetailsPage, {node: this.targetedNode});
     modal.present();
   }
 }

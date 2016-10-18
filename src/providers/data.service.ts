@@ -28,4 +28,11 @@ export class DataService {
       return resp.json();
     });
   }
+
+  getNodeDetails(nodeId) : Observable<any> {
+    let url = this.config.backEndUrl + "/graph/details/" + nodeId + ".json";
+    return this.http.get(url).map(resp => {
+      return resp.json();
+    });
+  }
 }

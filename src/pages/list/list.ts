@@ -2,6 +2,8 @@ import {Component} from '@angular/core';
 import {NavController, ModalController} from 'ionic-angular';
 import {ExplorerService} from "../../providers/explorer.service";
 import {SearchPage} from "../search/search";
+import {DetailsPage} from "../details/details";
+import {DataService} from "../../providers/data.service";
 
 @Component({
   templateUrl: 'list.html'
@@ -9,7 +11,7 @@ import {SearchPage} from "../search/search";
 export class ListPage {
 
   constructor(public navCtrl: NavController, public modalCtrl: ModalController,
-              public explorerService: ExplorerService) {
+              public explorerService: ExplorerService, private dataService: DataService) {
   }
 
   rootNodeChange(event): void {
@@ -31,5 +33,12 @@ export class ListPage {
   modalSearch() {
     let modal = this.modalCtrl.create(SearchPage);
     modal.present();
+  }
+
+  modalDetails(nodeId) {
+    this.dataService.getNodeDetails(nodeId).subscribe(data => {
+      let modal = this.modalCtrl.create(DetailsPage, {node: data.node});
+      modal.present();
+    });
   }
 }

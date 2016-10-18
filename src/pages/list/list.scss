@@ -1,48 +1,7 @@
-div.font_avatar {
-  font-family: 'Ionicons';
-  font-size: 48px;
+ion-item-options > button.button {
+  padding: 0 1em;
 }
 
-div.font_avatar.concept {
-  color: map-get($colors, dark);
-}
-
-div.font_avatar.idea {
-  color: map-get($colors, bulb);
-}
-
-div.font_avatar.organization {
-  color: map-get($colors, favorite);
-}
-
-div.font_avatar.action {
-  color: map-get($colors, bulb);
-}
-
-div.font_avatar.event {
-  color: map-get($colors, danger);
-}
-
-div.font_avatar.competence {
-  color: map-get($colors, danger);
-}
-
-div.font_avatar.product {
-  color: map-get($colors, dark);
-}
-
-div.font_avatar.project {
-  color: map-get($colors, dark);
-}
-
-div.font_avatar.creativework {
-  color: map-get($colors, secondary);
-}
-
-div.font_avatar.schema {
-  color: map-get($colors, secondary);
-}
-
-div.font_avatar.person {
-  color: map-get($colors, primary);
+ion-item-options ion-icon {
+  font-size: 2em;
 }

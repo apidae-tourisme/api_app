@@ -11,15 +11,19 @@ import {ExplorerService} from "../providers/explorer.service";
 import {NetworkContext} from "../providers/network.context";
 import {MapPage} from "../pages/map/map";
 import {AuthService} from "../providers/auth.service";
+import {LoginPage} from "../pages/login/login";
+import {DetailsPage} from "../pages/details/details";
 
 @NgModule({
   declarations: [
     ApiApp,
     TabsPage,
+    LoginPage,
     GraphPage,
     MapPage,
     ListPage,
     SearchPage,
+    DetailsPage,
     GraphComponent
   ],
   imports: [
@@ -29,10 +33,12 @@ import {AuthService} from "../providers/auth.service";
   entryComponents: [
     ApiApp,
     TabsPage,
+    LoginPage,
     GraphPage,
     MapPage,
     ListPage,
-    SearchPage
+    SearchPage,
+    DetailsPage
   ],
   providers: [
     AuthService,

@@ -1,0 +1,38 @@
+<ion-header>
+  <ion-navbar color="danger">
+    <ion-title text-center>{{node.fullName()}}</ion-title>
+    <ion-buttons right>
+      <button ion-button id="header_close" (click)="closeModal()">Fermer</button>
+    </ion-buttons>
+  </ion-navbar>
+</ion-header>
+
+<ion-content>
+  <ion-list>
+    <ion-item>
+      <ion-thumbnail item-left>
+        <ion-img *ngIf="node.picture" [src]="node.picture"></ion-img>
+        <div *ngIf="!node.picture" class="font_avatar {{node.category}}" text-center>{{node.code}}</div>
+      </ion-thumbnail>
+      <h2 class="dowrap">{{node.fullName()}}</h2>
+      <p *ngIf="node.role" class="dowrap">{{node.role}}</p>
+    </ion-item>
+
+    <ion-item *ngIf="node.telephone">
+      <ion-icon name="call" item-left></ion-icon>
+      {{node.telephone}}
+    </ion-item>
+    <ion-item *ngIf="node.mobilePhone">
+      <ion-icon name="phone-portrait" item-left></ion-icon>
+      {{node.mobilePhone}}
+    </ion-item>
+    <ion-item *ngIf="node.email">
+      <ion-icon name="at" item-left></ion-icon>
+      {{node.email}}
+    </ion-item>
+    <ion-item *ngIf="node.description">
+      <p class="dowrap">{{node.description}}</p>
+    </ion-item>
+  </ion-list>
+
+</ion-content>
