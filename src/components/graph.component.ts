@@ -1,4 +1,5 @@
 import {Component, ElementRef, Input, OnChanges, EventEmitter, Output, DoCheck, SimpleChanges} from "@angular/core";
+import {Platform} from "ionic-angular";
 
 declare var d3: any;
 
@@ -22,10 +23,13 @@ export class GraphComponent implements DoCheck, OnChanges {
   private rootHasChanged: boolean;
   private zoom;
   private zoomContainer;
+  private defaultTransform;
+  private isDesktop: boolean;
 
-  constructor(private element: ElementRef) {
+  constructor(private element: ElementRef, platform: Platform) {
     this.htmlElement = this.element.nativeElement;
     this.host = d3.select(this.element.nativeElement);
+    this.isDesktop = platform.is('core');
   }
 
   ngAfterViewInit() {
@@ -57,7 +61,10 @@ export class GraphComponent implements DoCheck, OnChanges {
     this.nodesContainer = this.zoomContainer.append("g")
       .attr("class", "nodes");
 
+    this.setUpInteractions(this.isDesktop);
+
     this.drawGraph();
+    this.defaultTransform = d3.zoomTransform(this.zoomContainer);
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -65,6 +72,7 @@ export class GraphComponent implements DoCheck, OnChanges {
       this.linksContainer.selectAll("*").remove();
       this.nodesContainer.selectAll("*").remove();
       this.drawGraph();
+      this.zoomContainer.attr("transform", this.defaultTransform);
     }
   }
 
@@ -73,6 +81,36 @@ export class GraphComponent implements DoCheck, OnChanges {
       this.rootChange.emit({newRoot: this.newRoot});
       this.rootHasChanged = false;
     }
+  }
+
+  setUpInteractions(isDesktop): void {
+    d3.selection.prototype.handleTap = function(singleCallback, doubleCallback) {
+      let last = 0, wait;
+      return this.each(function() {
+        let that = this, dnd = false;
+        d3.select(this).on((isDesktop ? "mousedown" : "touchstart"), function(e) {
+          if ((d3.event.timeStamp - last) < 500) {
+            if (wait) {
+              window.clearTimeout(wait);
+              wait = null;
+            }
+            return doubleCallback(that);
+          } else {
+            wait = window.setTimeout(
+              (function(evt) { return function() {
+                if(!dnd) {
+                  singleCallback(that);
+                }
+                wait = null;
+              };
+              })(d3.event), 500
+            );
+            last = d3.event.timeStamp;
+          }
+        });
+        d3.select(this).on((isDesktop ? "dragstart" : "touchmove"), () => {dnd = true;});
+      });
+    };
   }
 
   drawGraph(): void {
@@ -145,34 +183,6 @@ export class GraphComponent implements DoCheck, OnChanges {
       });
 
     let allTexts = this.nodesContainer.selectAll("text");
-
-    d3.selection.prototype.handleTap = function(singleCallback, doubleCallback) {
-      let last = 0, wait;
-      return this.each(function() {
-        let that = this, dnd = false;
-        d3.select(this).on("touchstart", function(e) {
-          if ((d3.event.timeStamp - last) < 500) {
-            if (wait) {
-              window.clearTimeout(wait);
-              wait = null;
-            }
-            return doubleCallback(that);
-          } else {
-            wait = window.setTimeout(
-              (function(evt) { return function() {
-                if(!dnd) {
-                  singleCallback(that);
-                }
-                wait = null;
-              };
-              })(d3.event), 500
-            );
-            last = d3.event.timeStamp;
-          }
-        });
-        d3.select(this).on("touchmove", () => {dnd = true;});
-      });
-    };
 
     allTexts.handleTap(changeRootNode, panToNode);
 
