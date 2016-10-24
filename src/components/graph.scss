@@ -15,7 +15,7 @@ graph {
 
 graph text.icon {
   font-family: 'Ionicons';
-  font-size: 42px;
+  font-size: 28px;
 }
 
 graph text.icon.icon-bg {
@@ -23,68 +23,70 @@ graph text.icon.icon-bg {
 }
 
 graph text.icon.root {
-  font-size: 52px;
+  font-size: 40px;
 }
 
 graph text.icon.icon-bg.root {
-  font-size: 96px;
+  font-size: 150px;
 }
 
-graph text.icon.concept {
+graph rect.icon.concept {
   fill: map-get($colors, dark);
 }
 
-graph text.icon.idea {
+graph rect.icon.idea {
   fill: map-get($colors, bulb);
 }
 
-graph text.icon.organization {
+graph rect.icon.organization {
   fill: map-get($colors, favorite);
 }
 
-graph text.icon.action {
+graph rect.icon.action {
   fill: map-get($colors, bulb);
 }
 
-graph text.icon.event {
+graph rect.icon.event {
   fill: map-get($colors, danger);
 }
 
-graph text.icon.competence {
+graph rect.icon.competence {
   fill: map-get($colors, danger);
 }
 
-graph text.icon.product {
+graph rect.icon.product {
   fill: map-get($colors, dark);
 }
 
-graph text.icon.project {
+graph rect.icon.project {
   fill: map-get($colors, dark);
 }
 
-graph text.icon.creativework {
+graph rect.icon.creativework {
   fill: map-get($colors, secondary);
 }
 
-graph text.icon.schema {
+graph rect.icon.schema {
   fill: map-get($colors, secondary);
 }
 
-graph text.icon.person {
+graph rect.icon.person {
   fill: #86c7e8;
 }
 
 graph image.img-node {
-  clip-path: circle(32px at 36px 34px);
-  width: 72px;
-  height: 72px;
-  fill: #fff;
+  clip-path: circle(16px at 16px 16px);
+  width: 32px;
+  height: 32px;
 }
 
 graph image.img-node.root {
-  clip-path: circle(38px at 44px 42px);
-  width: 88px;
-  height: 88px;
+  clip-path: circle(28px at 30px 28px);
+  width: 58px;
+  height: 58px;
+  fill: black;
+  stroke: black;
+  stroke-width: 2px;
 }
 
 graph > * {

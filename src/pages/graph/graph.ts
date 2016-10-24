@@ -11,31 +11,15 @@ import {DetailsPage} from "../details/details";
 })
 export class GraphPage {
 
-  public targetedNode: any;
-
   constructor(public modalCtrl: ModalController, private dataService: DataService,
               public explorerService: ExplorerService, public authService: AuthService, public events: Events) {
-    this.events.subscribe('actions:hide', (evt) => {
-      this.hideActions(evt);
-    });
   }
 
   rootNodeChange(event): void {
     this.explorerService.navigateTo(event.newRoot);
   }
 
-  showNodeActions(event): void {
-    this.dataService.getNodeDetails(event.nodeId).subscribe(data => {
-      this.targetedNode = data.node;
-    });
-  }
-
-  hideActions(event): void {
-    this.targetedNode = null;
-  }
-
   homeNode(): void {
-    this.targetedNode = null;
     this.explorerService.navigateHome();
   }
 
@@ -51,7 +35,9 @@ export class GraphPage {
   }
 
   modalDetails() {
-    let modal = this.modalCtrl.create(DetailsPage, {node: this.targetedNode});
-    modal.present();
+    this.dataService.getNodeDetails(this.explorerService.networkContext.node).subscribe(data => {
+      let modal = this.modalCtrl.create(DetailsPage, {node: data.node});
+      modal.present();
+    });
   }
 }

@@ -5,3 +5,21 @@ ion-item-options > button.button {
 ion-item-options ion-icon {
   font-size: 2em;
 }
+
+#root_node {
+  border-bottom: 3px solid map-get($colors, danger);
+}
+
+#root_node.item-block .item-inner {
+  border-bottom: none;
+}
+
+#fixed_nodes {
+  position: fixed;
+  z-index: 99;
+  width: 100%;
+}
+
+#scroll_nodes {
+  margin-top: 200px;
+}

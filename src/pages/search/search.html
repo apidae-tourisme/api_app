@@ -13,15 +13,11 @@
   <div id="loading_spinner" *ngIf="!nodes" text-center><ion-spinner name="dots"></ion-spinner><span light>Chargement en cours</span></div>
   <ion-searchbar (ionInput)="filterNodes($event)" [showCancelButton]="true" [cancelButtonText]="'Annuler'" placeholder="Rechercher"></ion-searchbar>
   <ion-list [virtualScroll]="nodes">
-    <ion-item-sliding *virtualItem="let node">
-      <ion-item>
-        <h2>{{node.name}}</h2>
-        <p>{{node.description}}</p>
-      </ion-item>
-      <ion-item-options>
-        <button ion-button color="primary" (click)="modalDetails(node.id)"><ion-icon name="search"></ion-icon></button>
-        <button ion-button color="secondary" (click)="navigateTo(node.id)"><ion-icon name="git-network"></ion-icon></button>
-      </ion-item-options>
-    </ion-item-sliding>
+    <ion-item *virtualItem="let node">
+      <h2>{{node.name}}</h2>
+      <p>{{node.description}}</p>
+      <button ion-button item-right large color="primary" (click)="modalDetails(node.id)"><ion-icon name="search"></ion-icon></button>
+      <button ion-button item-right large color="secondary" (click)="navigateTo(node.id)"><ion-icon name="git-network"></ion-icon></button>
+    </ion-item>
   </ion-list>
 </ion-content>

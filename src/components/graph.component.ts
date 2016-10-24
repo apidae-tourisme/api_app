@@ -1,5 +1,4 @@
 import {Component, ElementRef, Input, OnChanges, EventEmitter, Output, DoCheck, SimpleChanges} from "@angular/core";
-import {Platform} from "ionic-angular";
 
 declare var d3: any;
 
@@ -11,7 +10,6 @@ export class GraphComponent implements DoCheck, OnChanges {
 
   @Input() networkData: any;
   @Output() rootChange = new EventEmitter();
-  @Output() nodeDetails = new EventEmitter();
 
   private host;
   private htmlElement;
@@ -24,12 +22,10 @@ export class GraphComponent implements DoCheck, OnChanges {
   private zoom;
   private zoomContainer;
   private defaultTransform;
-  private isDesktop: boolean;
 
-  constructor(private element: ElementRef, platform: Platform) {
+  constructor(private element: ElementRef) {
     this.htmlElement = this.element.nativeElement;
     this.host = d3.select(this.element.nativeElement);
-    this.isDesktop = platform.is('core');
   }
 
   ngAfterViewInit() {
@@ -61,8 +57,6 @@ export class GraphComponent implements DoCheck, OnChanges {
     this.nodesContainer = this.zoomContainer.append("g")
       .attr("class", "nodes");
 
-    this.setUpInteractions(this.isDesktop);
-
     this.drawGraph();
     this.defaultTransform = d3.zoomTransform(this.zoomContainer);
   }
@@ -83,38 +77,8 @@ export class GraphComponent implements DoCheck, OnChanges {
     }
   }
 
-  setUpInteractions(isDesktop): void {
-    d3.selection.prototype.handleTap = function(singleCallback, doubleCallback) {
-      let last = 0, wait;
-      return this.each(function() {
-        let that = this, dnd = false;
-        d3.select(this).on((isDesktop ? "mousedown" : "touchstart"), function(e) {
-          if ((d3.event.timeStamp - last) < 500) {
-            if (wait) {
-              window.clearTimeout(wait);
-              wait = null;
-            }
-            return doubleCallback(that);
-          } else {
-            wait = window.setTimeout(
-              (function(evt) { return function() {
-                if(!dnd) {
-                  singleCallback(that);
-                }
-                wait = null;
-              };
-              })(d3.event), 500
-            );
-            last = d3.event.timeStamp;
-          }
-        });
-        d3.select(this).on((isDesktop ? "dragstart" : "touchmove"), () => {dnd = true;});
-      });
-    };
-  }
-
   drawGraph(): void {
-    let labelSize = 12, nodeRadius = 40;
+    let labelSize = 10, nodeRadius = 60;
     let nominalHeight = this.dimensions.height / 2;
     let nominalWidth = this.dimensions.width / 2;
 
@@ -122,7 +86,7 @@ export class GraphComponent implements DoCheck, OnChanges {
       .alphaMin(0.1)
       .force("link", d3.forceLink().id(function (d) { return d.id; }).distance(function (link, index) { return computeDistance(index); }))
       .force("charge", d3.forceManyBody().strength(function(node, index) {
-        return -800;
+        return node.isRoot ? -2000 : -800;
       }))
       .force("yCharge", d3.forceY(0).strength(function(node, index) {
         return node.isPrevious ? 0 : 0.1;
@@ -143,14 +107,17 @@ export class GraphComponent implements DoCheck, OnChanges {
 
     let textEnter = textData.enter();
 
+    let nodesBg = textEnter.append("rect")
+      .attr("width", function(d) {return d.isRoot ? 120 : 80;})
+      .attr("height", function(d) {return d.isRoot ? 160 : 80;})
+      .attr("rx", function(d) { return d.isRoot ? 20 : 40; })
+      .attr("ry", function(d) { return d.isRoot ? 20 : 40; })
+      .attr("class", function(d) { return "icon icon-bg " + d.category + (d.isRoot ? " root" : ""); })
+      .attr("text-anchor", "middle");
+
     let nodesImg = textEnter.append("image")
       .attr("class", function(d) {return d.picture ? (d.isRoot ? "root img-node" : "img-node") : "";})
       .attr("xlink:href", function(d) {return d.picture;});
-
-    let nodesBg = textEnter.append("text")
-      .attr("class", function(d) { return "icon icon-bg " + d.category + (d.isRoot ? " root" : ""); })
-      .attr("text-anchor", "middle")
-      .text(function(d) {return d.picture ? "\uf1f6" : "\uf1f7";});
 
     let nodesText = textEnter.append("text")
       .attr("class", function(d) {return "icon" + (d.isRoot ? " root" : "");})
@@ -159,34 +126,33 @@ export class GraphComponent implements DoCheck, OnChanges {
       .text(function (d) { return d.picture ? '' : d.code; });
 
     let nodesLabel = textEnter.append("text")
-      .attr("text-anchor", "middle")
+      .attr("text-anchor", function(d) {return d.isRoot ? "left" : "middle";})
       .attr("font-size", labelSize + "px")
+      .attr("fill", "white")
       .html(function (d) {
-        var maxLength = nodeRadius * 2 / labelSize;
-        if (d.label.length > maxLength && !d.isPrevious) {
-          let tspans = '',
-            words = d.label.split(/\s+/),
-            currentLine = [],
-            firstLine = true;
-          for (let i = 0; i < words.length; i++) {
-            currentLine.push(words[i]);
-            if (currentLine.join(' ').length > maxLength || i == words.length - 1) {
-              tspans += '<tspan dy="' + (firstLine ? 0 : 1) + 'em">' + currentLine.join(' ') + '</tspan>';
-              currentLine = [];
-              firstLine = false;
-            }
-          }
-          return tspans;
-        } else {
-          return d.label;
+        let maxLength = 3;
+        return splitLabels(d.label, maxLength);
+      });
+    let rootDesc = textEnter.append("text")
+      .attr("text-anchor", "left")
+      .attr("font-size", labelSize + "px")
+      .attr("fill", "white")
+      .html(function (d) {
+        if(d.isRoot) {
+          let maxLength = 12;
+          return splitLabels(d.description, maxLength);
         }
       });
 
     let allTexts = this.nodesContainer.selectAll("text");
-
-    allTexts.handleTap(changeRootNode, panToNode);
-
+    allTexts.on("click", changeRootNode);
     allTexts.call(d3.drag()
+      .on("start", dragstarted)
+      .on("drag", dragged)
+      .on("end", dragended));
+
+    nodesImg.on("click", changeRootNode);
+    nodesImg.call(d3.drag()
       .on("start", dragstarted)
       .on("drag", dragged)
       .on("end", dragended));
@@ -206,20 +172,34 @@ export class GraphComponent implements DoCheck, OnChanges {
 
     let that = this;
 
-    function changeRootNode(clickedElt) {
-      let clickedNode = d3.select(clickedElt).datum().id;
+    function changeRootNode() {
+      let clickedNode = d3.select(this).datum().id;
       if(clickedNode != that.newRoot) {
         that.newRoot = clickedNode;
         that.rootHasChanged = true;
       }
     }
 
-    function panToNode(clickedElt) {
-      let tappedNode = d3.select(clickedElt);
-      let t = d3.zoomIdentity.translate(nominalWidth - parseFloat(tappedNode.attr("x"))*1.5,
-        nominalHeight - parseFloat(tappedNode.attr("y"))*1.5).scale(1.5);
-      that.zoomContainer.transition().duration(300).attr("transform", "translate(" + t.x + "," + t.y + ") scale(" + t.k + ")");
-      window.setTimeout(() => {that.nodeDetails.emit({nodeId: tappedNode.datum().id});}, 300);
+    function splitLabels(inputText, maxLength) {
+      if (inputText.length > maxLength) {
+        let tspans = '',
+          words = inputText.split(/\s+/),
+          currentLine = [],
+          firstLine = true;
+        for (let i = 0; i < words.length; i++) {
+          if(words[i].indexOf('@') == -1 && words[i].indexOf('tel:') == -1) {
+            currentLine.push(words[i]);
+            if (currentLine.join(' ').length > maxLength || i == words.length - 1) {
+              tspans += '<tspan dy="1em">' + currentLine.join(' ') + '</tspan>';
+              currentLine = [];
+              firstLine = false;
+            }
+          }
+        }
+        return tspans;
+      } else {
+        return '<tspan dy="1em">' + inputText + '</tspan>';
+      }
     }
 
     function ticked() {
@@ -233,48 +213,58 @@ export class GraphComponent implements DoCheck, OnChanges {
           return parseFloat(y) - 30;
         })
         .attr("x2", function (d) {
-          return parseFloat(d.target.x);
+          return parseFloat(d.target.x) + 8;
         })
         .attr("y2", function (d) {
-          return parseFloat(d.target.y) - 30;
+          return parseFloat(d.target.y);
         });
 
       nodesBg
         .attr("x", function (d) {
-          return d.isPrevious ? nominalWidth : d.x;
+          return d.isPrevious ? (nominalWidth - 40) : (d.isRoot ? (nominalWidth - 60) : (d.x - 40));
         })
         .attr("y", function (d) {
-          return d.isPrevious ? (nominalHeight * 2 - 40) : d.y;
+          return d.isPrevious ? (nominalHeight * 2 - 110) : (d.isRoot ? (nominalHeight - 80) : (d.y - 70));
         });
 
       nodesImg
         .attr("x", function (d) {
           let x = d.isPrevious ? nominalWidth : d.x;
-          return d.isRoot ? (x - 44) : (x - 36);
+          return d.isRoot ? (nominalWidth - 60) : (x - 16);
         })
         .attr("y", function (d) {
           let y = d.isPrevious ? (nominalHeight * 2 - 40) : d.y;
-          return d.isRoot ? (y - 80) : (y - 64);
+          return d.isRoot ? (nominalHeight - 80) : (y - 64);
         });
 
       nodesLabel
         .attr("x", function (d) {
-          let x = d.isPrevious ? nominalWidth : d.x;
+          let x = (d.isPrevious || d.isRoot) ? nominalWidth : d.x;
           d3.select(this).selectAll("tspan").attr("x", x);
           return x;
         })
         .attr("y", function (d) {
-          let y = d.isPrevious ? (nominalHeight * 2 - 40) : d.y;
-          return parseFloat(y) + 12;
+          let y = d.isPrevious ? (nominalHeight * 2 - 80) : parseFloat(d.y) - 40;
+          return (d.isRoot ? (nominalHeight - 85) : y) + 12;
+        });
+
+      rootDesc
+        .attr("x", function (d) {
+          d3.select(this).selectAll("tspan").attr("x", (nominalWidth - 53));
+          return (nominalWidth - 53);
+        })
+        .attr("y", function (d) {
+          return nominalHeight - 20;
         });
 
       nodesText
         .attr("x", function (d) {
-          return d.isPrevious ? nominalWidth : d.x;
+          let x = d.isPrevious ? nominalWidth : d.x;
+          return d.isRoot ? (nominalWidth - 30) : x;
         })
         .attr("y", function (d) {
           let y = d.isPrevious ? (nominalHeight * 2 - 40) : d.y;
-          return d.isRoot ? (parseFloat(y) - 17) : (parseFloat(y) - 14);
+          return d.isRoot ? (nominalHeight - 40) : (parseFloat(y) - 35);
         });
     }
 

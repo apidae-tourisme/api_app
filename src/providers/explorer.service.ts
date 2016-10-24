@@ -9,6 +9,8 @@ export class ExplorerService {
 
   networkContext: NetworkContext;
   networkData: any;
+  rootNode: Seed;
+  previousNode: Seed;
 
   constructor(private dataService: DataService) {
     this.networkContext = new NetworkContext();
@@ -43,6 +45,12 @@ export class ExplorerService {
         let node = nodes[i];
         if (node.id) {
           let networkNode = new Seed(node, node.id == this.networkContext.node, this.networkContext.isPrevious(node.id));
+          if(networkNode.isRoot) {
+            this.rootNode = networkNode;
+          }
+          if(networkNode.isPrevious) {
+            this.previousNode = networkNode;
+          }
           parsedData.nodes.push(networkNode);
           parsedData.edges = data.links;
         }
