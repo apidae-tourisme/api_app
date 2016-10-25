@@ -12,6 +12,7 @@ export class Seed {
   email: string;
   telephone: string;
   mobilePhone: string;
+  fixed: boolean;
 
   public constructor(nodeData: any, public isRoot: boolean, public isPrevious: boolean) {
     this.id = nodeData.id;

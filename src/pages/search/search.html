@@ -16,8 +16,8 @@
     <ion-item *virtualItem="let node">
       <h2>{{node.name}}</h2>
       <p>{{node.description}}</p>
-      <button ion-button item-right large color="primary" (click)="modalDetails(node.id)"><ion-icon name="search"></ion-icon></button>
-      <button ion-button item-right large color="secondary" (click)="navigateTo(node.id)"><ion-icon name="git-network"></ion-icon></button>
+      <button ion-button item-right outline large color="primary" (click)="modalDetails(node.id)"><ion-icon name="search"></ion-icon></button>
+      <button ion-button item-right outline large color="secondary" (click)="navigateTo(node.id)"><ion-icon name="git-network"></ion-icon></button>
     </ion-item>
   </ion-list>
 </ion-content>

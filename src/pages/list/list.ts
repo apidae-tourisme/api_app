@@ -41,4 +41,8 @@ export class ListPage {
       modal.present();
     });
   }
+
+  // switchToNetwork() {
+  //   this.navCtrl.popToRoot();
+  // }
 }

@@ -15,7 +15,7 @@ graph {
 
 graph text.icon {
   font-family: 'Ionicons';
-  font-size: 28px;
+  font-size: 30px;
 }
 
 graph text.icon.icon-bg {
@@ -23,7 +23,7 @@ graph text.icon.icon-bg {
 }
 
 graph text.icon.root {
-  font-size: 40px;
+  font-size: 44px;
 }
 
 graph text.icon.icon-bg.root {
@@ -81,12 +81,9 @@ graph image.img-node {
 }
 
 graph image.img-node.root {
-  clip-path: circle(28px at 30px 28px);
-  width: 58px;
-  height: 58px;
-  fill: black;
-  stroke: black;
-  stroke-width: 2px;
+  clip-path: circle(24px at 24px 24px);
+  width: 48px;
+  height: 48px;
 }
 
 graph > * {

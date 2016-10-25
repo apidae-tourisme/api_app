@@ -24,13 +24,21 @@
       <h2>{{explorerService.previousNode.label}}</h2>
     </ion-item>
     <ion-item text-wrap id="root_node">
-      <button ion-button large color="primary" item-right (click)="modalDetails(explorerService.rootNode.id)"><ion-icon name="search"></ion-icon></button>
+      <button ion-button large color="primary" outline item-right (click)="modalDetails(explorerService.rootNode.id)"><ion-icon name="search"></ion-icon></button>
+      <!--<button ion-button item-right outline large color="secondary" (click)="switchToNetwork()"><ion-icon name="git-network"></ion-icon></button>-->
       <ion-thumbnail item-left>
         <ion-img *ngIf="explorerService.rootNode.picture" [src]="explorerService.rootNode.picture"></ion-img>
         <div *ngIf="!explorerService.rootNode.picture" class="font_avatar {{explorerService.rootNode.category}}" text-center>{{explorerService.rootNode.code}}</div>
       </ion-thumbnail>
       <h2>{{explorerService.rootNode.label}}</h2>
       <p>{{explorerService.rootNode.description}}</p>
+      <p>
+        Contact :
+        <a *ngIf="explorerService.rootNode.telephone" ion-button large item-right icon-only outline color="primary" href="tel:{{node.telephone}}"><ion-icon name="call"></ion-icon></a>
+        <a *ngIf="explorerService.rootNode.mobilePhone" ion-button large item-right icon-only outline color="primary" href="tel:{{node.mobilePhone}}"><ion-icon name="phone-portrait"></ion-icon></a>
+        <a *ngIf="explorerService.rootNode.mobilePhone" ion-button large item-right icon-only outline color="secondary" href="sms:{{node.mobilePhone}}"><ion-icon name="text"></ion-icon></a>
+        <a *ngIf="explorerService.rootNode.email" ion-button large item-right icon-only outline color="danger" href="mailto:{{node.email}}"><ion-icon name="mail"></ion-icon></a>
+      </p>
     </ion-item>
   </div>
   <ion-list id="scroll_nodes" *ngIf="explorerService.networkData && explorerService.networkData.nodes">
@@ -41,7 +49,7 @@
           <div *ngIf="!node.picture" class="font_avatar {{node.category}}" text-center>{{node.code}}</div>
         </ion-thumbnail>
         <h2>{{node.label}}</h2>
-        <button ion-button clear item-right><ion-icon large name="arrow-forward"></ion-icon></button>
+        <button ion-button large clear item-right><ion-icon name="arrow-forward"></ion-icon></button>
       </ion-item>
     </div>
   </ion-list>
