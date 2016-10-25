@@ -23,8 +23,8 @@ export class SearchPage {
 
     if (val && val.trim() != '') {
       this.nodes = this.nodes.filter((item) => {
-        return (item.name.toLowerCase().indexOf(val.toLowerCase()) > -1) ||
-          (item.description.toLowerCase().indexOf(val.toLowerCase()) > -1);
+        return (item.name && item.name.toLowerCase().indexOf(val.toLowerCase()) > -1) ||
+          (item.description && item.description.toLowerCase().indexOf(val.toLowerCase()) > -1);
       })
     }
   }
