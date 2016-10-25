@@ -20,16 +20,16 @@
 
     <ion-item *ngIf="node.telephone">
       {{node.telephone}}
-      <a ion-button large item-right icon-only outline color="primary" href="tel:{{node.telephone}}"><ion-icon name="call"></ion-icon></a>
+      <a ion-button large item-right icon-only outline color="primary" [href]="sanitizeUrl('tel:' + node.telephone)"><ion-icon name="call"></ion-icon></a>
     </ion-item>
     <ion-item *ngIf="node.mobilePhone">
       {{node.mobilePhone}}
-      <a ion-button large item-right icon-only outline color="primary" href="tel:{{node.mobilePhone}}"><ion-icon name="phone-portrait"></ion-icon></a>
-      <a ion-button large item-right icon-only outline color="secondary" href="sms:{{node.mobilePhone}}"><ion-icon name="text"></ion-icon></a>
+      <a ion-button large item-right icon-only outline color="primary" [href]="sanitizeUrl('tel:' + node.mobilePhone)"><ion-icon name="phone-portrait"></ion-icon></a>
+      <a ion-button large item-right icon-only outline color="secondary" [href]="sanitizeUrl('sms:' + node.mobilePhone)"><ion-icon name="text"></ion-icon></a>
     </ion-item>
     <ion-item *ngIf="node.email">
       {{node.email}}
-      <a ion-button large item-right icon-only outline color="danger" href="mailto:{{node.email}}"><ion-icon name="mail"></ion-icon></a>
+      <a ion-button large item-right icon-only outline color="danger" [href]="sanitizeUrl('mailto:' + node.email)"><ion-icon name="mail"></ion-icon></a>
     </ion-item>
     <ion-item *ngIf="node.description">
       <p class="dowrap">{{node.description}}</p>

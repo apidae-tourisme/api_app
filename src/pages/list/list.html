@@ -32,13 +32,6 @@
       </ion-thumbnail>
       <h2>{{explorerService.rootNode.label}}</h2>
       <p>{{explorerService.rootNode.description}}</p>
-      <p>
-        Contact :
-        <a *ngIf="explorerService.rootNode.telephone" ion-button large item-right icon-only outline color="primary" href="tel:{{node.telephone}}"><ion-icon name="call"></ion-icon></a>
-        <a *ngIf="explorerService.rootNode.mobilePhone" ion-button large item-right icon-only outline color="primary" href="tel:{{node.mobilePhone}}"><ion-icon name="phone-portrait"></ion-icon></a>
-        <a *ngIf="explorerService.rootNode.mobilePhone" ion-button large item-right icon-only outline color="secondary" href="sms:{{node.mobilePhone}}"><ion-icon name="text"></ion-icon></a>
-        <a *ngIf="explorerService.rootNode.email" ion-button large item-right icon-only outline color="danger" href="mailto:{{node.email}}"><ion-icon name="mail"></ion-icon></a>
-      </p>
     </ion-item>
   </div>
   <ion-list id="scroll_nodes" *ngIf="explorerService.networkData && explorerService.networkData.nodes">
