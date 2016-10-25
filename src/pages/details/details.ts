@@ -1,7 +1,7 @@
 import {Component} from '@angular/core';
 import {NavParams, Events, ViewController} from 'ionic-angular';
 import {Seed} from "../../components/seed.model";
-import {DomSanitizer} from "@angular/platform-browser";
+import {DomSanitizer, SafeUrl} from "@angular/platform-browser";
 
 @Component({
   templateUrl: 'details.html'
@@ -20,7 +20,7 @@ export class DetailsPage {
     // this.events.publish('actions:hide');
   }
 
-  sanitizeUrl(url) {
+  sanitizeUrl(url): SafeUrl {
     return this.sanitizer.bypassSecurityTrustUrl(url);
   }
 }
