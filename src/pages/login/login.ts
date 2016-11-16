@@ -1,7 +1,6 @@
 import {Component} from '@angular/core';
-import {NavController} from 'ionic-angular';
+import {NavController, Platform} from 'ionic-angular';
 import {AuthService} from "../../providers/auth.service";
-import {InAppBrowser} from "ionic-native";
 import {TabsPage} from "../tabs/tabs";
 
 @Component({
@@ -9,32 +8,36 @@ import {TabsPage} from "../tabs/tabs";
 })
 export class LoginPage {
 
-  constructor(public navCtrl: NavController, public authService: AuthService) {
+  constructor(public navCtrl: NavController, public authService: AuthService, private platform: Platform) {
   }
 
-  ngAfterViewInit() {
-    if(this.authService.isLoggedIn()) {
-      console.log('user is already logged in');
-      this.navCtrl.setRoot(TabsPage, {}, {animate: false});
+  ionViewDidEnter() {
+    console.log('view did enter');
+    let url = window.location.href;
+    if(url.indexOf('auth_token') != -1 && url.indexOf('client_id') != -1 && url.indexOf('uid') != -1) {
+      let callBackParams = url.slice(url.indexOf('?'));
+      let storedAuth = this.authService.setLocalAuthData(callBackParams);
+      if(storedAuth) {
+        storedAuth.then(() => this.loggedInRedirect());
+      }
+    } else {
+      this.platform.ready().then(() => {
+        console.log('loading auth data');
+        this.authService.getLocalAuthData().then(authData => {
+          console.log('authData : ' + JSON.stringify(authData));
+          if(authData) {
+            this.loggedInRedirect();
+          }
+        })
+      });
     }
   }
 
   authenticateUser(): void {
-    // Note : use a specific path instead of the current location ?
-    let authUrl = this.authService.authUrl() + '?auth_origin_url=' + encodeURIComponent(window.location.href);
-    let browser = new InAppBrowser(authUrl, '_blank', 'location=no');
-    browser.on('loadstop').subscribe(data => {
-      let callBackUrl = data['url'];
-      if(callBackUrl && callBackUrl.indexOf('auth_token') != -1 && callBackUrl.indexOf('client_id') != -1 &&
-        callBackUrl.indexOf('uid') != -1) {
-        let callBackParams = callBackUrl.slice(callBackUrl.indexOf('?'));
-        this.authService.loadQueryAuthData(callBackParams);
-        browser.close();
-        this.navCtrl.setRoot(TabsPage, {}, {animate: false});
-      }
-    });
-    browser.on('loaderror').subscribe(data => {
-      console.log('OAuth request error : ' + JSON.stringify(data));
-    });
+    this.authService.authenticate(() => this.loggedInRedirect(), () => {});
+  }
+
+  loggedInRedirect(): void {
+    this.navCtrl.setRoot(TabsPage, {}, {animate: false});
   }
 }

@@ -13,6 +13,7 @@ import {MapPage} from "../pages/map/map";
 import {AuthService} from "../providers/auth.service";
 import {LoginPage} from "../pages/login/login";
 import {DetailsPage} from "../pages/details/details";
+import { Storage } from '@ionic/storage';
 
 @NgModule({
   declarations: [
@@ -44,7 +45,8 @@ import {DetailsPage} from "../pages/details/details";
     AuthService,
     DataService,
     ExplorerService,
-    NetworkContext
+    NetworkContext,
+    Storage
   ]
 })
 export class AppModule {

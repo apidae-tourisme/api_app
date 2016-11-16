@@ -125,6 +125,8 @@ export class GraphComponent implements DoCheck, OnChanges {
 
     let nodesImg = textEnter.append("image")
       .attr("class", function(d) {return d.picture ? (d.isRoot ? "root img-node" : "img-node") : "";})
+      .attr("width", function(d) {return d.isRoot ? 48 : 32;})
+      .attr("height", function(d) {return d.isRoot ? 48 : 32;})
       .attr("xlink:href", function(d) {return d.picture;});
 
     let nodesText = textEnter.append("text")

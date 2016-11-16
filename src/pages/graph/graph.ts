@@ -24,9 +24,10 @@ export class GraphPage {
   }
 
   ionViewDidEnter() {
-    if(this.authService.isLoggedIn()) {
+    // this.
+    // if(this.authService.isLoggedIn()) {
       this.explorerService.exploreGraph(true);
-    }
+    // }
   }
 
   modalSearch() {
