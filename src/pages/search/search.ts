@@ -11,10 +11,11 @@ export class SearchPage {
 
   private cachedNodes: Array<any>;
   public nodes: Array<any>;
+  public showSearch: boolean;
 
   constructor(public navCtrl: NavController, public modalCtrl: ModalController, public events: Events,
-              private dataService: DataService, private explorerService: ExplorerService) {
-    this.loadNodes();
+              protected dataService: DataService, public explorerService: ExplorerService) {
+    this.showSearch = false;
   }
 
   filterNodes(ev: any) {
@@ -30,26 +31,28 @@ export class SearchPage {
   }
 
   loadNodes(): void {
+    this.showSearch = true;
     this.dataService.getAllNodesData().subscribe(data => {
       this.cachedNodes = data.nodes;
       this.nodes = data.nodes;
     });
   }
 
+  hideResults(ev: any): void {
+    ev.stopPropagation();
+    this.showSearch = false;
+    this.nodes = [];
+  }
+
   closeModal(): void {
     this.navCtrl.pop();
   }
 
-  modalDetails(nodeId) {
-    this.dataService.getNodeDetails(nodeId).subscribe(data => {
+  modalDetails(nodeId?) {
+    let currentNode = nodeId || this.explorerService.networkContext.node;
+    this.dataService.getNodeDetails(currentNode).subscribe(data => {
       let modal = this.modalCtrl.create(DetailsPage, {node: data.node});
       modal.present();
     });
-  }
-
-  navigateTo(nodeId) {
-    this.explorerService.networkContext.changeNode(nodeId);
-    this.explorerService.exploreGraph(true);
-    this.navCtrl.popToRoot();
   }
 }

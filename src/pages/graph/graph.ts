@@ -1,5 +1,5 @@
 import {Component} from '@angular/core';
-import {ModalController, Events, NavParams} from 'ionic-angular';
+import {ModalController, Events, NavParams, NavController} from 'ionic-angular';
 import {ExplorerService} from "../../providers/explorer.service";
 import {SearchPage} from "../search/search";
 import {AuthService} from "../../providers/auth.service";
@@ -9,10 +9,11 @@ import {DetailsPage} from "../details/details";
 @Component({
   templateUrl: 'graph.html'
 })
-export class GraphPage {
+export class GraphPage extends SearchPage {
 
-  constructor(public modalCtrl: ModalController, private dataService: DataService,
-              public explorerService: ExplorerService, public authService: AuthService, public events: Events) {
+  constructor(public navCtrl: NavController, public modalCtrl: ModalController, public events: Events,
+              protected dataService: DataService, public explorerService: ExplorerService) {
+    super(navCtrl, modalCtrl, events, dataService, explorerService);
   }
 
   rootNodeChange(event): void {
@@ -23,22 +24,18 @@ export class GraphPage {
     this.explorerService.navigateHome();
   }
 
-  ionViewDidEnter() {
-    // this.
-    // if(this.authService.isLoggedIn()) {
-      this.explorerService.exploreGraph(true);
-    // }
+  ionViewDidEnter(): void {
+    this.explorerService.exploreGraph(true);
   }
 
-  modalSearch() {
-    let modal = this.modalCtrl.create(SearchPage);
-    modal.present();
-  }
+  // modalSearch() {
+  //   let modal = this.modalCtrl.create(SearchPage);
+  //   modal.present();
+  // }
 
-  modalDetails() {
-    this.dataService.getNodeDetails(this.explorerService.networkContext.node).subscribe(data => {
-      let modal = this.modalCtrl.create(DetailsPage, {node: data.node});
-      modal.present();
-    });
+  navigateTo(nodeId) {
+    this.explorerService.navigateTo(nodeId);
+    this.showSearch = false;
+    this.nodes = [];
   }
 }

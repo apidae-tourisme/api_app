@@ -3,7 +3,7 @@
 }
 
 #header_logo {
-  max-width: 64px;
+  max-width: 50px;
 }
 
 #header_search > span {
@@ -11,13 +11,25 @@
   padding-left: 30px;
 }
 
-#loading_spinner {
+.loading_spinner {
   display: flex;
   flex-direction: column;
   height: 100%;
   align-items: center;
   justify-content: center;
   font-size: 24px;
+}
+
+ion-searchbar.searchbar-has-focus.searchbar-md .searchbar-ios-cancel {
+  display: block;
+}
+
+ion-header .searchbar-input-container .searchbar-search-icon {
+  background-image: none;
+}
+
+ion-header .searchbar-input-container input.searchbar-input {
+  padding: 6px 15px;
 }
 
 .dowrap {

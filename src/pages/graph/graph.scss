@@ -1,3 +1,7 @@
 #graph_wrapper div.scroll-content {
   overflow: hidden;
 }
+
+#graph_wrapper div.scroll-content > * {
+  height: 100%;
+}

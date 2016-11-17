@@ -1,17 +1,19 @@
 import {Component} from '@angular/core';
-import {NavController, ModalController} from 'ionic-angular';
+import {NavController, ModalController, Events} from 'ionic-angular';
 import {ExplorerService} from "../../providers/explorer.service";
 import {SearchPage} from "../search/search";
 import {DetailsPage} from "../details/details";
 import {DataService} from "../../providers/data.service";
+import {GraphPage} from "../graph/graph";
 
 @Component({
   templateUrl: 'list.html'
 })
-export class ListPage {
+export class ListPage extends SearchPage {
 
-  constructor(public navCtrl: NavController, public modalCtrl: ModalController,
-              public explorerService: ExplorerService, private dataService: DataService) {
+  constructor(public navCtrl: NavController, public modalCtrl: ModalController, public events: Events,
+              protected dataService: DataService, public explorerService: ExplorerService) {
+    super(navCtrl, modalCtrl, events, dataService, explorerService);
   }
 
   rootNodeChange(event): void {
@@ -26,23 +28,28 @@ export class ListPage {
     this.explorerService.exploreGraph(true);
   }
 
-  navigateTo(node): void {
+
+  navigateToList(node): void {
     this.explorerService.navigateTo(node);
   }
 
-  modalSearch() {
-    let modal = this.modalCtrl.create(SearchPage);
-    modal.present();
-  }
-
-  modalDetails(nodeId) {
-    this.dataService.getNodeDetails(nodeId).subscribe(data => {
-      let modal = this.modalCtrl.create(DetailsPage, {node: data.node});
-      modal.present();
-    });
-  }
-
-  // switchToNetwork() {
-  //   this.navCtrl.popToRoot();
+  // modalSearch() {
+  //   let modal = this.modalCtrl.create(SearchPage);
+  //   modal.present();
   // }
+
+  // modalDetails(nodeId) {
+  //   this.dataService.getNodeDetails(nodeId).subscribe(data => {
+  //     let modal = this.modalCtrl.create(DetailsPage, {node: data.node});
+  //     modal.present();
+  //   });
+  // }
+
+  navigateToNetwork(nodeId?) {
+    if(nodeId) {
+      this.explorerService.networkContext.changeNode(nodeId);
+    }
+    this.navCtrl.setRoot(GraphPage);
+    // this.explorerService.exploreGraph(true);
+  }
 }

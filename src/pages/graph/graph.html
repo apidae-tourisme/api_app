@@ -1,26 +1,40 @@
-<ion-header>
-  <ion-navbar color="danger">
+<ion-header no-shadow>
+  <ion-navbar color="danger" mode="md">
     <ion-buttons left>
       <button ion-button (click)="homeNode()">
         <ion-img id="header_logo" src="assets/img/logo_white.png" srcset="assets/img/logo_white.png 2x"></ion-img>
       </button>
     </ion-buttons>
-    <ion-title text-center>
-      ApiApp
-    </ion-title>
-    <ion-buttons right>
-      <button ion-button id="header_search" (click)="modalSearch()">
-        <ion-icon name="search"></ion-icon>
-      </button>
-    </ion-buttons>
+    <ion-toolbar color="danger" mode="md" no-border>
+      <ion-searchbar (ionInput)="filterNodes($event)" (ionFocus)="loadNodes()" (ionCancel)="hideResults($event)"
+                     [showCancelButton]="true" [cancelButtonText]="'Fermer'" placeholder="Bienvenue" debounce="500"></ion-searchbar>
+    </ion-toolbar>
+    <!--<ion-buttons right>-->
+      <!--<button ion-button id="header_search" (click)="modalSearch()">-->
+        <!--<ion-icon name="search"></ion-icon>-->
+      <!--</button>-->
+    <!--</ion-buttons>-->
   </ion-navbar>
 </ion-header>
 
 <ion-content id="graph_wrapper">
-  <div id="loading_spinner" *ngIf="!explorerService.networkData" text-center>
-    <ion-spinner name="dots"></ion-spinner>
-    <span color="light">Chargement en cours</span>
+  <div *ngIf="!showSearch">
+    <div class="loading_spinner" *ngIf="!explorerService.networkData" text-center>
+      <ion-spinner name="dots"></ion-spinner>
+      <span color="light">Chargement en cours</span>
+    </div>
+    <graph *ngIf="explorerService.networkData" [networkData]="explorerService.networkData" (showDetails)="modalDetails()"
+           (rootChange)="rootNodeChange($event);"></graph>
   </div>
-  <graph *ngIf="explorerService.networkData" [networkData]="explorerService.networkData" (showDetails)="modalDetails()"
-       (rootChange)="rootNodeChange($event);"></graph>
+
+  <div class="loading_spinner" *ngIf="!nodes && showSearch" text-center><ion-spinner name="dots"></ion-spinner><span light>Chargement en cours</span></div>
+  <ion-list [virtualScroll]="nodes">
+    <ion-item *virtualItem="let node">
+      <h2>{{node.name}}</h2>
+      <p>{{node.description}}</p>
+      <button ion-button item-right outline large color="primary" (click)="modalDetails(node.id)"><ion-icon name="search"></ion-icon></button>
+      <button ion-button item-right outline large color="secondary" (click)="navigateTo(node.id)"><ion-icon name="git-network"></ion-icon></button>
+    </ion-item>
+  </ion-list>
+
 </ion-content>

@@ -96,10 +96,10 @@ export class GraphComponent implements DoCheck, OnChanges {
       .force("charge", d3.forceManyBody().strength(function(node, index) {
         return node.isRoot ? -2000 : -800;
       }))
-      .force("yCharge", d3.forceY(0).strength(function(node, index) {
-        return node.isPrevious ? 0 : 0.1;
-      }))
-      .force("center", d3.forceCenter(nominalWidth, nominalHeight));
+      // .force("yCharge", d3.forceY(0).strength(function(node, index) {
+      //   return node.isPrevious ? 0 : 0.1;
+      // }))
+      .force("center", d3.forceCenter(nominalWidth, nominalHeight + 30));
 
     let linkData = this.linksContainer
       .selectAll("line")

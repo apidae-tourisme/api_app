@@ -6,6 +6,10 @@ ion-item-options ion-icon {
   font-size: 2em;
 }
 
+#list_wrapper {
+  margin-top: -200px;
+}
+
 #root_node {
   border-bottom: 3px solid map-get($colors, danger);
 }
