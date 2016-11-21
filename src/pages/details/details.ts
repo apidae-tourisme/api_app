@@ -14,7 +14,6 @@ export class DetailsPage {
 
   constructor(params: NavParams, private navCtrl: NavController, public events: Events, private sanitizer: DomSanitizer,
               private explorerService: ExplorerService) {
-    console.log(params.get('node'));
     this.node = new Seed(params.get('node'), false, false);
   }
 

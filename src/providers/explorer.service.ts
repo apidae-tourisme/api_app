@@ -16,17 +16,17 @@ export class ExplorerService {
     this.networkContext = new NetworkContext();
   }
 
-  navigateTo(newNode: string): void {
+  navigateTo(newNode: string, onComplete?): void {
     this.networkContext.changeNode(newNode);
-    this.exploreGraph();
+    this.exploreGraph(false, onComplete);
   }
 
-  navigateHome(): void {
+  navigateHome(onComplete?): void {
     this.networkContext.reset();
-    this.exploreGraph();
+    this.exploreGraph(false, onComplete);
   }
 
-  exploreGraph(resetData?: boolean): void {
+  exploreGraph(resetData: boolean, onComplete?): void {
     if(resetData) {
       this.networkData = null;
     }
@@ -56,6 +56,9 @@ export class ExplorerService {
         }
       }
       this.networkData = parsedData;
+      if(onComplete) {
+        onComplete();
+      }
     });
   }
 }

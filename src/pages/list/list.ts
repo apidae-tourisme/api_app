@@ -1,5 +1,5 @@
-import {Component} from '@angular/core';
-import {NavController, ModalController, Events} from 'ionic-angular';
+import {Component, ViewChild} from '@angular/core';
+import {NavController, Events, Content} from 'ionic-angular';
 import {ExplorerService} from "../../providers/explorer.service";
 import {SearchPage} from "../search/search";
 import {DataService} from "../../providers/data.service";
@@ -8,18 +8,15 @@ import {DataService} from "../../providers/data.service";
   templateUrl: 'list.html'
 })
 export class ListPage extends SearchPage {
+  @ViewChild(Content) content: Content;
 
-  constructor(public navCtrl: NavController, public modalCtrl: ModalController, public events: Events,
+  constructor(public navCtrl: NavController, public events: Events,
               protected dataService: DataService, public explorerService: ExplorerService) {
-    super(navCtrl, modalCtrl, events, dataService, explorerService);
-  }
-
-  rootNodeChange(event): void {
-    this.explorerService.navigateTo(event.newRoot);
+    super(navCtrl, events, dataService, explorerService);
   }
 
   homeNode(): void {
-    this.explorerService.navigateHome();
+    this.explorerService.navigateHome(() => {this.content.resize();});
   }
 
   ionViewDidEnter(): void {
@@ -27,6 +24,6 @@ export class ListPage extends SearchPage {
   }
 
   navigateToList(node): void {
-    this.explorerService.navigateTo(node);
+    this.explorerService.navigateTo(node, () => {this.content.resize();});
   }
 }

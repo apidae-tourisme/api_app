@@ -1,4 +1,3 @@
-import {Component} from '@angular/core';
 import {NavController, ModalController, Events} from 'ionic-angular';
 import {DataService} from "../../providers/data.service";
 import {DetailsPage} from "../details/details";
@@ -11,7 +10,7 @@ export class SearchPage {
   public nodes: Array<any>;
   public showSearch: boolean;
 
-  constructor(public navCtrl: NavController, public modalCtrl: ModalController, public events: Events,
+  constructor(public navCtrl: NavController, public events: Events,
               protected dataService: DataService, public explorerService: ExplorerService) {
     this.showSearch = false;
     this.cachedNodes = [];
@@ -52,8 +51,6 @@ export class SearchPage {
   modalDetails(nodeId?) {
     let currentNode = nodeId || this.explorerService.networkContext.node;
     this.dataService.getNodeDetails(currentNode).subscribe(data => {
-      // let modal = this.modalCtrl.create(DetailsPage, {node: data.node});
-      // modal.present();
       this.navCtrl.push(DetailsPage, {node: data.node});
     });
   }

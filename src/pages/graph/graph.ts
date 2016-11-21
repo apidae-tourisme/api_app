@@ -1,19 +1,17 @@
 import {Component} from '@angular/core';
-import {ModalController, Events, NavParams, NavController} from 'ionic-angular';
+import {Events, NavController} from 'ionic-angular';
 import {ExplorerService} from "../../providers/explorer.service";
 import {SearchPage} from "../search/search";
-import {AuthService} from "../../providers/auth.service";
 import {DataService} from "../../providers/data.service";
-import {DetailsPage} from "../details/details";
 
 @Component({
   templateUrl: 'graph.html'
 })
 export class GraphPage extends SearchPage {
 
-  constructor(public navCtrl: NavController, public modalCtrl: ModalController, public events: Events,
+  constructor(public navCtrl: NavController, public events: Events,
               protected dataService: DataService, public explorerService: ExplorerService) {
-    super(navCtrl, modalCtrl, events, dataService, explorerService);
+    super(navCtrl, events, dataService, explorerService);
   }
 
   rootNodeChange(event): void {

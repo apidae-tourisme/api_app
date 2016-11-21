@@ -10,7 +10,7 @@
                      [showCancelButton]="true" [cancelButtonText]="'Fermer'" placeholder="Rechercher" debounce="500"></ion-searchbar>
     </ion-toolbar>
   </ion-navbar>
-  <ion-toolbar id="subheader">
+  <ion-toolbar id="subheader" *ngIf="!showSearch">
     <ion-buttons left>
       <button *ngIf="explorerService.previousNode" ion-button (click)="navigateToList(explorerService.previousNode.id)" id="prevNode">
         <ion-icon name="arrow-back"></ion-icon>
@@ -26,6 +26,9 @@
       <button ion-button (click)="modalDetails(explorerService.rootNode.id)" id="nodeDetails"><ion-icon name="eye" large></ion-icon></button>
     </ion-buttons>
   </ion-toolbar>
+  <ion-toolbar *ngIf="explorerService.rootNode.description" id="desc_header">
+    <p class="txtcenter">{{explorerService.rootNode.description}}</p>
+  </ion-toolbar>
 </ion-header>
 
 <ion-content>
@@ -33,12 +36,13 @@
     <div id="loading_spinner" *ngIf="!explorerService.networkData" text-center><ion-spinner name="dots"></ion-spinner><span light>Chargement en cours</span></div>
     <ion-list id="scroll_nodes" *ngIf="explorerService.networkData && explorerService.networkData.nodes">
       <div *ngFor="let node of explorerService.networkData.nodes" (click)="navigateToList(node.id)">
-        <ion-item *ngIf="!node.isRoot && !node.isPrevious">
+        <ion-item text-wrap *ngIf="!node.isRoot && !node.isPrevious">
           <ion-thumbnail item-left>
             <ion-img *ngIf="node.picture" [src]="node.picture"></ion-img>
             <div *ngIf="!node.picture" class="font_avatar {{node.category}}" text-center>{{node.code}}</div>
           </ion-thumbnail>
           <h2>{{node.label}}</h2>
+          <p>{{node.description}}</p>
           <button ion-button large clear item-right><ion-icon name="arrow-forward"></ion-icon></button>
         </ion-item>
       </div>
