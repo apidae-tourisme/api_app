@@ -7,35 +7,30 @@
     </ion-buttons>
     <ion-toolbar color="danger" mode="md" no-border>
       <ion-searchbar (ionInput)="filterNodes($event)" (ionFocus)="loadNodes()" (ionCancel)="hideResults($event)"
-                     [showCancelButton]="true" [cancelButtonText]="'Fermer'" placeholder="Bienvenue" debounce="500"></ion-searchbar>
+                     [showCancelButton]="true" [cancelButtonText]="'Fermer'" placeholder="Rechercher" debounce="500"></ion-searchbar>
     </ion-toolbar>
-    <!--<ion-buttons right>-->
-      <!--<button ion-button id="header_search" (click)="modalSearch()">-->
-        <!--<ion-icon name="search"></ion-icon>-->
-      <!--</button>-->
-    <!--</ion-buttons>-->
   </ion-navbar>
+  <ion-toolbar id="subheader">
+    <ion-buttons left>
+      <button *ngIf="explorerService.previousNode" ion-button (click)="navigateToList(explorerService.previousNode.id)" id="prevNode">
+        <ion-icon name="arrow-back"></ion-icon>
+        <div>{{explorerService.previousNode.label}}</div>
+      </button>
+    </ion-buttons>
+    <ion-title text-center>
+      <ion-img *ngIf="explorerService.rootNode.picture" [src]="explorerService.rootNode.picture"></ion-img>
+      <div *ngIf="!explorerService.rootNode.picture" class="font_avatar {{explorerService.rootNode.category}}" text-center>{{explorerService.rootNode.code}}&nbsp;</div>
+      <div>{{explorerService.rootNode.label}}</div>
+    </ion-title>
+    <ion-buttons right>
+      <button ion-button (click)="modalDetails(explorerService.rootNode.id)" id="nodeDetails"><ion-icon name="eye" large></ion-icon></button>
+    </ion-buttons>
+  </ion-toolbar>
 </ion-header>
 
 <ion-content>
   <div id="list_wrapper" *ngIf="!showSearch">
     <div id="loading_spinner" *ngIf="!explorerService.networkData" text-center><ion-spinner name="dots"></ion-spinner><span light>Chargement en cours</span></div>
-    <div id="fixed_nodes">
-      <ion-item *ngIf="explorerService.previousNode" (click)="navigateToList(explorerService.previousNode.id)">
-        <ion-icon item-left name="arrow-back" large></ion-icon>
-        <h2>{{explorerService.previousNode.label}}</h2>
-      </ion-item>
-      <ion-item text-wrap id="root_node">
-        <button ion-button large color="primary" outline item-right (click)="modalDetails(explorerService.rootNode.id)"><ion-icon name="search"></ion-icon></button>
-        <button ion-button item-right outline large color="secondary" (click)="navigateToNetwork()"><ion-icon name="git-network"></ion-icon></button>
-        <ion-thumbnail item-left>
-          <ion-img *ngIf="explorerService.rootNode.picture" [src]="explorerService.rootNode.picture"></ion-img>
-          <div *ngIf="!explorerService.rootNode.picture" class="font_avatar {{explorerService.rootNode.category}}" text-center>{{explorerService.rootNode.code}}</div>
-        </ion-thumbnail>
-        <h2>{{explorerService.rootNode.label}}</h2>
-        <p>{{explorerService.rootNode.description}}</p>
-      </ion-item>
-    </div>
     <ion-list id="scroll_nodes" *ngIf="explorerService.networkData && explorerService.networkData.nodes">
       <div *ngFor="let node of explorerService.networkData.nodes" (click)="navigateToList(node.id)">
         <ion-item *ngIf="!node.isRoot && !node.isPrevious">
@@ -51,12 +46,15 @@
   </div>
 
   <div class="loading_spinner" *ngIf="!nodes && showSearch" text-center><ion-spinner name="dots"></ion-spinner><span light>Chargement en cours</span></div>
-  <ion-list [virtualScroll]="nodes">
-    <ion-item *virtualItem="let node">
-      <h2>{{node.name}}</h2>
+  <ion-list [virtualScroll]="nodes" [approxItemHeight]="'60px'">
+    <ion-item *virtualItem="let node" text-wrap (click)="modalDetails(node.id)">
+      <ion-thumbnail item-left>
+        <ion-img *ngIf="node.picture" [src]="node.picture"></ion-img>
+        <div *ngIf="!node.picture" class="font_avatar {{node.category}}" text-center>{{node.code}}</div>
+      </ion-thumbnail>
+      <h2>{{node.label}}</h2>
       <p>{{node.description}}</p>
-      <button ion-button item-right outline large color="primary" (click)="modalDetails(node.id)"><ion-icon name="search"></ion-icon></button>
-      <button ion-button item-right outline large color="secondary" (click)="navigateToNetwork(node.id)"><ion-icon name="git-network"></ion-icon></button>
+      <ion-icon item-right name="eye" large></ion-icon>
     </ion-item>
   </ion-list>
 </ion-content>

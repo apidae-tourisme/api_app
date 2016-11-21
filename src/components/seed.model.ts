@@ -12,11 +12,12 @@ export class Seed {
   email: string;
   telephone: string;
   mobilePhone: string;
+  url: string;
   fixed: boolean;
 
   public constructor(nodeData: any, public isRoot: boolean, public isPrevious: boolean) {
     this.id = nodeData.id;
-    this.label = nodeData.name;
+    this.label = (nodeData.firstName && nodeData.lastName) ? (nodeData.firstName + ' ' + nodeData.lastName) : nodeData.name;
     this.description = nodeData.description;
     this.category = nodeData.label.toLowerCase();
     this.firstName = nodeData.firstname;
@@ -27,11 +28,23 @@ export class Seed {
     this.mobilePhone = nodeData.mobilephone;
     this.setCode(nodeData.label);
     this.setPicture(nodeData.thumbnail);
+    this.url = this.normalize(nodeData.url);
   }
 
-  fullName(): string {
-    return (this.firstName && this.lastName) ? (this.firstName + ' ' + this.lastName) : this.label;
+
+
+  private normalize(url) {
+    if(url && url.length > 0) {
+      if(url.indexOf('http') != -1) {
+        return url;
+      } else {
+        return 'http://' + url;
+      }
+    } else {
+      return null;
+    }
   }
+
 
   private setPicture(picUrl): void {
     if (picUrl && (picUrl.indexOf("jpg") != -1 || picUrl.indexOf("logo") != -1)) {

@@ -1,9 +1,6 @@
 <ion-header>
   <ion-navbar color="danger">
-    <ion-title text-center>{{node.fullName()}}</ion-title>
-    <ion-buttons right>
-      <button ion-button id="header_close" (click)="closeModal()">Fermer</button>
-    </ion-buttons>
+    <ion-title text-center>{{node.label}}</ion-title>
   </ion-navbar>
 </ion-header>
 
@@ -14,8 +11,10 @@
         <ion-img *ngIf="node.picture" [src]="node.picture"></ion-img>
         <div *ngIf="!node.picture" class="font_avatar {{node.category}}" text-center>{{node.code}}</div>
       </ion-thumbnail>
-      <h2 class="dowrap">{{node.fullName()}}</h2>
+      <h2 class="dowrap">{{node.label}}</h2>
       <p *ngIf="node.role" class="dowrap">{{node.role}}</p>
+      <button ion-button item-right outline large color="secondary" (click)="navigateToNetwork(node.id)"><ion-icon name="git-network"></ion-icon></button>
+      <button ion-button item-right outline large color="primary" (click)="navigateToList(node.id)"><ion-icon name="list"></ion-icon></button>
     </ion-item>
 
     <ion-item *ngIf="node.telephone">
@@ -30,6 +29,10 @@
     <ion-item *ngIf="node.email">
       {{node.email}}
       <a ion-button large item-right icon-only outline color="danger" [href]="sanitizeUrl('mailto:' + node.email)"><ion-icon name="mail"></ion-icon></a>
+    </ion-item>
+    <ion-item *ngIf="node.url">
+      {{node.url}}
+      <a ion-button large item-right icon-only outline color="secondary" (click)="openUrl(node.url)"><ion-icon name="open"></ion-icon></a>
     </ion-item>
     <ion-item *ngIf="node.description">
       <p class="dowrap">{{node.description}}</p>

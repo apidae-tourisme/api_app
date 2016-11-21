@@ -1,29 +1,52 @@
-ion-item-options > button.button {
-  padding: 0 1em;
+ion-header #subheader .toolbar-title {
+  white-space: inherit;
+  font-size: 1.6rem;
+  text-transform: uppercase;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
 }
 
-ion-item-options ion-icon {
-  font-size: 2em;
+ion-header #subheader .toolbar-title img {
+  min-width: inherit;
+  max-width: inherit;
+  max-height: 50px;
+  margin: 10px;
 }
 
-#list_wrapper {
-  margin-top: -200px;
+ion-header #subheader .toolbar-title > * {
+  //display: inline-block;
 }
 
-#root_node {
-  border-bottom: 3px solid map-get($colors, danger);
+ion-header #subheader #prevNode.bar-button {
+  height: auto;
 }
 
-#root_node.item-block .item-inner {
-  border-bottom: none;
+ion-header #subheader ion-buttons {
+  width: 80px;
 }
 
-#fixed_nodes {
-  position: fixed;
-  z-index: 99;
-  width: 100%;
+ion-header #subheader #prevNode .button-inner {
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
-#scroll_nodes {
-  margin-top: 200px;
+ion-header #subheader #nodeDetails .button-inner {
+  justify-content: flex-end;
 }
+
+ion-header #subheader .button-inner > ion-icon {
+  font-size: 2.6rem;
+}
+
+ion-header #subheader #prevNode .button-inner > div {
+  max-width: 80px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+  text-transform: none;
+}
+

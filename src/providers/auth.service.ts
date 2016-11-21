@@ -30,7 +30,6 @@ export class AuthService {
       let browser = new InAppBrowser(authUrl, '_blank', 'location=no');
       browser.on('loadstart').subscribe(data => {
         let callBackUrl = data['url'];
-        console.log('url: ' + callBackUrl);
         if(callBackUrl && callBackUrl.indexOf('auth_token') != -1 && callBackUrl.indexOf('client_id') != -1 &&
           callBackUrl.indexOf('uid') != -1) {
           let callBackParams = callBackUrl.slice(callBackUrl.indexOf('?'));

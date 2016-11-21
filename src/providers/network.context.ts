@@ -16,8 +16,8 @@ export class NetworkContext {
     this.node = newNode;
   }
 
-  reset(): void {
-    this.node = null;
+  reset(node?): void {
+    this.node = node;
     this.previousNodes = [];
   }
 

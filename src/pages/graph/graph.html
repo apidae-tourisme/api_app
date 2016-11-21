@@ -7,13 +7,8 @@
     </ion-buttons>
     <ion-toolbar color="danger" mode="md" no-border>
       <ion-searchbar (ionInput)="filterNodes($event)" (ionFocus)="loadNodes()" (ionCancel)="hideResults($event)"
-                     [showCancelButton]="true" [cancelButtonText]="'Fermer'" placeholder="Bienvenue" debounce="500"></ion-searchbar>
+                     [showCancelButton]="true" [cancelButtonText]="'Fermer'" placeholder="Rechercher" debounce="500"></ion-searchbar>
     </ion-toolbar>
-    <!--<ion-buttons right>-->
-      <!--<button ion-button id="header_search" (click)="modalSearch()">-->
-        <!--<ion-icon name="search"></ion-icon>-->
-      <!--</button>-->
-    <!--</ion-buttons>-->
   </ion-navbar>
 </ion-header>
 
@@ -28,12 +23,15 @@
   </div>
 
   <div class="loading_spinner" *ngIf="!nodes && showSearch" text-center><ion-spinner name="dots"></ion-spinner><span light>Chargement en cours</span></div>
-  <ion-list [virtualScroll]="nodes">
-    <ion-item *virtualItem="let node">
+  <ion-list [virtualScroll]="nodes" [approxItemHeight]="'60px'">
+    <ion-item *virtualItem="let node" text-wrap (click)="modalDetails(node.id)">
+      <ion-thumbnail item-left>
+        <ion-img *ngIf="node.picture" [src]="node.picture"></ion-img>
+        <div *ngIf="!node.picture" class="font_avatar {{node.category}}" text-center>{{node.code}}</div>
+      </ion-thumbnail>
       <h2>{{node.name}}</h2>
       <p>{{node.description}}</p>
-      <button ion-button item-right outline large color="primary" (click)="modalDetails(node.id)"><ion-icon name="search"></ion-icon></button>
-      <button ion-button item-right outline large color="secondary" (click)="navigateTo(node.id)"><ion-icon name="git-network"></ion-icon></button>
+      <ion-icon item-right name="eye" large></ion-icon>
     </ion-item>
   </ion-list>
 

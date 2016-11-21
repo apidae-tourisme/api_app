@@ -141,7 +141,7 @@ export class GraphComponent implements DoCheck, OnChanges {
       .attr("fill", "white")
       .attr("dy", "1em")
       .html(function (d) {
-        return d.isRoot ? (d.label + "|" + d.description) : d.label;
+        return d.isRoot ? (d.label + "|" + (d.description || '')) : d.label;
       });
 
     let allTexts = this.nodesContainer.selectAll("text");

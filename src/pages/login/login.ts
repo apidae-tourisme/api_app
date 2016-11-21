@@ -12,7 +12,6 @@ export class LoginPage {
   }
 
   ionViewDidEnter() {
-    console.log('view did enter');
     let url = window.location.href;
     if(url.indexOf('auth_token') != -1 && url.indexOf('client_id') != -1 && url.indexOf('uid') != -1) {
       let callBackParams = url.slice(url.indexOf('?'));
@@ -22,9 +21,7 @@ export class LoginPage {
       }
     } else {
       this.platform.ready().then(() => {
-        console.log('loading auth data');
         this.authService.getLocalAuthData().then(authData => {
-          console.log('authData : ' + JSON.stringify(authData));
           if(authData) {
             this.loggedInRedirect();
           }

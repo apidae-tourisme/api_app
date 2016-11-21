@@ -1,5 +1,5 @@
 import {NgModule} from '@angular/core';
-import {IonicApp, IonicModule} from 'ionic-angular';
+import {IonicApp, IonicModule, Tabs} from 'ionic-angular';
 import {ApiApp} from './app.component';
 import {TabsPage} from '../pages/tabs/tabs';
 import {GraphPage} from "../pages/graph/graph";
@@ -23,7 +23,6 @@ import { Storage } from '@ionic/storage';
     GraphPage,
     MapPage,
     ListPage,
-    SearchPage,
     DetailsPage,
     GraphComponent
   ],
@@ -38,7 +37,6 @@ import { Storage } from '@ionic/storage';
     GraphPage,
     MapPage,
     ListPage,
-    SearchPage,
     DetailsPage
   ],
   providers: [

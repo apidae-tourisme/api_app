@@ -27,15 +27,4 @@ export class GraphPage extends SearchPage {
   ionViewDidEnter(): void {
     this.explorerService.exploreGraph(true);
   }
-
-  // modalSearch() {
-  //   let modal = this.modalCtrl.create(SearchPage);
-  //   modal.present();
-  // }
-
-  navigateTo(nodeId) {
-    this.explorerService.navigateTo(nodeId);
-    this.showSearch = false;
-    this.nodes = [];
-  }
 }
