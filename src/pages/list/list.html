@@ -6,7 +6,7 @@
       </button>
     </ion-buttons>
     <ion-toolbar color="danger" mode="md" no-border>
-      <ion-searchbar (ionInput)="filterNodes($event)" (ionFocus)="loadNodes()" (ionCancel)="hideResults($event)"
+      <ion-searchbar (ionInput)="filterNodes($event)" (ionFocus)="loadListNodes()" (ionCancel)="hideResults($event)"
                      [showCancelButton]="true" [cancelButtonText]="'Fermer'" placeholder="Rechercher" debounce="500"></ion-searchbar>
     </ion-toolbar>
   </ion-navbar>
@@ -26,7 +26,7 @@
       <button ion-button (click)="modalDetails(explorerService.rootNode.id)" id="nodeDetails"><ion-icon name="eye" large></ion-icon></button>
     </ion-buttons>
   </ion-toolbar>
-  <ion-toolbar *ngIf="explorerService.rootNode.description" id="desc_header">
+  <ion-toolbar *ngIf="explorerService.rootNode.description && !showSearch" id="desc_header">
     <p class="txtcenter">{{explorerService.rootNode.description}}</p>
   </ion-toolbar>
 </ion-header>

@@ -19,6 +19,10 @@ export class ListPage extends SearchPage {
     this.explorerService.navigateHome(() => {this.content.resize();});
   }
 
+  loadListNodes(): void {
+    this.loadNodes(() => {this.content.resize();});
+  }
+
   ionViewDidEnter(): void {
     this.explorerService.exploreGraph(true);
   }

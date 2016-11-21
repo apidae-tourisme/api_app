@@ -28,13 +28,16 @@ export class SearchPage {
     }
   }
 
-  loadNodes(): void {
+  loadNodes(onComplete?): void {
     this.showSearch = true;
     this.dataService.getAllNodesData().subscribe(data => {
       for(let i = 0; i < data.nodes.length; i++) {
         this.cachedNodes.push(new Seed(data.nodes[i], false, false));
       }
       this.nodes = this.cachedNodes;
+      if(onComplete) {
+        onComplete();
+      }
     });
   }
 
