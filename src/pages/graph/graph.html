@@ -29,7 +29,7 @@
         <ion-img *ngIf="node.picture" [src]="node.picture"></ion-img>
         <div *ngIf="!node.picture" class="font_avatar {{node.category}}" text-center>{{node.code}}</div>
       </ion-thumbnail>
-      <h2>{{node.name}}</h2>
+      <h2>{{node.label}}</h2>
       <p>{{node.description}}</p>
       <ion-icon item-right name="eye" large></ion-icon>
     </ion-item>

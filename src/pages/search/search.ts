@@ -23,7 +23,7 @@ export class SearchPage {
 
     if (val && val.trim() != '') {
       this.nodes = this.nodes.filter((item) => {
-        return (item.name && item.name.toLowerCase().indexOf(val.toLowerCase()) > -1) ||
+        return (item.label && item.label.toLowerCase().indexOf(val.toLowerCase()) > -1) ||
           (item.description && item.description.toLowerCase().indexOf(val.toLowerCase()) > -1);
       })
     }
