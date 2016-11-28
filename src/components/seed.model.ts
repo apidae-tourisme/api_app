@@ -29,6 +29,7 @@ export class Seed {
     this.setCode(nodeData.label);
     this.setPicture(nodeData.thumbnail);
     this.url = this.normalize(nodeData.url);
+    this.fixed = true;
   }
 
 

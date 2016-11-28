@@ -20,18 +20,6 @@
   font-size: 24px;
 }
 
-ion-searchbar.searchbar-has-focus.searchbar-md .searchbar-ios-cancel {
-  display: block;
-}
-
-ion-header .searchbar-input-container .searchbar-search-icon {
-  background-image: none;
-}
-
-ion-header .searchbar-input-container input.searchbar-input {
-  padding: 6px 15px;
-}
-
 .dowrap {
   white-space: pre-line;
 }
@@ -40,6 +28,7 @@ div.font_avatar {
   font-family: 'Ionicons';
   font-size: 48px;
   line-height: 80px;
+  color: white;
 }
 
 div.font_avatar.concept {
@@ -84,4 +73,56 @@ div.font_avatar.schema {
 
 div.font_avatar.person {
   color: map-get($colors, primary);
+}
+
+ion-header .toolbar_header .toolbar-title {
+  white-space: inherit;
+  font-size: 1.4rem;
+  text-transform: uppercase;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+ion-header .toolbar_header .toolbar-title.toolbar-title-ios {
+  font-size: 1.2rem;
+}
+
+ion-header .toolbar_header .toolbar-title img {
+  min-width: inherit;
+  max-width: inherit;
+  max-height: 50px;
+  margin: 10px;
+}
+
+ion-header .toolbar_header .close_toolbar.bar-button {
+  height: auto;
+}
+
+ion-header .toolbar_header ion-buttons {
+  width: 80px;
+}
+
+ion-header .toolbar_header .close_toolbar .button-inner {
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+ion-header .toolbar_header #nodeDetails .button-inner {
+  justify-content: flex-end;
+}
+
+ion-header .toolbar_header .button-inner > ion-icon {
+  font-size: 2.6rem;
+}
+
+ion-header .toolbar_header .close_toolbar .button-inner > div {
+  max-width: 80px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+  text-transform: none;
 }

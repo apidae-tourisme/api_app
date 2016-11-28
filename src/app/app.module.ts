@@ -27,7 +27,7 @@ import { Storage } from '@ionic/storage';
     GraphComponent
   ],
   imports: [
-    IonicModule.forRoot(ApiApp)
+    IonicModule.forRoot(ApiApp, {scrollAssist: false, autoFocusAssist: false})
   ],
   bootstrap: [IonicApp],
   entryComponents: [

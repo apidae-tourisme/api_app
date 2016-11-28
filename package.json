@@ -44,8 +44,16 @@
     "cordova-plugin-inappbrowser"
   ],
   "cordovaPlatforms": [
-    "android",
-    "ios"
+    {
+      "platform": "android",
+      "version": "",
+      "locator": "android"
+    },
+    {
+      "platform": "ios",
+      "version": "",
+      "locator": "ios"
+    }
   ],
   "description": "api_app: ApiApp"
 }

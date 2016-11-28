@@ -45,14 +45,20 @@ export class GraphComponent implements DoCheck, OnChanges {
     this.zoomContainer = this.svg.append("g");
     this.svg.call(this.zoom.on("zoom", () => {
       this.zoomContainer.attr("transform", d3.event.transform);
-    })).on("dblclick.zoom", null);
+    })).on("dblclick.zoom", null)
+      .on("mousedown.zoom", null);
 
-    this.zoomContainer.append("defs")
-      .append("font-face")
+    let defs = this.zoomContainer.append("defs");
+    defs.append("font-face")
       .attr("font-family", "Ionicons")
       .append("font-face-src")
       .append("font-face-uri")
       .attr("xlink:href", "assets/fonts/ionicons.svg#Ionicons");
+
+    let grad = defs.append("linearGradient").attr("id", "grad")
+      .attr("x1", "0%").attr("x2", "0%").attr("y1", "100%").attr("y2", "0%");
+    grad.append("stop").attr("offset", "50%").style("stop-color", "white").attr("stop-opacity", "0");
+    grad.append("stop").attr("offset", "50%").style("stop-color", "white").attr("stop-opacity", "0.2");
 
     this.linksContainer = this.zoomContainer.append("g")
       .attr("class", "links");
@@ -99,15 +105,14 @@ export class GraphComponent implements DoCheck, OnChanges {
       // .force("yCharge", d3.forceY(0).strength(function(node, index) {
       //   return node.isPrevious ? 0 : 0.1;
       // }))
-      .force("center", d3.forceCenter(nominalWidth, nominalHeight + 30));
+      .force("center", d3.forceCenter(nominalWidth - 5, nominalHeight + 28));
 
     let linkData = this.linksContainer
       .selectAll("line")
       .data(this.networkData.edges);
 
     let linkEnter = linkData
-      .enter().append("line")
-      .attr("stroke-width", 2);
+      .enter().append("line");
 
     let textData = this.nodesContainer
       .selectAll("text")
@@ -116,24 +121,31 @@ export class GraphComponent implements DoCheck, OnChanges {
     let textEnter = textData.enter();
 
     let nodesBg = textEnter.append("rect")
-      .attr("width", function(d) {return d.isRoot ? 120 : 80;})
+      .attr("width", function(d) {return d.isRoot ? 150 : 80;})
       .attr("height", function(d) {return d.isRoot ? 160 : 80;})
       .attr("rx", function(d) { return d.isRoot ? 30 : 40; })
       .attr("ry", function(d) { return d.isRoot ? 30 : 40; })
       .attr("class", function(d) { return "icon icon-bg " + d.category + (d.isRoot ? " root" : ""); })
       .attr("text-anchor", "middle");
 
+    let nodesMask = textEnter.append("rect")
+      .attr("width", function(d) {return d.isRoot ? 150 : 80;})
+      .attr("height", function(d) {return d.isRoot ? 160 : 80;})
+      .attr("rx", function(d) { return d.isRoot ? 30 : 40; })
+      .attr("ry", function(d) { return d.isRoot ? 30 : 40; })
+      .attr("fill", "url(#grad)");
+
     let nodesImg = textEnter.append("image")
       .attr("class", function(d) {return d.picture ? (d.isRoot ? "root img-node" : "img-node") : "";})
       .attr("width", function(d) {return d.isRoot ? 48 : 32;})
       .attr("height", function(d) {return d.isRoot ? 48 : 32;})
-      .attr("xlink:href", function(d) {return d.picture;});
+      .attr("xlink:href", function(d) {return d.isPrevious ? '' : d.picture;});
 
     let nodesText = textEnter.append("text")
       .attr("class", function(d) {return "icon" + (d.isRoot ? " root" : "");})
       .attr("text-anchor", "middle")
       .attr("fill", "white")
-      .text(function (d) { return d.picture ? '' : d.code; });
+      .text(function (d) { return d.isPrevious ? '\uf27d' : (d.picture ? '' : d.code); });
 
     let nodesLabel = textEnter.append("text")
       .attr("text-anchor", "middle")
@@ -149,21 +161,21 @@ export class GraphComponent implements DoCheck, OnChanges {
     nodesImg.on("click", changeRootNode);
     nodesBg.on("click", changeRootNode);
 
-    let draggableTexts = allTexts.select(function(d, i) { return (d.isRoot || d.isPrevious) ? null : this; });
-    draggableTexts.call(d3.drag()
-      .on("start", dragstarted)
-      .on("drag", dragged)
-      .on("end", dragended));
-    let draggableImg = nodesImg.select(function(d, i) { return (d.isRoot || d.isPrevious) ? null : this; });
-    draggableImg.call(d3.drag()
-      .on("start", dragstarted)
-      .on("drag", dragged)
-      .on("end", dragended));
-    let draggableBg = nodesBg.select(function(d, i) { return (d.isRoot || d.isPrevious) ? null : this; });
-    draggableBg.call(d3.drag()
-      .on("start", dragstarted)
-      .on("drag", dragged)
-      .on("end", dragended));
+    // let draggableTexts = allTexts.select(function(d, i) { return (d.isRoot || d.isPrevious) ? null : this; });
+    // draggableTexts.call(d3.drag()
+    //   .on("start", dragstarted)
+    //   .on("drag", dragged)
+    //   .on("end", dragended));
+    // let draggableImg = nodesImg.select(function(d, i) { return (d.isRoot || d.isPrevious) ? null : this; });
+    // draggableImg.call(d3.drag()
+    //   .on("start", dragstarted)
+    //   .on("drag", dragged)
+    //   .on("end", dragended));
+    // let draggableBg = nodesBg.select(function(d, i) { return (d.isRoot || d.isPrevious) ? null : this; });
+    // draggableBg.call(d3.drag()
+    //   .on("start", dragstarted)
+    //   .on("drag", dragged)
+    //   .on("end", dragended));
 
     wrapLabels(nodesLabel);
 
@@ -172,11 +184,11 @@ export class GraphComponent implements DoCheck, OnChanges {
 
     function computeDistance(index) {
       if(index < 9) {
-        return nodeRadius + 40;
+        return nodeRadius + 50;
       } else if(index < 20) {
-        return 2 * nodeRadius + 40;
+        return 2 * nodeRadius + 50;
       } else {
-        return 3 * nodeRadius + 40;
+        return 3 * nodeRadius + 50;
       }
     }
 
@@ -208,7 +220,7 @@ export class GraphComponent implements DoCheck, OnChanges {
             word,
             line = [],
             y = text.attr("y"),
-            width = textElt.datum().isRoot ? 110 : 70;
+            width = textElt.datum().isRoot ? 140 : 70;
           if(reset) {
             textElt.text(null);
           }
@@ -231,15 +243,15 @@ export class GraphComponent implements DoCheck, OnChanges {
     function ticked() {
       linkEnter
         .attr("x1", function (d) {
-          let x = d.source.isPrevious ? nominalWidth : d.source.x;
+          let x = d.source.isPrevious ? 45 : d.source.x;
           return parseFloat(x);
         })
         .attr("y1", function (d) {
-          let y = d.source.isPrevious ? (nominalHeight * 2 - 30) : d.source.y;
+          let y = d.source.isPrevious ? 75 : d.source.y;
           return parseFloat(y) - 30;
         })
         .attr("x2", function (d) {
-          return parseFloat(d.target.x) + 8;
+          return parseFloat(d.target.x);
         })
         .attr("y2", function (d) {
           return parseFloat(d.target.y);
@@ -247,60 +259,68 @@ export class GraphComponent implements DoCheck, OnChanges {
 
       nodesBg
         .attr("x", function (d) {
-          return d.isPrevious ? (nominalWidth - 40) : (d.isRoot ? (nominalWidth - 60) : (d.x - 40));
+          return d.isPrevious ? 5 : (d.isRoot ? (nominalWidth - 75) : (d.x - 40));
         })
         .attr("y", function (d) {
-          return d.isPrevious ? (nominalHeight * 2 - 110) : (d.isRoot ? (nominalHeight - 80) : (d.y - 70));
+          return d.isPrevious ? 5 : (d.isRoot ? (nominalHeight - 80) : (d.y - 70));
+        });
+
+      nodesMask
+        .attr("x", function (d) {
+          return d.isPrevious ? 5 : (d.isRoot ? (nominalWidth - 75) : (d.x - 40));
+        })
+        .attr("y", function (d) {
+          return d.isPrevious ? 5 : (d.isRoot ? (nominalHeight - 80) : (d.y - 70));
         });
 
       nodesImg
         .attr("x", function (d) {
-          let x = d.isPrevious ? nominalWidth : d.x;
+          let x = d.isPrevious ? 44 : d.x;
           return d.isRoot ? (nominalWidth - 25) : (x - 16);
         })
         .attr("y", function (d) {
-          let y = d.isPrevious ? (nominalHeight * 2 - 40) : d.y;
+          let y = d.isPrevious ? 74 : d.y;
           return d.isRoot ? (nominalHeight - 70) : (y - 64);
         });
 
       nodesLabel
         .attr("x", function (d) {
-          let x = (d.isPrevious || d.isRoot) ? nominalWidth : d.x;
+          let x = d.isPrevious ? 45 : (d.isRoot ? nominalWidth : d.x);
           d3.select(this).selectAll("tspan").attr("x", x);
           return x;
         })
         .attr("y", function (d) {
-          let y = d.isPrevious ? (nominalHeight * 2 - 80) : parseFloat(d.y) - 46;
+          let y = d.isPrevious ? 28 : (parseFloat(d.y) - 46);
           return (d.isRoot ? (nominalHeight - 36) : y) + 12;
         });
 
       nodesText
         .attr("x", function (d) {
-          let x = d.isPrevious ? nominalWidth : d.x;
+          let x = d.isPrevious ? 45 : d.x;
           return d.isRoot ? (nominalWidth) : x;
         })
         .attr("y", function (d) {
-          let y = d.isPrevious ? (nominalHeight * 2 - 40) : d.y;
+          let y = d.isPrevious ? 75 : d.y;
           return d.isRoot ? (nominalHeight - 30) : (parseFloat(y) - 35);
         });
     }
 
-    function dragstarted(d) {
-      if (!d3.event.active) simulation.alphaTarget(0.3).restart();
-      d.fx = d.x;
-      d.fy = d.y;
-    }
-
-    function dragged(d) {
-      d.fx = d3.event.x;
-      d.fy = d3.event.y;
-    }
-
-    function dragended(d) {
-      if (!d3.event.active) simulation.alphaTarget(0);
-      d.fx = null;
-      d.fy = null;
-    }
+    // function dragstarted(d) {
+    //   if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+    //   d.fx = d.x;
+    //   d.fy = d.y;
+    // }
+    //
+    // function dragged(d) {
+    //   d.fx = d3.event.x;
+    //   d.fy = d3.event.y;
+    // }
+    //
+    // function dragended(d) {
+    //   if (!d3.event.active) simulation.alphaTarget(0);
+    //   d.fx = null;
+    //   d.fy = null;
+    // }
   }
 }
 
