@@ -24,11 +24,9 @@ export class ListPage extends SearchPage {
     this.explorerService.exploreGraph(true);
   }
 
-  navigateToList(node, clear?): void {
-    this.explorerService.navigateTo(node);
-    if(clear) {
-      this.clearResults();
-    }
+  navigateTo(node, reset): void {
+    this.explorerService.navigateTo(node, reset);
+    this.clearResults();
   }
 
   loadResults(): void {

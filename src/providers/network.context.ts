@@ -7,11 +7,15 @@ export class NetworkContext {
     this.previousNodes = [];
   }
 
-  changeNode(newNode): void {
-    if(this.isPrevious(newNode)) {
-      this.previousNodes.pop();
+  changeNode(newNode, reset): void {
+    if(reset) {
+      this.previousNodes = [];
     } else {
-      this.previousNodes.push(this.node);
+      if(this.isPrevious(newNode)) {
+        this.previousNodes.pop();
+      } else {
+        this.previousNodes.push(this.node);
+      }
     }
     this.node = newNode;
   }

@@ -16,7 +16,7 @@ export class GraphPage extends SearchPage {
   }
 
   rootNodeChange(event): void {
-    this.explorerService.navigateTo(event.newRoot);
+    this.explorerService.navigateTo(event.newRoot, false);
   }
 
   homeNode(): void {
@@ -28,8 +28,8 @@ export class GraphPage extends SearchPage {
     this.explorerService.exploreGraph(true);
   }
 
-  navigateToGraph(node): void {
-    this.explorerService.networkContext.reset(node);
+  navigateTo(node): void {
+    this.explorerService.navigateTo(node, true);
     this.clearResults();
   }
 

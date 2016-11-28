@@ -16,13 +16,13 @@ export class ExplorerService {
     this.networkContext = new NetworkContext();
   }
 
-  navigateTo(newNode: string, onComplete?): void {
-    this.networkContext.changeNode(newNode);
+  navigateTo(newNode: string, reset, onComplete?): void {
+    this.networkContext.changeNode(newNode, reset);
     this.exploreGraph(false, onComplete);
   }
 
   navigateHome(onComplete?): void {
-    this.networkContext.reset();
+    this.networkContext.changeNode(null, true);
     this.exploreGraph(false, onComplete);
   }
 

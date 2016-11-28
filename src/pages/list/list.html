@@ -21,7 +21,7 @@
   </ion-toolbar>
   <ion-toolbar class="toolbar_header" *ngIf="!showSearch" no-border-bottom>
     <ion-buttons left>
-      <button *ngIf="explorerService.previousNode" ion-button (click)="navigateToList(explorerService.previousNode.id)" class="close_toolbar">
+      <button *ngIf="explorerService.previousNode" ion-button (click)="navigateTo(explorerService.previousNode.id, false)" class="close_toolbar">
         <ion-icon name="arrow-back" large></ion-icon>
       </button>
     </ion-buttons>
@@ -44,7 +44,7 @@
   <div id="list_wrapper" *ngIf="!showSearch">
     <div id="loading_spinner" *ngIf="!explorerService.networkData" text-center><ion-spinner name="dots"></ion-spinner><span light>Chargement en cours</span></div>
     <ion-list id="scroll_nodes" *ngIf="explorerService.networkData && explorerService.networkData.nodes">
-      <div *ngFor="let node of explorerService.networkData.nodes" (click)="navigateToList(node.id)">
+      <div *ngFor="let node of explorerService.networkData.nodes" (click)="navigateTo(node.id, false)">
         <ion-item text-wrap *ngIf="!node.isRoot && !node.isPrevious">
           <ion-thumbnail item-left>
             <ion-img *ngIf="node.picture" [src]="node.picture"></ion-img>
@@ -60,7 +60,7 @@
 
   <div class="loading_spinner" *ngIf="!nodes && showSearch" text-center><ion-spinner name="dots"></ion-spinner><span light>Chargement en cours</span></div>
   <ion-list *ngIf="showSearch" [virtualScroll]="nodes" [approxItemHeight]="'60px'">
-    <ion-item *virtualItem="let node" text-wrap (click)="navigateToList(node.id)">
+    <ion-item *virtualItem="let node" text-wrap (click)="navigateTo(node.id, true)">
       <ion-thumbnail item-left>
         <ion-img *ngIf="node.picture" [src]="node.picture"></ion-img>
         <div *ngIf="!node.picture" class="font_avatar {{node.category}}" text-center>{{node.code}}</div>
