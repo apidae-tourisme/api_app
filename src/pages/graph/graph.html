@@ -33,7 +33,7 @@
 
   <div class="loading_spinner" *ngIf="!nodes && showSearch" text-center><ion-spinner name="dots"></ion-spinner><span light>Chargement en cours</span></div>
   <ion-list *ngIf="showSearch" [virtualScroll]="nodes" [approxItemHeight]="'60px'">
-    <ion-item *virtualItem="let node" text-wrap (click)="navigateToGraph(node.id)">
+    <ion-item *virtualItem="let node" text-wrap (click)="navigateTo(node.id)">
       <ion-thumbnail item-left>
         <ion-img *ngIf="node.picture" [src]="node.picture"></ion-img>
         <div *ngIf="!node.picture" class="font_avatar {{node.category}}" text-center>{{node.code}}</div>
