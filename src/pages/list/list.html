@@ -12,8 +12,7 @@
   <ion-toolbar class="toolbar_header" *ngIf="showSearch && nodes">
     <ion-buttons left>
       <button ion-button (click)="clearResults()" class="close_toolbar">
-        <ion-icon name="arrow-back"></ion-icon>
-        <div>Fermer</div>
+        <ion-icon name="arrow-back" large></ion-icon>
       </button>
     </ion-buttons>
     <ion-title text-center>
@@ -23,8 +22,7 @@
   <ion-toolbar class="toolbar_header" *ngIf="!showSearch" no-border-bottom>
     <ion-buttons left>
       <button *ngIf="explorerService.previousNode" ion-button (click)="navigateToList(explorerService.previousNode.id)" class="close_toolbar">
-        <ion-icon name="arrow-back"></ion-icon>
-        <div>{{explorerService.previousNode.label}}</div>
+        <ion-icon name="arrow-back" large></ion-icon>
       </button>
     </ion-buttons>
     <ion-title text-center>
