@@ -25,7 +25,7 @@
 </ion-header>
 
 <ion-content>
-  <ion-list *ngIf="!showSearch">
+  <ion-list>
     <ion-item *ngIf="node.telephone">
       {{node.telephone}}
       <a ion-button large item-right icon-only outline color="primary" [href]="sanitizeUrl('tel:' + node.telephone)"><ion-icon name="call"></ion-icon></a>
