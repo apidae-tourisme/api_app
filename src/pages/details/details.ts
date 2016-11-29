@@ -1,9 +1,11 @@
-import {Component} from '@angular/core';
-import {NavParams, Events, NavController} from 'ionic-angular';
+import {Component, Renderer} from '@angular/core';
+import {NavParams, Events, NavController, Platform} from 'ionic-angular';
 import {Seed} from "../../components/seed.model";
 import {DomSanitizer, SafeUrl} from "@angular/platform-browser";
 import {InAppBrowser} from "ionic-native";
 import {ExplorerService} from "../../providers/explorer.service";
+import {SearchPage} from "../search/search";
+import {DataService} from "../../providers/data.service";
 
 @Component({
   templateUrl: 'details.html'
@@ -39,5 +41,10 @@ export class DetailsPage {
     if (this.navCtrl.parent.getSelected() != this.navCtrl.parent.getByIndex(0)) {
       this.navCtrl.parent.select(0);
     }
+  }
+
+  homeNode(): void {
+    this.explorerService.networkContext.reset();
+    this.navCtrl.pop();
   }
 }

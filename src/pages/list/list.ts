@@ -36,33 +36,4 @@ export class ListPage extends SearchPage {
   clearResults(): void {
     this.clearNodes(() => {this.content.resize()});
   }
-
-  categoryColor(cat): string {
-    switch(cat) {
-      case 'concept':
-        return 'dark';
-      case 'idea':
-        return 'bulb';
-      case 'organization':
-        return 'favorite';
-      case 'action':
-        return 'bulb';
-      case 'event':
-        return 'danger';
-      case 'competence':
-        return 'danger';
-      case 'product':
-        return 'dark';
-      case 'project':
-        return 'dark';
-      case 'creativework':
-        return 'secondary';
-      case 'schema':
-        return 'secondary';
-      case 'person':
-        return 'primary';
-      default:
-        return 'primary';
-    }
-  }
 }

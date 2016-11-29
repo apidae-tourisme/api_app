@@ -195,12 +195,12 @@ export class GraphComponent implements DoCheck, OnChanges {
     let that = this;
 
     function changeRootNode() {
-      let clickedNode = d3.select(this).datum().id;
-      if(clickedNode != that.newRoot) {
-        that.newRoot = clickedNode;
-        that.rootHasChanged = true;
-      } else {
+      let clickedNode = d3.select(this);
+      if(clickedNode.datum().isRoot) {
         that.rootDetails = true;
+      } else {
+        that.newRoot = clickedNode.datum().id;
+        that.rootHasChanged = true;
       }
     }
 

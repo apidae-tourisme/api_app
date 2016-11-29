@@ -1,22 +1,31 @@
 <ion-header>
-  <ion-navbar color="danger">
-    <ion-title text-center>{{node.label}}</ion-title>
+  <ion-navbar color="danger" mode="md">
+    <ion-buttons left>
+      <button ion-button (click)="homeNode()">
+        <ion-img id="header_logo" src="assets/img/logo_white.png" srcset="assets/img/logo_white.png 2x"></ion-img>
+      </button>
+    </ion-buttons>
   </ion-navbar>
+  <ion-toolbar class="toolbar_header">
+    <ion-title text-center>
+      <button ion-button text-wrap color="{{node.categoryColor()}}" id="title_button">
+        <ion-img *ngIf="node.picture" [src]="node.picture"></ion-img>
+        <div *ngIf="!node.picture" class="font_avatar" text-center>{{node.code}}&nbsp;</div>
+        <div>{{node.label}}</div>
+      </button>
+    </ion-title>
+    <ion-buttons right>
+      <!--<button ion-button item-right outline large color="secondary" (click)="navigateToNetwork(node.id)"><ion-icon name="git-network"></ion-icon></button>-->
+      <!--<button ion-button item-right outline large color="primary" (click)="navigateToList(node.id)"><ion-icon name="list"></ion-icon></button>-->
+    </ion-buttons>
+  </ion-toolbar>
+  <ion-toolbar *ngIf="node.description" id="desc_header" no-border-top>
+    <p text-center>{{node.description}}</p>
+  </ion-toolbar>
 </ion-header>
 
 <ion-content>
-  <ion-list>
-    <ion-item>
-      <ion-thumbnail item-left>
-        <ion-img *ngIf="node.picture" [src]="node.picture"></ion-img>
-        <div *ngIf="!node.picture" class="font_avatar {{node.category}}" text-center>{{node.code}}</div>
-      </ion-thumbnail>
-      <h2 class="dowrap">{{node.label}}</h2>
-      <p *ngIf="node.role" class="dowrap">{{node.role}}</p>
-      <button ion-button item-right outline large color="secondary" (click)="navigateToNetwork(node.id)"><ion-icon name="git-network"></ion-icon></button>
-      <button ion-button item-right outline large color="primary" (click)="navigateToList(node.id)"><ion-icon name="list"></ion-icon></button>
-    </ion-item>
-
+  <ion-list *ngIf="!showSearch">
     <ion-item *ngIf="node.telephone">
       {{node.telephone}}
       <a ion-button large item-right icon-only outline color="primary" [href]="sanitizeUrl('tel:' + node.telephone)"><ion-icon name="call"></ion-icon></a>
@@ -34,9 +43,17 @@
       {{node.url}}
       <a ion-button large item-right icon-only outline color="secondary" (click)="openUrl(node.url)"><ion-icon name="open"></ion-icon></a>
     </ion-item>
-    <ion-item *ngIf="node.description">
-      <p class="dowrap">{{node.description}}</p>
+    <ion-item *ngIf="node.creationDate > 0">
+      Date de création : {{node.createdAt().toLocaleDateString('fr-FR') + ' ' + node.createdAt().toLocaleTimeString('fr-FR')}}
+    </ion-item>
+    <ion-item *ngIf="node.updateDate">
+      Dernière mise à jour : {{node.updatedAt().toLocaleDateString('fr-FR') + ' ' + node.updatedAt().toLocaleTimeString('fr-FR')}}
+    </ion-item>
+    <ion-item *ngIf="node.startDate">
+      Date de début : {{node.startedAt().toLocaleDateString('fr-FR') + ' ' + node.startedAt().toLocaleTimeString('fr-FR')}}
+    </ion-item>
+    <ion-item *ngIf="node.endDate">
+      Date de fin : {{node.endedAt().toLocaleDateString('fr-FR') + ' ' + node.endedAt().toLocaleTimeString('fr-FR')}}
     </ion-item>
   </ion-list>
-
 </ion-content>

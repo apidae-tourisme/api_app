@@ -26,7 +26,7 @@
       </button>
     </ion-buttons>
     <ion-title text-center>
-      <button ion-button text-wrap (click)="modalDetails(explorerService.rootNode.id)" color="{{categoryColor(explorerService.rootNode.category)}}" id="title_button">
+      <button ion-button text-wrap (click)="modalDetails(explorerService.rootNode.id)" color="{{explorerService.rootNode.categoryColor()}}" id="title_button">
         <ion-img *ngIf="explorerService.rootNode.picture" [src]="explorerService.rootNode.picture"></ion-img>
         <div *ngIf="!explorerService.rootNode.picture" class="font_avatar" text-center>{{explorerService.rootNode.code}}&nbsp;</div>
         <div>{{explorerService.rootNode.label}}</div>
