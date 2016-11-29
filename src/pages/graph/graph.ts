@@ -1,18 +1,18 @@
 import {Component, ViewChild, Renderer} from '@angular/core';
-import {Events, NavController, Content, Platform} from 'ionic-angular';
+import {Content, NavController, Platform} from 'ionic-angular';
 import {ExplorerService} from "../../providers/explorer.service";
-import {SearchPage} from "../search/search";
+import {SearchService} from "../../providers/search.service";
+import {DetailsPage} from "../details/details";
 import {DataService} from "../../providers/data.service";
 
 @Component({
   templateUrl: 'graph.html'
 })
-export class GraphPage extends SearchPage {
+export class GraphPage {
   @ViewChild(Content) content: Content;
 
-  constructor(public navCtrl: NavController, public events: Events, protected renderer: Renderer,
-              protected dataService: DataService, public explorerService: ExplorerService, protected platform: Platform) {
-    super(navCtrl, events, renderer, dataService, explorerService, platform);
+  constructor(public explorerService: ExplorerService, public searchService: SearchService, private platform: Platform,
+              private dataService: DataService, private navCtrl: NavController, protected renderer: Renderer) {
   }
 
   rootNodeChange(event): void {
@@ -34,10 +34,26 @@ export class GraphPage extends SearchPage {
   }
 
   loadResults(): void {
-    this.loadNodes(() => {this.content.resize()});
+    this.searchService.loadNodes(() => {this.content.resize()});
   }
 
   clearResults(): void {
-    this.clearNodes(() => {this.content.resize()});
+    this.searchService.clearNodes(() => {this.content.resize()});
+  }
+
+  modalDetails(nodeId?) {
+    let currentNode = nodeId || this.explorerService.networkContext.node;
+    this.dataService.getNodeDetails(currentNode).subscribe(data => {
+      this.navCtrl.push(DetailsPage, {node: data.node});
+    });
+  }
+
+  filterNodes(ev: any) {
+    this.searchService.filterNodes(ev);
+
+    // Temp fix on iOS - Searchbar keeps focus even when another button is clicked
+    if(this.platform.is('ios')) {
+      this.renderer.invokeElementMethod(ev.target, 'blur');
+    }
   }
 }

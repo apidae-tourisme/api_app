@@ -1,28 +1,28 @@
 <ion-header>
-  <ion-navbar color="danger" mode="md">
+  <ion-navbar color="danger">
     <ion-buttons left>
       <button ion-button (click)="homeNode()">
         <ion-img id="header_logo" src="assets/img/logo_white.png" srcset="assets/img/logo_white.png 2x"></ion-img>
       </button>
     </ion-buttons>
-    <ion-toolbar color="danger" mode="md" no-border>
+    <ion-toolbar color="danger" no-border>
       <ion-searchbar (ionInput)="filterNodes($event)" (ionFocus)="loadResults()" placeholder="Rechercher" debounce="800"></ion-searchbar>
     </ion-toolbar>
   </ion-navbar>
-  <ion-toolbar class="toolbar_header" *ngIf="showSearch && nodes">
+  <ion-toolbar class="toolbar_header" *ngIf="searchService.showSearch && searchService.nodes && searchService.nodes.length > 0">
     <ion-buttons left>
       <button ion-button (click)="clearResults()" class="close_toolbar">
         <ion-icon name="arrow-back" large></ion-icon>
       </button>
     </ion-buttons>
     <ion-title text-center>
-      <div>{{nodes.length}} résultat{{nodes.length != 1 ? 's' : ''}}</div>
+      <div>{{searchService.nodes.length}} résultat{{searchService.nodes.length != 1 ? 's' : ''}}</div>
     </ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content id="graph_wrapper">
-  <div *ngIf="!showSearch">
+  <div *ngIf="!searchService.showSearch">
     <div class="loading_spinner" *ngIf="!explorerService.networkData" text-center>
       <ion-spinner name="dots"></ion-spinner>
       <span color="light">Chargement en cours</span>
@@ -31,8 +31,8 @@
            (rootChange)="rootNodeChange($event);"></graph>
   </div>
 
-  <div class="loading_spinner" *ngIf="!nodes && showSearch" text-center><ion-spinner name="dots"></ion-spinner><span light>Chargement en cours</span></div>
-  <ion-list *ngIf="showSearch" [virtualScroll]="nodes" [approxItemHeight]="'60px'">
+  <div class="loading_spinner" *ngIf="(!searchService.nodes || searchService.nodes.length == 0) && searchService.showSearch" text-center><ion-spinner name="dots"></ion-spinner><span light>Chargement en cours</span></div>
+  <ion-list *ngIf="searchService.showSearch" [virtualScroll]="searchService.nodes" [approxItemHeight]="'60px'">
     <ion-item *virtualItem="let node" text-wrap (click)="navigateTo(node.id)">
       <ion-thumbnail item-left>
         <ion-img *ngIf="node.picture" [src]="node.picture"></ion-img>

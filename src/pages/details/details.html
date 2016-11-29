@@ -1,12 +1,30 @@
 <ion-header>
-  <ion-navbar color="danger" mode="md">
+  <ion-navbar color="danger" hideBackButton="true">
     <ion-buttons left>
       <button ion-button (click)="homeNode()">
         <ion-img id="header_logo" src="assets/img/logo_white.png" srcset="assets/img/logo_white.png 2x"></ion-img>
       </button>
     </ion-buttons>
+    <ion-toolbar color="danger" no-border>
+      <ion-searchbar (ionInput)="filterNodes($event)" (ionFocus)="loadResults()" placeholder="Rechercher" debounce="500"></ion-searchbar>
+    </ion-toolbar>
   </ion-navbar>
-  <ion-toolbar class="toolbar_header">
+  <ion-toolbar class="toolbar_header" *ngIf="searchService.showSearch && searchService.nodes && searchService.nodes.length > 0">
+    <ion-buttons left>
+      <button ion-button (click)="clearResults()" class="close_toolbar">
+        <ion-icon name="arrow-back" large></ion-icon>
+      </button>
+    </ion-buttons>
+    <ion-title text-center>
+      <div>{{searchService.nodes.length}} résultat{{searchService.nodes.length != 1 ? 's' : ''}}</div>
+    </ion-title>
+  </ion-toolbar>
+  <ion-toolbar class="toolbar_header" *ngIf="!searchService.showSearch">
+    <ion-buttons left>
+      <button ion-button (click)="navigateTo(node.id, false)" class="close_toolbar">
+        <ion-icon name="arrow-back" large></ion-icon>
+      </button>
+    </ion-buttons>
     <ion-title text-center>
       <button ion-button text-wrap color="{{node.categoryColor()}}" id="title_button">
         <ion-img *ngIf="node.picture" [src]="node.picture"></ion-img>
@@ -15,17 +33,15 @@
       </button>
     </ion-title>
     <ion-buttons right>
-      <!--<button ion-button item-right outline large color="secondary" (click)="navigateToNetwork(node.id)"><ion-icon name="git-network"></ion-icon></button>-->
-      <!--<button ion-button item-right outline large color="primary" (click)="navigateToList(node.id)"><ion-icon name="list"></ion-icon></button>-->
     </ion-buttons>
   </ion-toolbar>
-  <ion-toolbar *ngIf="node.description" id="desc_header" no-border-top>
+  <ion-toolbar *ngIf="node.description && !searchService.showSearch" id="desc_header" no-border-top>
     <p text-center>{{node.description}}</p>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
-  <ion-list>
+  <ion-list *ngIf="!searchService.showSearch">
     <ion-item *ngIf="node.telephone">
       {{node.telephone}}
       <a ion-button large item-right icon-only outline color="primary" [href]="sanitizeUrl('tel:' + node.telephone)"><ion-icon name="call"></ion-icon></a>
@@ -54,6 +70,19 @@
     </ion-item>
     <ion-item *ngIf="node.endDate">
       Date de fin : {{node.endedAt().toLocaleDateString('fr-FR') + ' ' + node.endedAt().toLocaleTimeString('fr-FR')}}
+    </ion-item>
+  </ion-list>
+
+  <div class="loading_spinner" *ngIf="(!searchService.nodes || searchService.nodes.length == 0) && searchService.showSearch" text-center><ion-spinner name="dots"></ion-spinner><span light>Chargement en cours</span></div>
+  <ion-list *ngIf="searchService.showSearch" [virtualScroll]="searchService.nodes" [approxItemHeight]="'60px'">
+    <ion-item *virtualItem="let node" text-wrap (click)="navigateTo(node.id)">
+      <ion-thumbnail item-left>
+        <ion-img *ngIf="node.picture" [src]="node.picture"></ion-img>
+        <div *ngIf="!node.picture" class="font_avatar {{node.category}}" text-center>{{node.code}}</div>
+      </ion-thumbnail>
+      <h2>{{node.label}}</h2>
+      <p>{{node.description}}</p>
+      <ion-icon item-right name="arrow-forward" large></ion-icon>
     </ion-item>
   </ion-list>
 </ion-content>

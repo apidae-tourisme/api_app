@@ -85,8 +85,12 @@ ion-header .toolbar_header .toolbar-title {
   align-items: center;
 }
 
-ion-header .toolbar_header .toolbar-title.toolbar-title-ios {
-  font-size: 1.2rem;
+ion-header .toolbar_header #title_button {
+  white-space: normal;
+}
+
+ion-header .toolbar_header .toolbar-title ion-img {
+  overflow: visible;
 }
 
 ion-header .toolbar_header .toolbar-title img {
@@ -117,12 +121,3 @@ ion-header .toolbar_header #nodeDetails .button-inner {
 ion-header .toolbar_header .button-inner > ion-icon {
   font-size: 2.6rem;
 }
-
-//ion-header .toolbar_header .close_toolbar .button-inner > div {
-//  max-width: 80px;
-//  overflow: hidden;
-//  text-overflow: ellipsis;
-//  white-space: nowrap;
-//  font-size: 12px;
-//  text-transform: none;
-//}

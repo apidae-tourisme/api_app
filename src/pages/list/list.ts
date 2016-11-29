@@ -1,22 +1,22 @@
 import {Component, ViewChild, Renderer} from '@angular/core';
-import {NavController, Events, Content, Platform} from 'ionic-angular';
+import {NavController, Content, Platform} from 'ionic-angular';
 import {ExplorerService} from "../../providers/explorer.service";
-import {SearchPage} from "../search/search";
+import {DetailsPage} from "../details/details";
+import {SearchService} from "../../providers/search.service";
 import {DataService} from "../../providers/data.service";
 
 @Component({
   templateUrl: 'list.html'
 })
-export class ListPage extends SearchPage {
+export class ListPage {
   @ViewChild(Content) content: Content;
 
-  constructor(public navCtrl: NavController, public events: Events, protected renderer: Renderer,
-              protected dataService: DataService, public explorerService: ExplorerService, protected platform: Platform) {
-    super(navCtrl, events, renderer, dataService, explorerService, platform);
+  constructor(public navCtrl: NavController, protected renderer: Renderer, private dataService: DataService,
+              public searchService: SearchService, public explorerService: ExplorerService, protected platform: Platform) {
   }
 
   homeNode(): void {
-    this.explorerService.navigateHome();
+    this.explorerService.navigateHome(() => {this.content.resize()});
     this.clearResults();
   }
 
@@ -24,16 +24,34 @@ export class ListPage extends SearchPage {
     this.explorerService.exploreGraph(true);
   }
 
-  navigateTo(node, reset): void {
-    this.explorerService.navigateTo(node, reset);
-    this.clearResults();
+  navigateTo(node, reset, clear?): void {
+    this.explorerService.navigateTo(node, reset, () => {this.content.resize()});
+    if(clear) {
+      this.clearResults();
+    }
   }
 
   loadResults(): void {
-    this.loadNodes(() => {this.content.resize()});
+    this.searchService.loadNodes(() => {this.content.resize()});
   }
 
   clearResults(): void {
-    this.clearNodes(() => {this.content.resize()});
+    this.searchService.clearNodes(() => {this.content.resize()});
+  }
+
+  modalDetails(nodeId?) {
+    let currentNode = nodeId || this.explorerService.networkContext.node;
+    this.dataService.getNodeDetails(currentNode).subscribe(data => {
+      this.navCtrl.push(DetailsPage, {node: data.node});
+    });
+  }
+
+  filterNodes(ev: any) {
+    this.searchService.filterNodes(ev);
+
+    // Temp fix on iOS - Searchbar keeps focus even when another button is clicked
+    if(this.platform.is('ios')) {
+      this.renderer.invokeElementMethod(ev.target, 'blur');
+    }
   }
 }

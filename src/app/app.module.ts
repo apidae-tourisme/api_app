@@ -14,6 +14,7 @@ import {AuthService} from "../providers/auth.service";
 import {LoginPage} from "../pages/login/login";
 import {DetailsPage} from "../pages/details/details";
 import { Storage } from '@ionic/storage';
+import {SearchService} from "../providers/search.service";
 
 @NgModule({
   declarations: [
@@ -27,7 +28,14 @@ import { Storage } from '@ionic/storage';
     GraphComponent
   ],
   imports: [
-    IonicModule.forRoot(ApiApp, {scrollAssist: false, autoFocusAssist: false})
+    IonicModule.forRoot(ApiApp,
+      {
+        scrollAssist: false,
+        autoFocusAssist: false,
+        mode: 'md',
+        tabsPlacement: 'bottom'
+      }
+    )
   ],
   bootstrap: [IonicApp],
   entryComponents: [
@@ -43,6 +51,7 @@ import { Storage } from '@ionic/storage';
     AuthService,
     DataService,
     ExplorerService,
+    SearchService,
     NetworkContext,
     Storage
   ]
