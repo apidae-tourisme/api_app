@@ -4,6 +4,7 @@ import {ExplorerService} from "../../providers/explorer.service";
 import {DetailsPage} from "../details/details";
 import {SearchService} from "../../providers/search.service";
 import {DataService} from "../../providers/data.service";
+import {AuthService} from "../../providers/auth.service";
 
 @Component({
   templateUrl: 'list.html'
@@ -11,8 +12,11 @@ import {DataService} from "../../providers/data.service";
 export class ListPage {
   @ViewChild(Content) content: Content;
 
+  public searchQuery: string;
+
   constructor(public navCtrl: NavController, protected renderer: Renderer, private dataService: DataService,
-              public searchService: SearchService, public explorerService: ExplorerService, protected platform: Platform) {
+              public searchService: SearchService, public explorerService: ExplorerService, public authService: AuthService,
+              protected platform: Platform) {
   }
 
   homeNode(): void {
@@ -37,6 +41,7 @@ export class ListPage {
 
   clearResults(): void {
     this.searchService.clearNodes(() => {this.content.resize()});
+    this.searchQuery = null;
   }
 
   modalDetails(nodeId?) {

@@ -1,12 +1,12 @@
 import {Component, Renderer, ViewChild} from '@angular/core';
-import {NavParams, Events, NavController, Platform, Content} from 'ionic-angular';
+import {App, NavParams, Events, NavController, Platform, Content, AlertController} from 'ionic-angular';
 import {Seed} from "../../components/seed.model";
 import {DomSanitizer, SafeUrl} from "@angular/platform-browser";
 import {InAppBrowser} from "ionic-native";
 import {ExplorerService} from "../../providers/explorer.service";
-import {SearchPage} from "../search/search";
-import {DataService} from "../../providers/data.service";
 import {SearchService} from "../../providers/search.service";
+import {AuthService} from "../../providers/auth.service";
+import {LoginPage} from "../login/login";
 
 @Component({
   templateUrl: 'details.html'
@@ -15,10 +15,11 @@ export class DetailsPage {
   @ViewChild(Content) content: Content;
 
   public node: Seed;
+  public searchQuery: string;
 
-  constructor(params: NavParams, private navCtrl: NavController, public events: Events, private sanitizer: DomSanitizer,
-              private explorerService: ExplorerService, public searchService: SearchService, private platform: Platform,
-              protected renderer: Renderer) {
+  constructor(private app: App, params: NavParams, private navCtrl: NavController, public events: Events, private sanitizer: DomSanitizer,
+              private explorerService: ExplorerService, public searchService: SearchService, public authService: AuthService,
+              private platform: Platform, protected renderer: Renderer, public alertCtrl: AlertController) {
     this.node = new Seed(params.get('node'), false, false);
   }
 
@@ -47,6 +48,7 @@ export class DetailsPage {
 
   clearResults(): void {
     this.searchService.clearNodes(() => {this.content.resize()});
+    this.searchQuery = null;
   }
 
   filterNodes(ev: any) {
@@ -56,5 +58,27 @@ export class DetailsPage {
     if(this.platform.is('ios')) {
       this.renderer.invokeElementMethod(ev.target, 'blur');
     }
+  }
+
+  logOut() {
+    let confirm = this.alertCtrl.create({
+      title: 'Déconnexion',
+      message: 'Souhaitez-vous vous déconnecter ?',
+      buttons: [
+        {text: 'Non', handler: () => {}},
+        {
+          text: 'Oui',
+          handler: () => {
+            this.authService.logOut().then(() => {
+              console.log('logOut');
+              this.authService.userSeed = null;
+              console.log('userSeed : ' + this.authService.userSeed);
+              this.app.getRootNav().setRoot(LoginPage);
+            });
+          }
+        }
+      ]
+    });
+    confirm.present();
   }
 }

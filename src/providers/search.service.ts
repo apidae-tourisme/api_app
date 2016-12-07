@@ -43,7 +43,7 @@ export class SearchService {
 
   clearNodes(onComplete?): void {
     this.showSearch = false;
-    this.nodes = [];
+    this.nodes = null;
     if(onComplete) {
       onComplete();
     }

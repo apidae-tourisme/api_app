@@ -4,6 +4,7 @@ import {ExplorerService} from "../../providers/explorer.service";
 import {SearchService} from "../../providers/search.service";
 import {DetailsPage} from "../details/details";
 import {DataService} from "../../providers/data.service";
+import {AuthService} from "../../providers/auth.service";
 
 @Component({
   templateUrl: 'graph.html'
@@ -11,8 +12,11 @@ import {DataService} from "../../providers/data.service";
 export class GraphPage {
   @ViewChild(Content) content: Content;
 
-  constructor(public explorerService: ExplorerService, public searchService: SearchService, private platform: Platform,
-              private dataService: DataService, private navCtrl: NavController, protected renderer: Renderer) {
+  public searchQuery: string;
+
+  constructor(public explorerService: ExplorerService, public searchService: SearchService, public authService: AuthService,
+              private platform: Platform, private dataService: DataService, private navCtrl: NavController,
+              protected renderer: Renderer) {
   }
 
   rootNodeChange(event): void {
@@ -39,6 +43,7 @@ export class GraphPage {
 
   clearResults(): void {
     this.searchService.clearNodes(() => {this.content.resize()});
+    this.searchQuery = null;
   }
 
   modalDetails(nodeId?) {

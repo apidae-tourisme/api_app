@@ -6,82 +6,90 @@
       </button>
     </ion-buttons>
     <ion-toolbar color="danger" no-border>
-      <ion-searchbar (ionInput)="filterNodes($event)" (ionFocus)="loadResults()" placeholder="Rechercher" debounce="500"></ion-searchbar>
+      <ion-searchbar (ionInput)="filterNodes($event)" (ionFocus)="loadResults()" [(ngModel)]="searchQuery" placeholder="Rechercher" debounce="500"></ion-searchbar>
     </ion-toolbar>
+    <ion-buttons right *ngIf="authService.userSeed">
+      <button ion-button (click)="navigateTo(authService.userSeed.id)">
+        <ion-img id="avatar_logo" *ngIf="authService.userSeed.picture" [src]="authService.userSeed.picture"></ion-img>
+      </button>
+    </ion-buttons>
   </ion-navbar>
-  <ion-toolbar class="toolbar_header" *ngIf="searchService.showSearch && searchService.nodes && searchService.nodes.length > 0">
+  <ion-toolbar class="toolbar_header" *ngIf="searchService.showSearch && searchService.nodes">
     <ion-buttons left>
       <button ion-button (click)="clearResults()" class="close_toolbar">
         <ion-icon name="arrow-back" large></ion-icon>
       </button>
     </ion-buttons>
     <ion-title text-center>
-      <div>{{searchService.nodes.length}} résultat{{searchService.nodes.length != 1 ? 's' : ''}}</div>
+      <div>{{searchService.nodes.length == 0 ? 'Aucun' : searchService.nodes.length}} résultat{{searchService.nodes.length > 1 ? 's' : ''}}</div>
     </ion-title>
   </ion-toolbar>
-  <ion-toolbar class="toolbar_header" *ngIf="!searchService.showSearch">
+  <ion-toolbar class="toolbar_header" *ngIf="!searchService.showSearch" color="{{node.categoryColor()}}">
     <ion-buttons left>
-      <button ion-button (click)="navigateTo(node.id, false)" class="close_toolbar">
+      <button ion-button color="lighter" (click)="navigateTo(node.id)" class="close_toolbar">
         <ion-icon name="arrow-back" large></ion-icon>
       </button>
     </ion-buttons>
     <ion-title text-center>
-      <button ion-button text-wrap color="{{node.categoryColor()}}" id="title_button">
+      <button ion-button text-wrap clear color="lighter" outline id="title_button">
         <ion-img *ngIf="node.picture" [src]="node.picture"></ion-img>
         <div *ngIf="!node.picture" class="font_avatar" text-center>{{node.code}}&nbsp;</div>
         <div>{{node.label}}</div>
       </button>
     </ion-title>
-    <ion-buttons right>
+    <ion-buttons right *ngIf="authService.userSeed && node.id == authService.userSeed.id">
+      <button ion-button color="lighter" (click)="logOut()" large>
+        <ion-icon name="exit" large></ion-icon>
+      </button>
     </ion-buttons>
   </ion-toolbar>
-  <ion-toolbar *ngIf="node.description && !searchService.showSearch" id="desc_header" no-border-top>
-    <p text-center>{{node.description}}</p>
+  <ion-toolbar *ngIf="node.description && !searchService.showSearch" id="desc_header" no-border-top color="{{node.categoryColor()}}">
+    <p text-center class="selectable" color="lighter">{{node.description}}</p>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
   <ion-list *ngIf="!searchService.showSearch">
-    <ion-item *ngIf="node.telephone">
+    <ion-item *ngIf="node.telephone" class="selectable">
       {{node.telephone}}
-      <a ion-button large item-right icon-only outline color="primary" [href]="sanitizeUrl('tel:' + node.telephone)"><ion-icon name="call"></ion-icon></a>
+      <a ion-button large item-right icon-only clear color="primary" [href]="sanitizeUrl('tel:' + node.telephone)"><ion-icon name="call"></ion-icon></a>
     </ion-item>
-    <ion-item *ngIf="node.mobilePhone">
+    <ion-item *ngIf="node.mobilePhone" class="selectable">
       {{node.mobilePhone}}
-      <a ion-button large item-right icon-only outline color="primary" [href]="sanitizeUrl('tel:' + node.mobilePhone)"><ion-icon name="phone-portrait"></ion-icon></a>
-      <a ion-button large item-right icon-only outline color="secondary" [href]="sanitizeUrl('sms:' + node.mobilePhone)"><ion-icon name="text"></ion-icon></a>
+      <a ion-button large item-right icon-only clear color="primary" [href]="sanitizeUrl('tel:' + node.mobilePhone)"><ion-icon name="phone-portrait"></ion-icon></a>
+      <a ion-button large item-right icon-only clear color="secondary" [href]="sanitizeUrl('sms:' + node.mobilePhone)"><ion-icon name="text"></ion-icon></a>
     </ion-item>
-    <ion-item *ngIf="node.email">
+    <ion-item *ngIf="node.email" class="selectable">
       {{node.email}}
-      <a ion-button large item-right icon-only outline color="danger" [href]="sanitizeUrl('mailto:' + node.email)"><ion-icon name="mail"></ion-icon></a>
+      <a ion-button large item-right icon-only clear color="danger" [href]="sanitizeUrl('mailto:' + node.email)"><ion-icon name="mail"></ion-icon></a>
     </ion-item>
-    <ion-item *ngIf="node.url">
+    <ion-item *ngIf="node.url" class="selectable">
       {{node.url}}
-      <a ion-button large item-right icon-only outline color="secondary" (click)="openUrl(node.url)"><ion-icon name="open"></ion-icon></a>
+      <a ion-button large item-right icon-only clear color="secondary" (click)="openUrl(node.url)"><ion-icon name="open"></ion-icon></a>
     </ion-item>
-    <ion-item *ngIf="node.creationDate > 0">
+    <ion-item *ngIf="node.creationDate > 0" class="selectable">
       Date de création : {{node.createdAt().toLocaleDateString('fr-FR') + ' ' + node.createdAt().toLocaleTimeString('fr-FR')}}
     </ion-item>
-    <ion-item *ngIf="node.updateDate">
+    <ion-item *ngIf="node.updateDate" class="selectable">
       Dernière mise à jour : {{node.updatedAt().toLocaleDateString('fr-FR') + ' ' + node.updatedAt().toLocaleTimeString('fr-FR')}}
     </ion-item>
-    <ion-item *ngIf="node.startDate">
+    <ion-item *ngIf="node.startDate" class="selectable">
       Date de début : {{node.startedAt().toLocaleDateString('fr-FR') + ' ' + node.startedAt().toLocaleTimeString('fr-FR')}}
     </ion-item>
-    <ion-item *ngIf="node.endDate">
+    <ion-item *ngIf="node.endDate" class="selectable">
       Date de fin : {{node.endedAt().toLocaleDateString('fr-FR') + ' ' + node.endedAt().toLocaleTimeString('fr-FR')}}
     </ion-item>
   </ion-list>
 
-  <div class="loading_spinner" *ngIf="(!searchService.nodes || searchService.nodes.length == 0) && searchService.showSearch" text-center><ion-spinner name="dots"></ion-spinner><span light>Chargement en cours</span></div>
-  <ion-list *ngIf="searchService.showSearch" [virtualScroll]="searchService.nodes" [approxItemHeight]="'60px'">
+  <div class="loading_spinner" *ngIf="!searchService.nodes && searchService.showSearch" text-center><ion-spinner name="dots"></ion-spinner><span light>Chargement en cours</span></div>
+  <ion-list *ngIf="searchService.showSearch && searchService.nodes && searchService.nodes.length > 0" [virtualScroll]="searchService.nodes" [approxItemHeight]="'60px'">
     <ion-item *virtualItem="let node" text-wrap (click)="navigateTo(node.id)">
       <ion-thumbnail item-left>
         <ion-img *ngIf="node.picture" [src]="node.picture"></ion-img>
         <div *ngIf="!node.picture" class="font_avatar {{node.category}}" text-center>{{node.code}}</div>
       </ion-thumbnail>
       <h2>{{node.label}}</h2>
-      <p>{{node.description}}</p>
+      <p text-nowrap>{{node.description}}</p>
       <ion-icon item-right name="arrow-forward" large></ion-icon>
     </ion-item>
   </ion-list>

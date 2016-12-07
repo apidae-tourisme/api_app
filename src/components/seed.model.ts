@@ -21,7 +21,7 @@ export class Seed {
 
   public constructor(nodeData: any, public isRoot: boolean, public isPrevious: boolean) {
     this.id = nodeData.id;
-    this.label = (nodeData.firstName && nodeData.lastName) ? (nodeData.firstName + ' ' + nodeData.lastName) : nodeData.name;
+    this.label = (nodeData.firstname && nodeData.lastname) ? (nodeData.firstname + ' ' + nodeData.lastname) : nodeData.name;
     this.description = nodeData.description;
     this.category = nodeData.label.toLowerCase();
     this.firstName = nodeData.firstname;

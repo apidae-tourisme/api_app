@@ -6,17 +6,22 @@
       </button>
     </ion-buttons>
     <ion-toolbar color="danger" no-border>
-      <ion-searchbar (ionInput)="filterNodes($event)" (ionFocus)="loadResults()" placeholder="Rechercher" debounce="500"></ion-searchbar>
+      <ion-searchbar (ionInput)="filterNodes($event)" (ionFocus)="loadResults()" [(ngModel)]="searchQuery" placeholder="Rechercher" debounce="500"></ion-searchbar>
     </ion-toolbar>
+    <ion-buttons right *ngIf="authService.userSeed">
+      <button ion-button (click)="navigateTo(authService.userSeed.id, true, true)">
+        <ion-img id="avatar_logo" *ngIf="authService.userSeed.picture" [src]="authService.userSeed.picture"></ion-img>
+      </button>
+    </ion-buttons>
   </ion-navbar>
-  <ion-toolbar class="toolbar_header" *ngIf="searchService.showSearch && searchService.nodes && searchService.nodes.length > 0">
+  <ion-toolbar class="toolbar_header" *ngIf="searchService.showSearch && searchService.nodes">
     <ion-buttons left>
       <button ion-button (click)="clearResults()" class="close_toolbar">
         <ion-icon name="arrow-back" large></ion-icon>
       </button>
     </ion-buttons>
     <ion-title text-center>
-      <div>{{searchService.nodes.length}} résultat{{searchService.nodes.length != 1 ? 's' : ''}}</div>
+      <div>{{searchService.nodes.length == 0 ? 'Aucun' : searchService.nodes.length}} résultat{{searchService.nodes.length > 1 ? 's' : ''}}</div>
     </ion-title>
   </ion-toolbar>
   <ion-toolbar class="toolbar_header" *ngIf="!searchService.showSearch" no-border-bottom>
@@ -51,22 +56,22 @@
             <div *ngIf="!node.picture" class="font_avatar {{node.category}}" text-center>{{node.code}}</div>
           </ion-thumbnail>
           <h2>{{node.label}}</h2>
-          <p>{{node.description}}</p>
+          <p text-nowrap>{{node.description}}</p>
           <button ion-button large clear item-right><ion-icon name="arrow-forward"></ion-icon></button>
         </ion-item>
       </div>
     </ion-list>
   </div>
 
-  <div class="loading_spinner" *ngIf="(!searchService.nodes || searchService.nodes.length == 0) && searchService.showSearch" text-center><ion-spinner name="dots"></ion-spinner><span light>Chargement en cours</span></div>
-  <ion-list *ngIf="searchService.showSearch" [virtualScroll]="searchService.nodes" [approxItemHeight]="'60px'">
+  <div class="loading_spinner" *ngIf="!searchService.nodes && searchService.showSearch" text-center><ion-spinner name="dots"></ion-spinner><span light>Chargement en cours</span></div>
+  <ion-list *ngIf="searchService.showSearch && searchService.nodes && searchService.nodes.length > 0" [virtualScroll]="searchService.nodes" [approxItemHeight]="'60px'">
     <ion-item *virtualItem="let node" text-wrap (click)="navigateTo(node.id, true, true)">
       <ion-thumbnail item-left>
         <ion-img *ngIf="node.picture" [src]="node.picture"></ion-img>
         <div *ngIf="!node.picture" class="font_avatar {{node.category}}" text-center>{{node.code}}</div>
       </ion-thumbnail>
       <h2>{{node.label}}</h2>
-      <p>{{node.description}}</p>
+      <p text-nowrap>{{node.description}}</p>
       <button ion-button large clear item-right><ion-icon name="arrow-forward"></ion-icon></button>
     </ion-item>
   </ion-list>

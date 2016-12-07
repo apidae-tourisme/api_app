@@ -17,7 +17,9 @@ export class LoginPage {
       let callBackParams = url.slice(url.indexOf('?'));
       let storedAuth = this.authService.setLocalAuthData(callBackParams);
       if(storedAuth) {
-        storedAuth.then(() => this.loggedInRedirect());
+        storedAuth.then(() => {
+          window.location.href = '/';
+        });
       }
     } else {
       this.platform.ready().then(() => {
@@ -35,6 +37,8 @@ export class LoginPage {
   }
 
   loggedInRedirect(): void {
-    this.navCtrl.setRoot(TabsPage, {}, {animate: false});
+    this.authService.loadUserSeed(() => {
+      this.navCtrl.setRoot(TabsPage, {}, {animate: false});
+    }, () => {});
   }
 }

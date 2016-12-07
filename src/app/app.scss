@@ -2,8 +2,13 @@
   min-height: inherit;
 }
 
-#header_logo {
+#header_logo,
+#avatar_logo {
   max-width: 50px;
+}
+
+#avatar_logo {
+  border-radius: 25px;
 }
 
 #header_search > span {
@@ -22,6 +27,17 @@
 
 .dowrap {
   white-space: pre-line;
+}
+
+.selectable {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+}
+
+ion-list ion-item.item-block {
+  min-height: 75px;
 }
 
 div.font_avatar {
@@ -119,5 +135,5 @@ ion-header .toolbar_header #nodeDetails .button-inner {
 }
 
 ion-header .toolbar_header .button-inner > ion-icon {
-  font-size: 2.6rem;
+  font-size: 3.2rem;
 }

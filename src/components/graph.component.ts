@@ -160,22 +160,7 @@ export class GraphComponent implements DoCheck, OnChanges {
     allTexts.on("click", changeRootNode);
     nodesImg.on("click", changeRootNode);
     nodesBg.on("click", changeRootNode);
-
-    // let draggableTexts = allTexts.select(function(d, i) { return (d.isRoot || d.isPrevious) ? null : this; });
-    // draggableTexts.call(d3.drag()
-    //   .on("start", dragstarted)
-    //   .on("drag", dragged)
-    //   .on("end", dragended));
-    // let draggableImg = nodesImg.select(function(d, i) { return (d.isRoot || d.isPrevious) ? null : this; });
-    // draggableImg.call(d3.drag()
-    //   .on("start", dragstarted)
-    //   .on("drag", dragged)
-    //   .on("end", dragended));
-    // let draggableBg = nodesBg.select(function(d, i) { return (d.isRoot || d.isPrevious) ? null : this; });
-    // draggableBg.call(d3.drag()
-    //   .on("start", dragstarted)
-    //   .on("drag", dragged)
-    //   .on("end", dragended));
+    nodesMask.on("click", changeRootNode);
 
     wrapLabels(nodesLabel);
 
