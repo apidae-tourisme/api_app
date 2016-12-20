@@ -48,7 +48,6 @@ export class DetailsPage {
       this.loadDetails();
     });
     if(clear) {
-      console.log('clearing');
       this.clearResults();
     }
   }
@@ -59,10 +58,7 @@ export class DetailsPage {
 
   clearResults(): void {
     this.searchService.clearNodes(() => {
-      console.log('clearing nodes');
       this.content.resize();
-      console.log('search nodes : ' + this.searchService.nodes);
-      console.log('showSearch : ' + this.searchService.showSearch);
     });
     this.searchQuery = null;
   }

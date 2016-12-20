@@ -18,7 +18,7 @@ ion-toolbar #title_details p:first-child {
 
 ion-toolbar #title_details p:last-child {
   color: map-get($colors, text_alt);
-  font-size: $button-md-small-font-size;
+  font-size: 1.1rem;
 }
 
 ion-toolbar #edit_seed {

@@ -1,7 +1,6 @@
 import {Component} from '@angular/core';
 import {NavController, ModalController} from 'ionic-angular';
 import {DataService} from "../../providers/data.service";
-import {SearchPage} from "../search/search";
 
 @Component({
   templateUrl: 'map.html'
@@ -32,10 +31,5 @@ export class MapPage {
     //   this.cachedNodes = data.nodes;
     //   this.nodes = data.nodes;
     // });
-  }
-
-  modalSearch() {
-    let modal = this.modalCtrl.create(SearchPage);
-    modal.present();
   }
 }

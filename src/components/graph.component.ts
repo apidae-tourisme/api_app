@@ -162,7 +162,7 @@ export class GraphComponent implements DoCheck, OnChanges {
       .force("link", d3.forceLink().id(function (d) { return d.id; })
         .distance(function (link, index) { return index < 10 ? layout.unitX : (layout.unitX * 2);}))
       .force("charge", d3.forceManyBody().strength(function(node, index) {
-        return node.isRoot ? -4000 : -800;
+        return node.isRoot ? -2500 : -800;
       }))
       .force("center", d3.forceCenter(this.dimensions.width / 2, this.dimensions.height / 2));
 
@@ -313,14 +313,14 @@ export class GraphComponent implements DoCheck, OnChanges {
   drawPrevious(previousNode): void {
     let prevNode = this.nodesContainer.append("g");
     prevNode.append("use")
-      .attr("transform", "translate(" + this.layout.padding + ", " + this.layout.padding + ")")
+      .attr("transform", "translate(" + this.layout.padding * 2 + ", " + this.layout.padding * 2 + ")")
       .attr("filter", previousNode.noIcon() ? "url(#shadow)" : "")
       .attr("class", previousNode.category + " bg_" + previousNode.category)
       .attr("xlink:href", "#seed");
 
     prevNode.append("use")
-      .attr("x", (this.layout.unitX - this.layout.unitIcon) / 2 + this.layout.padding)
-      .attr("y", (this.layout.unitIcon / 2) - (this.layout.padding * 2))
+      .attr("x", (this.layout.unitX - this.layout.unitIcon) / 2 + this.layout.padding * 2)
+      .attr("y", (this.layout.unitIcon / 2) - this.layout.padding)
       .attr("width", this.layout.unitIcon)
       .attr("height", this.layout.unitIcon)
       .attr("class", previousNode.category + " icon")
@@ -328,8 +328,8 @@ export class GraphComponent implements DoCheck, OnChanges {
 
     let prevText = prevNode.append("text");
     prevText.attr("text-anchor", "middle")
-      .attr("x", this.layout.unitX / 2 + this.layout.padding)
-      .attr("y", (this.layout.unitIcon * 1.5 - this.layout.padding * 2) * (previousNode.noIcon() ? 0.75 : 1) + 2 * this.layout.padding)
+      .attr("x", this.layout.unitX / 2 + this.layout.padding * 2)
+      .attr("y", (this.layout.unitIcon * 1.5 - this.layout.padding) * (previousNode.noIcon() ? 0.75 : 1) + 2 * this.layout.padding)
       .attr("class", previousNode.category + " label")
       .attr("dy", "1em")
       .html(previousNode.label);
@@ -343,8 +343,8 @@ export class GraphComponent implements DoCheck, OnChanges {
       .text('\uf27d');
 
     this.linksContainer.append("line")
-      .attr("x1", this.layout.unitX / 2 + this.layout.padding)
-      .attr("y1", this.layout.unitY / 2 + this.layout.padding)
+      .attr("x1", this.layout.unitX / 2 + this.layout.padding * 2)
+      .attr("y1", this.layout.unitY / 2 + this.layout.padding * 2)
       .attr("x2", this.dimensions.width / 2)
       .attr("y2", this.dimensions.height / 2);
 

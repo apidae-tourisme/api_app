@@ -3,6 +3,7 @@ import {Content, NavController, Platform} from 'ionic-angular';
 import {ExplorerService} from "../../providers/explorer.service";
 import {SearchService} from "../../providers/search.service";
 import {AuthService} from "../../providers/auth.service";
+import {Seed} from "../../components/seed.model";
 
 @Component({
   templateUrl: 'graph.html'
@@ -35,10 +36,6 @@ export class GraphPage {
     this.clearResults();
   }
 
-  loadResults(): void {
-    this.searchService.loadNodes(() => {this.content.resize()});
-  }
-
   clearResults(): void {
     this.searchService.clearNodes(() => {this.content.resize()});
     this.searchQuery = null;
@@ -50,11 +47,16 @@ export class GraphPage {
 
   filterNodes(ev: any) {
     this.searchService.filterNodes(ev);
+    this.content.resize();
 
     // Temp fix on iOS - Searchbar keeps focus even when another button is clicked
     if(this.platform.is('ios')) {
       this.renderer.invokeElementMethod(ev.target, 'blur');
     }
+  }
+
+  trackSeedById(i: number, seed: Seed) {
+    return seed.id;
   }
 
   createSeed() {

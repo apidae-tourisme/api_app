@@ -6,7 +6,7 @@
       </button>
     </ion-buttons>
     <ion-toolbar no-border>
-      <ion-searchbar (ionInput)="filterNodes($event)" (ionFocus)="loadResults()" [(ngModel)]="searchQuery" placeholder="Rechercher" debounce="500"></ion-searchbar>
+      <ion-searchbar (ionInput)="filterNodes($event)" (ionFocus)="searchService.loadNodes()" [(ngModel)]="searchQuery" placeholder="Rechercher" debounce="500"></ion-searchbar>
     </ion-toolbar>
     <ion-buttons right *ngIf="authService.userSeed">
       <button ion-button (click)="navigateTo(authService.userSeed.id, true, true)">
@@ -66,7 +66,7 @@
     <ion-item *ngIf="node.telephone" class="selectable">
       <div class="button-md button-large-md button-md-lighter selectable" large>
         <a ion-button icon-only item-left color="event" [href]="sanitizeUrl('tel:' + node.telephone)" large>
-          <ion-icon name="call"></ion-icon>
+          <ion-icon md="ios-call"></ion-icon>
         </a>
         <span class="button_label">{{node.telephone}}</span>
       </div>
@@ -74,11 +74,11 @@
     <ion-item *ngIf="node.mobilePhone" class="selectable">
       <div class="button-md button-large-md button-md-lighter selectable" large>
         <a ion-button icon-only item-left color="event" [href]="sanitizeUrl('tel:' + node.mobilePhone)" large>
-          <ion-icon name="call"></ion-icon>
+          <ion-icon md="ios-call"></ion-icon>
         </a>
         <span class="button_label">{{node.mobilePhone}}</span>
       </div>
-      <a ion-button large item-right icon-only color="product" [href]="sanitizeUrl('sms:' + node.mobilePhone)" class="button_eol"><ion-icon name="chatbubbles"></ion-icon></a>
+      <a ion-button large item-right icon-only color="product" [href]="sanitizeUrl('sms:' + node.mobilePhone)" class="button_eol"><ion-icon md="ios-chatbubbles"></ion-icon></a>
     </ion-item>
     <ion-item *ngIf="node.email" class="selectable" text-wrap>
       <div class="button-md button-large-md button-md-lighter selectable" large>
@@ -91,7 +91,7 @@
     <ion-item *ngIf="node.url" class="selectable" text-wrap>
       <div class="button-md button-large-md button-md-lighter selectable" large>
         <a ion-button icon-only item-left color="product" (click)="openUrl(node.url)" large>
-          <ion-icon name="desktop"></ion-icon>
+          <ion-icon md="ios-desktop"></ion-icon>
         </a>
         <p class="button_label label_sm">{{node.url}}</p>
       </div>
@@ -115,8 +115,8 @@
   </ion-list>
 
   <div class="loading_spinner" *ngIf="(searchService.showSearch && !searchService.nodes) || (!searchService.showSearch && !node)" text-center><ion-spinner name="dots"></ion-spinner><span light>Chargement en cours</span></div>
-  <ion-list *ngIf="searchService.showSearch && searchService.nodes && searchService.nodes.length > 0" [virtualScroll]="searchService.nodes" [approxItemHeight]="'60px'">
-    <ion-item *virtualItem="let nd" text-wrap (click)="navigateTo(nd.id, true, true)">
+  <ion-list *ngIf="searchService.showSearch && searchService.nodes.length > 0">
+    <ion-item *ngFor="let nd of searchService.nodes" text-wrap (click)="navigateTo(nd.id, true, true)">
       <ion-avatar item-left>
         <ion-img *ngIf="nd.picture" [src]="nd.picture"></ion-img>
         <div *ngIf="!nd.picture" class="font_avatar {{nd.category}}" text-center>{{nd.code}}</div>

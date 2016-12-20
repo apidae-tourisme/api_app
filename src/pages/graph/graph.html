@@ -6,7 +6,7 @@
       </button>
     </ion-buttons>
     <ion-toolbar no-border>
-      <ion-searchbar (ionInput)="filterNodes($event)" (ionFocus)="loadResults()" [(ngModel)]="searchQuery" placeholder="Rechercher" debounce="800"></ion-searchbar>
+      <ion-searchbar (ionInput)="filterNodes($event)" (ionFocus)="searchService.loadNodes()" [(ngModel)]="searchQuery" placeholder="Rechercher" debounce="500"></ion-searchbar>
     </ion-toolbar>
     <ion-buttons right *ngIf="authService.userSeed">
       <button ion-button (click)="navigateTo(authService.userSeed.id)">
@@ -14,7 +14,7 @@
       </button>
     </ion-buttons>
   </ion-navbar>
-  <ion-toolbar color="lighter" class="toolbar_header" *ngIf="searchService.showSearch && searchService.nodes">
+  <ion-toolbar color="lighter" class="toolbar_header" *ngIf="searchService.showSearch">
     <ion-buttons left text-center>
       <button ion-button color="link" (click)="clearResults()" class="close_toolbar">
         <ion-icon name="arrow-back" large></ion-icon>
@@ -45,9 +45,14 @@
     </div>
   </div>
 
-  <div class="loading_spinner" *ngIf="!searchService.nodes && searchService.showSearch" text-center><ion-spinner name="dots"></ion-spinner><span light>Chargement en cours</span></div>
-  <ion-list *ngIf="searchService.showSearch && searchService.nodes && searchService.nodes.length > 0" [virtualScroll]="searchService.nodes" [approxItemHeight]="'60px'">
-    <ion-item *virtualItem="let node" text-wrap (click)="navigateTo(node.id)">
+  <div class="loading_spinner" *ngIf="searchService.showSearch && searchService.searching" text-center>
+    <ion-spinner name="dots"></ion-spinner><span light>Chargement en cours</span>
+  </div>
+  <div class="loading_spinner" *ngIf="searchService.showSearch && !searchService.searching && searchService.nodes.length == 0" text-center>
+    Saisissez votre recherche
+  </div>
+  <ion-list *ngIf="searchService.showSearch && searchService.nodes.length > 0">
+    <ion-item *ngFor="let node of searchService.nodes" text-wrap (click)="navigateTo(node.id)">
       <ion-avatar item-left>
         <ion-img *ngIf="node.picture" [src]="node.picture"></ion-img>
         <div *ngIf="!node.picture" class="font_avatar {{node.category}}" text-center>{{node.code}}</div>

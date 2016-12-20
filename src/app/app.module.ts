@@ -4,7 +4,6 @@ import {ApiApp} from './app.component';
 import {TabsPage} from '../pages/tabs/tabs';
 import {GraphPage} from "../pages/graph/graph";
 import {ListPage} from "../pages/list/list";
-import {SearchPage} from "../pages/search/search";
 import {GraphComponent} from "../components/graph.component";
 import {DataService} from "../providers/data.service";
 import {ExplorerService} from "../providers/explorer.service";
