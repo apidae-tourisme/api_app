@@ -1,3 +1,44 @@
 #graph_wrapper div.scroll-content > * {
   height: 100%;
+  position: relative;
+}
+
+graph {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 99;
+  height: 100%;
+  width: 100%;
+}
+
+graph > * {
+  height: 100%;
+}
+
+#graph_bg {
+  position: relative;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  background-color: map_get($colors, bg);
+}
+
+#graph_bg > img {
+  position: absolute;
+  bottom: 0;
+}
+
+#graph_bg > img:first-child {
+  width: 35%;
+  height: auto;
+  max-width: 160px;
+  left: 0;
+}
+
+#graph_bg > img:last-child {
+  width: 45%;
+  height: auto;
+  max-width: 200px;
+  right: 0;
 }

@@ -1,88 +1,33 @@
 .links line {
   stroke: #ccc;
-  stroke-width: 1px;
+  stroke-width: 2px;
 }
 
-.nodes circle {
-  stroke: #fff;
-  stroke-width: 1.5px;
-}
-
-graph {
-  height: 100%;
-}
-
-graph text.icon {
+graph tspan.icon {
   font-family: 'Ionicons';
-  font-size: 30px;
 }
 
-graph text.icon.icon-bg {
-  font-size: 80px;
+//graph image.img-node {
+//  clip-path: circle(16px at 16px 16px);
+//}
+//
+//graph image.img-node.root {
+//  clip-path: circle(24px at 24px 24px);
+//}
+
+graph use.icon,
+graph text.label {
+  stroke: #ffffff;
+  fill: #ffffff;
+  stroke-width: 0.4;
 }
 
-graph text.icon.root {
-  font-size: 44px;
+graph use.icon.concept {
+  stroke: map_get($colors, link);
+  fill: map_get($colors, link);
 }
 
-graph text.icon.icon-bg.root {
-  font-size: 150px;
-}
-
-graph rect.icon.concept {
-  fill: map-get($colors, dark);
-}
-
-graph rect.icon.idea {
-  fill: map-get($colors, bulb);
-}
-
-graph rect.icon.organization {
-  fill: map-get($colors, favorite);
-}
-
-graph rect.icon.action {
-  fill: map-get($colors, bulb);
-}
-
-graph rect.icon.event {
-  fill: map-get($colors, danger);
-}
-
-graph rect.icon.competence {
-  fill: map-get($colors, danger);
-}
-
-graph rect.icon.product {
-  fill: map-get($colors, dark);
-}
-
-graph rect.icon.project {
-  fill: map-get($colors, dark);
-}
-
-graph rect.icon.creativework {
-  fill: map-get($colors, secondary);
-}
-
-graph rect.icon.schema {
-  fill: map-get($colors, secondary);
-}
-
-graph rect.icon.person {
-  fill: #86c7e8;
-}
-
-graph image.img-node {
-  clip-path: circle(16px at 16px 16px);
-}
-
-graph image.img-node.root {
-  clip-path: circle(24px at 24px 24px);
-}
-
-graph > * {
-  height: 100%;
-  background-image: url('../assets/img/bg_graph.png');
-  background-size: 100% 100%;
+graph text.concept.label {
+  stroke: map_get($colors, text_alt);
+  fill: map_get($colors, text_alt);
 }

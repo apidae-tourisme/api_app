@@ -2,18 +2,6 @@
 // http://ionicframework.com/docs/v2/theming/
 @import "ionic.globals";
 
-
-// Shared Variables
-// --------------------------------------------------
-// To customize the look and feel of this app, you can override
-// the Sass variables found in Ionic's source scss files.
-// To view all the possible Ionic variables, see:
-// http://ionicframework.com/docs/v2/theming/overriding-ionic-variables/
-
-$text-color:        #000;
-$background-color:  #fff;
-
-
 // Named Color Variables
 // --------------------------------------------------
 // Named colors makes it easy to reuse colors on various components.
@@ -30,8 +18,44 @@ $colors: (
   dark:       #7e7665,
   favorite:   #6eb1c6,
   bulb:       #edc141,
-  lighter:      #fff
+  lighter:    #ffffff,
+
+  // theme
+  bg:         #eceded,
+  text_main:  #282828,
+  text_alt:   #666666,
+  link:       #5db0c7,
+
+  // seeds
+  organization:   #9f3f3e,
+  person:         #df7b7a,
+  competence:     #f1d7d7,
+  project:        #46392c,
+  event:          #7e7764,
+  action:         #ddd4cb,
+  product:        #718c16,
+  creativework:   #a4bd52,
+  idea:           #d9e8a9,
+  concept:        #ffffff
 );
+
+$text-color:        map-get($colors, text_main);
+$background-color:  map-get($colors, bg);
+
+// Custom tabs
+$tabs-md-tab-text-color: map-get($colors, text_main);
+$tabs-md-tab-text-color-active: map-get($colors, link);
+$tabs-md-tab-icon-color: map-get($colors, text_alt);
+$tabs-md-tab-icon-color-active: map-get($colors, link);
+$tabs-md-tab-min-height: 6rem;
+$tabs-md-tab-icon-size: 3rem;
+$tabs-md-tab-font-size: 1.4rem;
+$tabs-md-tab-font-size-active: 1.6rem;
+
+// Custom search bar
+$searchbar-md-input-search-icon-color: map-get($colors, link);
+$searchbar-md-input-text-color: map-get($colors, text_alt);
+$searchbar-md-input-clear-icon-color: map-get($colors, text_main);
 
 // App Theme
 // --------------------------------------------------

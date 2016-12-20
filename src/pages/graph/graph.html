@@ -1,8 +1,8 @@
 <ion-header>
-  <ion-navbar color="danger">
+  <ion-navbar color="lighter">
     <ion-buttons left>
       <button ion-button (click)="homeNode()">
-        <ion-img id="header_logo" src="assets/img/logo_white.png" srcset="assets/img/logo_white.png 2x"></ion-img>
+        <img id="header_logo" src="assets/img/logo-apiapp-mini.svg"/>
       </button>
     </ion-buttons>
     <ion-toolbar color="danger" no-border>
@@ -10,7 +10,7 @@
     </ion-toolbar>
     <ion-buttons right *ngIf="authService.userSeed">
       <button ion-button (click)="navigateTo(authService.userSeed.id)">
-        <ion-img id="avatar_logo" *ngIf="authService.userSeed.picture" [src]="authService.userSeed.picture"></ion-img>
+        <img id="avatar_logo" *ngIf="authService.userSeed.picture" [src]="authService.userSeed.picture"/>
       </button>
     </ion-buttons>
   </ion-navbar>
@@ -34,6 +34,10 @@
     </div>
     <graph *ngIf="explorerService.networkData" [networkData]="explorerService.networkData" (showDetails)="modalDetails()"
            (rootChange)="rootNodeChange($event);"></graph>
+    <div id="graph_bg">
+      <img src="assets/img/flowers-left.png"/>
+      <img src="assets/img/flowers-right.png"/>
+    </div>
   </div>
 
   <div class="loading_spinner" *ngIf="!searchService.nodes && searchService.showSearch" text-center><ion-spinner name="dots"></ion-spinner><span light>Chargement en cours</span></div>

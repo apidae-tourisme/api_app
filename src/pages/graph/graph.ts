@@ -17,6 +17,7 @@ export class GraphPage {
   constructor(public explorerService: ExplorerService, public searchService: SearchService, public authService: AuthService,
               private platform: Platform, private dataService: DataService, private navCtrl: NavController,
               protected renderer: Renderer) {
+    this.searchQuery = null;
   }
 
   rootNodeChange(event): void {
