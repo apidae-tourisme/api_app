@@ -24,6 +24,15 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.ion-md-custom-competence:before {
+  content: "\e90d";
+}
+.ion-md-custom-creativework:before {
+  content: "\e90e";
+}
+.ion-md-custom-event:before {
+  content: "\e90f";
+}
 .ion-md-custom-action:before {
   content: "\e900";
 }
@@ -116,10 +125,9 @@ ion-list ion-item.item-block {
 }
 
 div.font_avatar {
-  font-family: 'Ionicons';
-  font-size: 48px;
+  font-family: 'apiapp';
+  font-size: 36px;
   line-height: 80px;
-  color: white;
 }
 
 .concept {
@@ -236,7 +244,6 @@ div.font_avatar {
 ion-header .toolbar_header .toolbar-title {
   white-space: inherit;
   font-size: 1.4rem;
-  text-transform: uppercase;
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -253,7 +260,7 @@ ion-header .toolbar_header .toolbar-title ion-img {
 
 ion-header .toolbar_header .toolbar-title img {
   min-width: inherit;
-  max-width: inherit;
+  max-width: 50px;
   max-height: 50px;
   margin: 10px;
 }

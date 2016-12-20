@@ -1,0 +1,85 @@
+ion-toolbar #title_details {
+  height: 64px;
+}
+
+ion-toolbar #title_details img {
+  border-radius: 25px;
+}
+
+ion-toolbar #title_details p {
+  text-transform: none;
+  margin: 0;
+}
+
+ion-toolbar #title_details p:first-child {
+  color: map-get($colors, text_main);
+  font-size: $font-size-base;
+}
+
+ion-toolbar #title_details p:last-child {
+  color: map-get($colors, text_alt);
+  font-size: $button-md-small-font-size;
+}
+
+ion-toolbar #edit_seed {
+  width: 32px;
+  border-radius: 16px;
+  margin-right: 0.6rem;
+}
+
+ion-toolbar #edit_seed .button-inner > ion-icon {
+  font-size: 2rem;
+}
+
+#list_details ion-item.item-block {
+  min-height: 4rem;
+}
+
+#list_details .button-inner {
+  text-transform: none;
+  justify-content: flex-start;
+}
+
+#list_details .button-large-md {
+  font-size: 1.7rem;
+  padding: 0;
+  line-height: 2.8em;
+}
+
+#list_details ion-label > .button-large-md {
+  padding: 0 1em 0 0;
+}
+
+#list_details .label-md {
+  margin: 13px 8px 0 0;
+}
+
+#list_details .datetime-md {
+  padding-bottom: 0;
+}
+
+#list_details a[item-left] {
+  margin: 0 1em 0 0;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  vertical-align: top;
+}
+
+#list_details .button_label {
+  font-weight: normal;
+  text-transform: none;
+  color: map-get($colors, text_alt);
+}
+
+#list_details a.button_eol {
+  margin: 22px 8px 9px 0;
+}
+
+#list_details p.button_label {
+  display: inline-block;
+  white-space: pre-line;
+  max-width: 70%;
+  vertical-align: middle;
+  font-size: 1.2rem;
+}
+

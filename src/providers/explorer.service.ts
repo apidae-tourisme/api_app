@@ -3,7 +3,6 @@ import {DataService} from "./data.service";
 import 'rxjs/Rx';
 import {NetworkContext} from "../providers/network.context";
 import {Seed} from "../components/seed.model";
-import {isUndefined} from "ionic-angular/util/util";
 
 @Injectable()
 export class ExplorerService {
@@ -59,6 +58,10 @@ export class ExplorerService {
       parsedData.edges = data.links;
 
       this.networkData = parsedData;
+      if(this.networkContext.previousNodes.length == 0) {
+        this.previousNode = null;
+      }
+
       if(onComplete) {
         onComplete();
       }

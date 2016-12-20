@@ -7,6 +7,7 @@ import {ExplorerService} from "../../providers/explorer.service";
 import {SearchService} from "../../providers/search.service";
 import {AuthService} from "../../providers/auth.service";
 import {LoginPage} from "../login/login";
+import {DataService} from "../../providers/data.service";
 
 @Component({
   templateUrl: 'details.html'
@@ -17,10 +18,14 @@ export class DetailsPage {
   public node: Seed;
   public searchQuery: string;
 
-  constructor(private app: App, params: NavParams, private navCtrl: NavController, public events: Events, private sanitizer: DomSanitizer,
-              private explorerService: ExplorerService, public searchService: SearchService, public authService: AuthService,
-              private platform: Platform, protected renderer: Renderer, public alertCtrl: AlertController) {
-    this.node = new Seed(params.get('node'), false, false);
+  constructor(private app: App, private navCtrl: NavController, public events: Events, private sanitizer: DomSanitizer,
+              public explorerService: ExplorerService, public searchService: SearchService, public authService: AuthService,
+              private platform: Platform, protected renderer: Renderer, public alertCtrl: AlertController, private dataService: DataService) {
+    this.searchQuery = null;
+  }
+
+  ionViewDidEnter(): void {
+    this.loadDetails();
   }
 
   sanitizeUrl(url): SafeUrl {
@@ -32,14 +37,20 @@ export class DetailsPage {
   }
 
   homeNode(): void {
-    this.explorerService.networkContext.reset();
-    this.navCtrl.pop();
+    this.explorerService.navigateHome(() => {
+      this.loadDetails();
+    });
+    this.clearResults();
   }
 
-  navigateTo(node): void {
-    this.explorerService.navigateTo(node, true);
-    this.clearResults();
-    this.navCtrl.pop();
+  navigateTo(node, reset, clear?): void {
+    this.explorerService.navigateTo(node, reset, () => {
+      this.loadDetails();
+    });
+    if(clear) {
+      console.log('clearing');
+      this.clearResults();
+    }
   }
 
   loadResults(): void {
@@ -47,7 +58,12 @@ export class DetailsPage {
   }
 
   clearResults(): void {
-    this.searchService.clearNodes(() => {this.content.resize()});
+    this.searchService.clearNodes(() => {
+      console.log('clearing nodes');
+      this.content.resize();
+      console.log('search nodes : ' + this.searchService.nodes);
+      console.log('showSearch : ' + this.searchService.showSearch);
+    });
     this.searchQuery = null;
   }
 
@@ -60,6 +76,21 @@ export class DetailsPage {
     }
   }
 
+  loadDetails(): void {
+    this.dataService.getNodeDetails(this.explorerService.rootNode.id).subscribe(data => {
+      this.node = new Seed(data.node, true, false);
+      this.content.resize();
+    });
+  }
+
+  createSeed() {
+
+  }
+
+  editSeed(): void {
+
+  }
+
   logOut() {
     let confirm = this.alertCtrl.create({
       title: 'Déconnexion',
@@ -70,9 +101,7 @@ export class DetailsPage {
           text: 'Oui',
           handler: () => {
             this.authService.logOut().then(() => {
-              console.log('logOut');
               this.authService.userSeed = null;
-              console.log('userSeed : ' + this.authService.userSeed);
               this.app.getRootNav().setRoot(LoginPage);
             });
           }

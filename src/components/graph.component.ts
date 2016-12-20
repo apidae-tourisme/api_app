@@ -181,7 +181,7 @@ export class GraphComponent implements DoCheck, OnChanges {
 
     nodesEnter.append("use")
       .attr("transform", function(d) {return d.isRoot ? "scale(" + layout.rootScaleX + " " + layout.rootScaleY + ")" : "";})
-      .attr("filter", function(d) {return d.category == 'concept' ? "url(#shadow)" : "";})
+      .attr("filter", function(d) {return d.noIcon() ? "url(#shadow)" : "";})
       .attr("class", function(d) { return d.category + " bg_" + d.category; })
       .attr("xlink:href", "#seed");
 
@@ -197,7 +197,7 @@ export class GraphComponent implements DoCheck, OnChanges {
     let nodesLabel = nodesEnter.append("text")
       .attr("text-anchor", "middle")
       .attr("x", function(d) {return (d.isRoot ? (layout.unitX * layout.rootScaleX) : layout.unitX) / 2;})
-      .attr("y", function(d) { return (layout.unitIcon * 1.5 - layout.padding * 2) * (d.category == 'concept' ? 0.75 : (d.isRoot ? layout.rootScaleX : 1)) + 2 * layout.padding; })
+      .attr("y", function(d) { return (layout.unitIcon * 1.5 - layout.padding * 2) * (d.noIcon() ? 0.75 : (d.isRoot ? layout.rootScaleX : 1)) + 2 * layout.padding; })
       .attr("class", function(d) { return d.category + " label"; })
       .attr("dy", "1em")
       .html(function (d) {
@@ -314,7 +314,7 @@ export class GraphComponent implements DoCheck, OnChanges {
     let prevNode = this.nodesContainer.append("g");
     prevNode.append("use")
       .attr("transform", "translate(" + this.layout.padding + ", " + this.layout.padding + ")")
-      .attr("filter", previousNode.category == 'concept' ? "url(#shadow)" : "")
+      .attr("filter", previousNode.noIcon() ? "url(#shadow)" : "")
       .attr("class", previousNode.category + " bg_" + previousNode.category)
       .attr("xlink:href", "#seed");
 
@@ -329,7 +329,7 @@ export class GraphComponent implements DoCheck, OnChanges {
     let prevText = prevNode.append("text");
     prevText.attr("text-anchor", "middle")
       .attr("x", this.layout.unitX / 2 + this.layout.padding)
-      .attr("y", (this.layout.unitIcon * 1.5 - this.layout.padding * 2) * (previousNode.category == 'concept' ? 0.75 : 1) + 2 * this.layout.padding)
+      .attr("y", (this.layout.unitIcon * 1.5 - this.layout.padding * 2) * (previousNode.noIcon() ? 0.75 : 1) + 2 * this.layout.padding)
       .attr("class", previousNode.category + " label")
       .attr("dy", "1em")
       .html(previousNode.label);

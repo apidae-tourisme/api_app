@@ -1,9 +1,7 @@
 import {Component, ViewChild, Renderer} from '@angular/core';
 import {NavController, Content, Platform} from 'ionic-angular';
 import {ExplorerService} from "../../providers/explorer.service";
-import {DetailsPage} from "../details/details";
 import {SearchService} from "../../providers/search.service";
-import {DataService} from "../../providers/data.service";
 import {AuthService} from "../../providers/auth.service";
 
 @Component({
@@ -14,9 +12,9 @@ export class ListPage {
 
   public searchQuery: string;
 
-  constructor(public navCtrl: NavController, protected renderer: Renderer, private dataService: DataService,
-              public searchService: SearchService, public explorerService: ExplorerService, public authService: AuthService,
-              protected platform: Platform) {
+  constructor(public navCtrl: NavController, protected renderer: Renderer, public searchService: SearchService,
+              public explorerService: ExplorerService, public authService: AuthService, protected platform: Platform) {
+    this.searchQuery = null;
   }
 
   homeNode(): void {
@@ -44,11 +42,8 @@ export class ListPage {
     this.searchQuery = null;
   }
 
-  modalDetails(nodeId?) {
-    let currentNode = nodeId || this.explorerService.networkContext.node;
-    this.dataService.getNodeDetails(currentNode).subscribe(data => {
-      this.navCtrl.push(DetailsPage, {node: data.node});
-    });
+  displayDetails() {
+    this.navCtrl.parent.select(1);
   }
 
   filterNodes(ev: any) {
@@ -58,5 +53,9 @@ export class ListPage {
     if(this.platform.is('ios')) {
       this.renderer.invokeElementMethod(ev.target, 'blur');
     }
+  }
+
+  createSeed() {
+
   }
 }

@@ -2,8 +2,6 @@ import {Component, ViewChild, Renderer} from '@angular/core';
 import {Content, NavController, Platform} from 'ionic-angular';
 import {ExplorerService} from "../../providers/explorer.service";
 import {SearchService} from "../../providers/search.service";
-import {DetailsPage} from "../details/details";
-import {DataService} from "../../providers/data.service";
 import {AuthService} from "../../providers/auth.service";
 
 @Component({
@@ -15,8 +13,7 @@ export class GraphPage {
   public searchQuery: string;
 
   constructor(public explorerService: ExplorerService, public searchService: SearchService, public authService: AuthService,
-              private platform: Platform, private dataService: DataService, private navCtrl: NavController,
-              protected renderer: Renderer) {
+              private platform: Platform, private navCtrl: NavController, protected renderer: Renderer) {
     this.searchQuery = null;
   }
 
@@ -47,11 +44,8 @@ export class GraphPage {
     this.searchQuery = null;
   }
 
-  modalDetails(nodeId?) {
-    let currentNode = nodeId || this.explorerService.networkContext.node;
-    this.dataService.getNodeDetails(currentNode).subscribe(data => {
-      this.navCtrl.push(DetailsPage, {node: data.node});
-    });
+  displayDetails() {
+    this.navCtrl.parent.select(1);
   }
 
   filterNodes(ev: any) {
@@ -61,5 +55,9 @@ export class GraphPage {
     if(this.platform.is('ios')) {
       this.renderer.invokeElementMethod(ev.target, 'blur');
     }
+  }
+
+  createSeed() {
+
   }
 }

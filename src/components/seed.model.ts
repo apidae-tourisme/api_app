@@ -14,10 +14,10 @@ export class Seed {
   mobilePhone: string;
   url: string;
   fixed: boolean;
-  creationDate: number;
-  updateDate: number;
-  startDate: number;
-  endDate: number;
+  creationDate: string;
+  updateDate: string;
+  startDate: string;
+  endDate: string;
 
   public constructor(nodeData: any, public isRoot: boolean, public isPrevious: boolean) {
     this.id = nodeData.id;
@@ -30,59 +30,45 @@ export class Seed {
     this.email = nodeData.email;
     this.telephone = nodeData.telephone;
     this.mobilePhone = nodeData.mobilephone;
-    this.setCode(nodeData.label);
+    this.setCode(nodeData.label.toLowerCase());
     this.setPicture(nodeData.thumbnail);
     this.url = this.normalize(nodeData.url);
     this.fixed = true;
-    this.creationDate = nodeData.created_at;
-    this.updateDate = nodeData.updated_at;
-    this.startDate = nodeData.start_date;
-    this.endDate = nodeData.end_date;
+    this.creationDate = this.formatDate(nodeData.created_at);
+    this.updateDate = this.formatDate(nodeData.updated_at);
+    this.startDate = this.formatDate(nodeData.start_date);
+    this.endDate = this.formatDate(nodeData.end_date);
   }
 
   public categoryColor() {
-    switch(this.category) {
-      case 'concept':
-        return 'dark';
-      case 'idea':
-        return 'bulb';
-      case 'organization':
-        return 'favorite';
-      case 'action':
-        return 'bulb';
-      case 'event':
-        return 'danger';
-      case 'competence':
-        return 'danger';
-      case 'product':
-        return 'dark';
-      case 'project':
-        return 'dark';
-      case 'creativework':
-        return 'secondary';
-      case 'schema':
-        return 'secondary';
-      case 'person':
-        return 'primary';
-      default:
-        return 'primary';
+    return this.category;
+  }
+
+  // public createdAt() {
+  //   return new Date(this.creationDate * 1000);
+  // }
+  //
+  // public updatedAt() {
+  //   return new Date(this.updateDate * 1000);
+  // }
+  //
+  // public startedAt() {
+  //   return new Date(this.startDate * 1000);
+  // }
+  //
+  // public endedAt() {
+  //   return new Date(this.endDate * 1000);
+  // }
+
+  public noIcon() {
+    return this.category == 'concept' || this.category == 'task';
+  }
+
+  private formatDate(dateInSecs) {
+    if(dateInSecs && dateInSecs > 0) {
+      return new Date(dateInSecs * 1000).toISOString();
     }
-  }
-
-  public createdAt() {
-    return new Date(this.creationDate * 1000);
-  }
-
-  public updatedAt() {
-    return new Date(this.updateDate * 1000);
-  }
-
-  public startedAt() {
-    return new Date(this.startDate * 1000);
-  }
-
-  public endedAt() {
-    return new Date(this.endDate * 1000);
+    return null;
   }
 
   private normalize(url) {
@@ -97,7 +83,6 @@ export class Seed {
     }
   }
 
-
   private setPicture(picUrl): void {
     if (picUrl && (picUrl.indexOf("jpg") != -1 || picUrl.indexOf("logo") != -1)) {
       this.picture = (picUrl.indexOf("http") != - 1) ? picUrl : ('http://' + picUrl);
@@ -106,41 +91,41 @@ export class Seed {
 
   private setCode(nodeCategory): void {
     switch (nodeCategory) {
-      case 'Person' :
-        this.code = '\uf47e';
+      case 'person' :
+        this.code = '\ue90a';
         break;
-      case 'Organization' :
-        this.code = '\uf47c';
+      case 'organization' :
+        this.code = '\ue909';
         break;
-      case 'Competence' :
-        this.code = '\uf1bf';
+      case 'competence' :
+        this.code = '\ue90d';
         break;
-      case 'Event' :
-        this.code = '\uf3f4';
+      case 'event' :
+        this.code = '\ue90f';
         break;
-      case 'Project' :
-        this.code = '\uf180';
+      case 'project' :
+        this.code = '\ue90c';
         break;
-      case 'Action' :
-        this.code = '\uf18e';
+      case 'action' :
+        this.code = '\ue900';
         break;
-      case 'CreativeWork' :
-        this.code = '\uf431';
+      case 'creativeWork' :
+        this.code = '\ue90e';
         break;
-      case 'Product' :
-        this.code = '\uf168';
+      case 'product' :
+        this.code = '\ue90b';
         break;
-      case 'Idea' :
-        this.code = '\uf138';
+      case 'idea' :
+        this.code = '\ue905';
         break;
-      case 'Concept' :
-        this.code = '\uf412';
+      case 'concept' :
+        this.code = '';
         break;
-      case 'Schema' :
-        this.code = '\uf187';
+      case 'schema' :
+        this.code = '';
         break;
       default:
-        this.code = '\uf446';
+        this.code = '';
     }
   }
 }

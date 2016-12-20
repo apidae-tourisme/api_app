@@ -1,19 +1,22 @@
-ion-header #desc_header {
-  min-height: inherit;
-}
-
-ion-header #desc_header p {
-  font-size: 1.2rem;
-  text-transform: none;
-  font-weight: normal;
-  padding: 0 10px;
-  margin: 0 0 10px 0;
-}
-
 ion-toolbar #title_button {
   height: 64px;
 }
 
-ion-toolbar #title_button ion-img img {
+ion-toolbar #title_button img {
   border-radius: 25px;
+}
+
+ion-toolbar #title_button p {
+  text-transform: none;
+  margin: 0;
+}
+
+ion-toolbar #title_button p:first-child {
+  color: map-get($colors, text_main);
+  font-size: $font-size-base;
+}
+
+ion-toolbar #title_button p:last-child {
+  color: map-get($colors, text_alt);
+  font-size: $button-md-small-font-size;
 }

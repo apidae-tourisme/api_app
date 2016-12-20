@@ -15,9 +15,7 @@ export class ApiApp {
   constructor(platform: Platform, private authService: AuthService, private explorerService: ExplorerService,
               private networkContact: NetworkContext) {
     platform.ready().then(() => {
-      if(platform.is('android')) {
-        StatusBar.hide();
-      }
+      StatusBar.hide();
     });
   }
 }
