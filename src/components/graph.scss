@@ -27,7 +27,13 @@ graph use.icon.concept {
   fill: map_get($colors, link);
 }
 
-graph text.concept.label {
+graph text.concept.label,
+graph text.competence.label,
+graph text.action.label,
+graph text.idea.label,
+graph use.icon.competence,
+graph use.icon.action,
+graph use.icon.idea {
   stroke: map_get($colors, text_alt);
   fill: map_get($colors, text_alt);
 }

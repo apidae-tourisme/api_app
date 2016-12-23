@@ -14,6 +14,9 @@ import {LoginPage} from "../pages/login/login";
 import {DetailsPage} from "../pages/details/details";
 import { Storage } from '@ionic/storage';
 import {SearchService} from "../providers/search.service";
+import {FormPage} from "../pages/form/form";
+import {SeedType} from "../pages/form/seed-type";
+import {Seeds} from "../providers/seeds";
 
 @NgModule({
   declarations: [
@@ -24,6 +27,8 @@ import {SearchService} from "../providers/search.service";
     MapPage,
     ListPage,
     DetailsPage,
+    FormPage,
+    SeedType,
     GraphComponent
   ],
   imports: [
@@ -44,7 +49,9 @@ import {SearchService} from "../providers/search.service";
     GraphPage,
     MapPage,
     ListPage,
-    DetailsPage
+    DetailsPage,
+    FormPage,
+    SeedType
   ],
   providers: [
     AuthService,
@@ -52,7 +59,8 @@ import {SearchService} from "../providers/search.service";
     ExplorerService,
     SearchService,
     NetworkContext,
-    Storage
+    Storage,
+    Seeds
   ]
 })
 export class AppModule {

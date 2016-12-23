@@ -41,6 +41,7 @@ $colors: (
 
 $text-color:        map-get($colors, text_main);
 $background-color:  map-get($colors, bg);
+$label-md-text-color: map-get($colors, text_alt);
 
 // Custom tabs
 $tabs-md-tab-text-color: map-get($colors, text_main);

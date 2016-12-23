@@ -1,0 +1,59 @@
+<ion-header>
+  <ion-navbar color="lighter" hideBackButton="true">
+    <ion-buttons left>
+      <button ion-button icon-only color="link" (click)="dismissForm()" large>
+        <ion-icon name="arrow-back" large></ion-icon>
+      </button>
+    </ion-buttons>
+    <ion-title text-center>{{node.id ? 'Modifier la ' : 'Créer une '}}graine</ion-title>
+    <ion-buttons right>
+      <button ion-button icon-only color="link" (click)="submitForm()" large>
+        <ion-icon name="checkmark-circle-outline" large></ion-icon>
+      </button>
+    </ion-buttons>
+  </ion-navbar>
+</ion-header>
+
+<ion-content id="seed_form">
+  <div padding>
+    <button ion-button block large ngClass="bg_{{node.category}}" (click)="seedTypes()">
+      <i class="{{'ion-md-custom-' + node.category}}"></i>&nbsp;{{node.typeLabel()}}
+    </button>
+  </div>
+  <ion-list>
+    <ion-item *ngIf="node.category != 'person'">
+      <ion-label stacked>Nom</ion-label>
+      <ion-input type="text" [(ngModel)]="node.label"></ion-input>
+    </ion-item>
+    <ion-item *ngIf="node.category == 'person'">
+      <ion-label stacked>Prénom</ion-label>
+      <ion-input type="text" [(ngModel)]="node.firstName"></ion-input>
+    </ion-item>
+    <ion-item *ngIf="node.category == 'person'">
+      <ion-label stacked>Nom</ion-label>
+      <ion-input type="text" [(ngModel)]="node.lastName"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label stacked>Description</ion-label>
+      <ion-textarea rows="4" [(ngModel)]="node.description"></ion-textarea>
+    </ion-item>
+    <ion-item no-lines class="label_only">
+      <ion-label stacked>Visuel</ion-label>
+    </ion-item>
+    <ion-item>
+      <ion-avatar item-left>
+        <ion-img *ngIf="node.picture" [src]="node.picture"></ion-img>
+        <div *ngIf="!node.picture" class="bg_seed {{node.category}}" text-center><i ngClass="ion-md-custom-{{node.code}}"></i></div>
+      </ion-avatar>
+      <button ion-button item-right block large class="button-md-link">{{node.picture ? 'Modifier le ' : 'Ajouter un '}}visuel</button>
+    </ion-item>
+    <ion-item *ngIf="node.category != 'person'">
+      <ion-label stacked>Début</ion-label>
+      <ion-datetime displayFormat="DD/MM/YYYY" [(ngModel)]="node.startDate"></ion-datetime>
+    </ion-item>
+    <ion-item *ngIf="node.category != 'person'">
+      <ion-label stacked>Fin</ion-label>
+      <ion-datetime displayFormat="DD/MM/YYYY" [(ngModel)]="node.endDate"></ion-datetime>
+    </ion-item>
+  </ion-list>
+</ion-content>

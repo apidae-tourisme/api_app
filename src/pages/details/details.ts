@@ -8,6 +8,7 @@ import {SearchService} from "../../providers/search.service";
 import {AuthService} from "../../providers/auth.service";
 import {LoginPage} from "../login/login";
 import {DataService} from "../../providers/data.service";
+import {FormPage} from "../form/form";
 
 @Component({
   templateUrl: 'details.html'
@@ -80,11 +81,11 @@ export class DetailsPage {
   }
 
   createSeed() {
-
+    this.navCtrl.push(FormPage);
   }
 
   editSeed(): void {
-
+    this.navCtrl.push(FormPage, {node: this.node});
   }
 
   logOut() {

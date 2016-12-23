@@ -1,4 +1,7 @@
+import {Seeds} from "../providers/seeds";
 export class Seed {
+
+  public static readonly DEFAULT_TYPE = Seeds.CONCEPT;
 
   id: string;
   label: string;
@@ -23,14 +26,14 @@ export class Seed {
     this.id = nodeData.id;
     this.label = (nodeData.firstname && nodeData.lastname) ? (nodeData.firstname + ' ' + nodeData.lastname) : nodeData.name;
     this.description = nodeData.description;
-    this.category = nodeData.label.toLowerCase();
+    this.category = nodeData.label ? nodeData.label.toLowerCase() : Seed.DEFAULT_TYPE;
     this.firstName = nodeData.firstname;
     this.lastName = nodeData.lastname;
     this.role = nodeData.role;
     this.email = nodeData.email;
     this.telephone = nodeData.telephone;
     this.mobilePhone = nodeData.mobilephone;
-    this.setCode(nodeData.label.toLowerCase());
+    this.setCode();
     this.setPicture(nodeData.thumbnail);
     this.url = this.normalize(nodeData.url);
     this.fixed = true;
@@ -44,24 +47,49 @@ export class Seed {
     return this.category;
   }
 
-  // public createdAt() {
-  //   return new Date(this.creationDate * 1000);
-  // }
-  //
-  // public updatedAt() {
-  //   return new Date(this.updateDate * 1000);
-  // }
-  //
-  // public startedAt() {
-  //   return new Date(this.startDate * 1000);
-  // }
-  //
-  // public endedAt() {
-  //   return new Date(this.endDate * 1000);
-  // }
-
   public noIcon() {
     return this.category == 'concept' || this.category == 'task';
+  }
+
+  public typeLabel() {
+    let label = '';
+    switch (this.category) {
+      case 'person' :
+        label = "Acteur";
+        break;
+      case 'organization' :
+        label = "Equipe";
+        break;
+      case 'competence' :
+        label = "Rôle";
+        break;
+      case 'event' :
+        label = "Rencontre";
+        break;
+      case 'project' :
+        label = "Chantier";
+        break;
+      case 'action' :
+        label = "Action";
+        break;
+      case 'creativeWork' :
+        label = "Ressource";
+        break;
+      case 'product' :
+        label = "Service";
+        break;
+      case 'idea' :
+        label = "Idée";
+        break;
+      case 'concept' :
+        label = "Etiquette";
+        break;
+      case 'schema' :
+        label = "Schéma";
+        break;
+      default:
+    }
+    return label;
   }
 
   private formatDate(dateInSecs) {
@@ -89,8 +117,8 @@ export class Seed {
     }
   }
 
-  private setCode(nodeCategory): void {
-    switch (nodeCategory) {
+  private setCode(): void {
+    switch (this.category) {
       case 'person' :
         this.code = '\ue90a';
         break;

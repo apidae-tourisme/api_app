@@ -3,6 +3,7 @@ import {NavController, Content, Platform} from 'ionic-angular';
 import {ExplorerService} from "../../providers/explorer.service";
 import {SearchService} from "../../providers/search.service";
 import {AuthService} from "../../providers/auth.service";
+import {FormPage} from "../form/form";
 
 @Component({
   templateUrl: 'list.html'
@@ -56,6 +57,6 @@ export class ListPage {
   }
 
   createSeed() {
-
+    this.navCtrl.push(FormPage);
   }
 }

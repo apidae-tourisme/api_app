@@ -4,6 +4,7 @@ import {ExplorerService} from "../../providers/explorer.service";
 import {SearchService} from "../../providers/search.service";
 import {AuthService} from "../../providers/auth.service";
 import {Seed} from "../../components/seed.model";
+import {FormPage} from "../form/form";
 
 @Component({
   templateUrl: 'graph.html'
@@ -36,6 +37,10 @@ export class GraphPage {
     this.clearResults();
   }
 
+  loadResults(): void {
+    this.searchService.loadNodes(() => {this.content.resize()});
+  }
+
   clearResults(): void {
     this.searchService.clearNodes(() => {this.content.resize()});
     this.searchQuery = null;
@@ -55,11 +60,7 @@ export class GraphPage {
     }
   }
 
-  trackSeedById(i: number, seed: Seed) {
-    return seed.id;
-  }
-
   createSeed() {
-
+    this.navCtrl.push(FormPage);
   }
 }

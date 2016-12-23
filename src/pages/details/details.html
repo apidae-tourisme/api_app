@@ -115,11 +115,11 @@
   </ion-list>
 
   <div class="loading_spinner" *ngIf="(searchService.showSearch && !searchService.nodes) || (!searchService.showSearch && !node)" text-center><ion-spinner name="dots"></ion-spinner><span light>Chargement en cours</span></div>
-  <ion-list *ngIf="searchService.showSearch && searchService.nodes.length > 0">
+  <ion-list *ngIf="searchService.showSearch && searchService.nodes.length > 0" id="search_results">
     <ion-item *ngFor="let nd of searchService.nodes" text-wrap (click)="navigateTo(nd.id, true, true)">
-      <ion-avatar item-left>
+      <ion-avatar item-left class="bg_seed {{node.category}}">
         <ion-img *ngIf="nd.picture" [src]="nd.picture"></ion-img>
-        <div *ngIf="!nd.picture" class="font_avatar {{nd.category}}" text-center>{{nd.code}}</div>
+        <div *ngIf="!nd.picture" text-center><i class="ion-md-custom-{{nd.category}}"></i></div>
       </ion-avatar>
       <h2>{{nd.label}}</h2>
       <p text-nowrap>{{nd.description}}</p>

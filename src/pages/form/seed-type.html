@@ -1,0 +1,34 @@
+<ion-header>
+  <ion-navbar color="lighter" hideBackButton="true">
+    <ion-buttons left>
+      <button ion-button icon-only color="link" (click)="dismiss()" large>
+        <ion-icon name="arrow-back" large></ion-icon>
+      </button>
+    </ion-buttons>
+    <ion-title text-center>Choix du type de graine</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content id="seed_types">
+  <ion-grid>
+    <ion-row wrap>
+      <ion-col *ngFor="let seed of orderedSeeds()" width-33>
+        <div class="bg_seed {{seed.type}}" padding text-center (click)="selectType(seed.type)">
+          <p>
+            <i class="ion-md-custom-{{seed.type}}"></i><br/>
+            {{seed.label}}
+          </p>
+        </div>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col>
+        <div class="bg_seed concept" padding text-center (click)="selectType('concept')">
+          <p>
+            Etiquette
+          </p>
+        </div>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>

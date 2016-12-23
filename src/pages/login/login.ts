@@ -12,16 +12,16 @@ export class LoginPage {
   }
 
   ionViewDidEnter() {
-    let url = window.location.href;
-    if(url.indexOf('auth_token') != -1 && url.indexOf('client_id') != -1 && url.indexOf('uid') != -1) {
-      let callBackParams = url.slice(url.indexOf('?'));
-      let storedAuth = this.authService.setLocalAuthData(callBackParams);
-      if(storedAuth) {
-        storedAuth.then(() => {
-          window.location.href = '/';
-        });
-      }
-    } else {
+    // let url = window.location.href;
+    // if(url.indexOf('auth_token') != -1 && url.indexOf('client_id') != -1 && url.indexOf('uid') != -1) {
+    //   let callBackParams = url.slice(url.indexOf('?'));
+    //   let storedAuth = this.authService.setLocalAuthData(callBackParams);
+    //   if(storedAuth) {
+    //     storedAuth.then(() => {
+    //       window.location.href = '/';
+    //     });
+    //   }
+    // } else {
       this.platform.ready().then(() => {
         this.authService.getLocalAuthData().then(authData => {
           if(authData) {
@@ -29,7 +29,7 @@ export class LoginPage {
           }
         })
       });
-    }
+    // }
   }
 
   authenticateUser(): void {
