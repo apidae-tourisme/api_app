@@ -16,7 +16,7 @@ export class AuthService {
   constructor(private http: Http, private platform: Platform, private storage: Storage,
               private dataService: DataService){
     this.config = {
-      backEndUrl: 'http://localhost:3000/api',
+      backEndUrl: 'http://apiapp-bo.hotentic.com/api',
       authPath: '/auth/apidae'
     };
   }

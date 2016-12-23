@@ -11,7 +11,7 @@ export class DataService {
   constructor(private http: Http){
     this.config = {
       root: "root",
-      backEndUrl: "http://localhost:3000/api"
+      backEndUrl: "http://apiapp-bo.hotentic.com/api"
     }
   }
 
