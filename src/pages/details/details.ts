@@ -1,6 +1,5 @@
 import {Component, Renderer, ViewChild} from '@angular/core';
 import {App, NavParams, Events, NavController, Platform, Content, AlertController} from 'ionic-angular';
-import {Seed} from "../../components/seed.model";
 import {DomSanitizer, SafeUrl} from "@angular/platform-browser";
 import {InAppBrowser} from "ionic-native";
 import {ExplorerService} from "../../providers/explorer.service";
@@ -16,17 +15,20 @@ import {FormPage} from "../form/form";
 export class DetailsPage {
   @ViewChild(Content) content: Content;
 
-  public node: Seed;
   public searchQuery: string;
 
   constructor(private app: App, private navCtrl: NavController, public events: Events, private sanitizer: DomSanitizer,
               public explorerService: ExplorerService, public searchService: SearchService, public authService: AuthService,
-              private platform: Platform, protected renderer: Renderer, public alertCtrl: AlertController, private dataService: DataService) {
+              private platform: Platform, private renderer: Renderer, public alertCtrl: AlertController,
+              private dataService: DataService, private navParams: NavParams) {
     this.searchQuery = null;
   }
 
   ionViewDidEnter(): void {
-    this.loadDetails();
+    let seedId = this.navParams.get('seedId');
+    if(seedId && seedId != 'default') {
+      this.navigateTo(seedId, true);
+    }
   }
 
   sanitizeUrl(url): SafeUrl {
@@ -38,16 +40,12 @@ export class DetailsPage {
   }
 
   homeNode(): void {
-    this.explorerService.navigateHome(() => {
-      this.loadDetails();
-    });
+    this.explorerService.navigateHome();
     this.clearResults();
   }
 
   navigateTo(node, reset, clear?): void {
-    this.explorerService.navigateTo(node, reset, () => {
-      this.loadDetails();
-    });
+    this.explorerService.navigateTo(node, reset);
     if(clear) {
       this.clearResults();
     }
@@ -73,19 +71,12 @@ export class DetailsPage {
     }
   }
 
-  loadDetails(): void {
-    this.dataService.getNodeDetails(this.explorerService.rootNode.id).subscribe(data => {
-      this.node = new Seed(data.node, true, false);
-      this.content.resize();
-    });
-  }
-
   createSeed() {
     this.navCtrl.push(FormPage);
   }
 
   editSeed(): void {
-    this.navCtrl.push(FormPage, {node: this.node});
+    this.navCtrl.push(FormPage, {node: this.explorerService.rootNode});
   }
 
   logOut() {
@@ -98,7 +89,7 @@ export class DetailsPage {
           text: 'Oui',
           handler: () => {
             this.authService.logOut().then(() => {
-              this.authService.userSeed = null;
+              this.dataService.userSeed = null;
               this.app.getRootNav().setRoot(LoginPage);
             });
           }

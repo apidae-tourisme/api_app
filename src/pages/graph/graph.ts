@@ -1,10 +1,9 @@
 import {Component, ViewChild, Renderer} from '@angular/core';
-import {Content, NavController, Platform} from 'ionic-angular';
+import {Content, NavController, Platform, NavParams} from 'ionic-angular';
 import {ExplorerService} from "../../providers/explorer.service";
 import {SearchService} from "../../providers/search.service";
-import {AuthService} from "../../providers/auth.service";
-import {Seed} from "../../components/seed.model";
 import {FormPage} from "../form/form";
+import {DataService} from "../../providers/data.service";
 
 @Component({
   templateUrl: 'graph.html'
@@ -14,8 +13,8 @@ export class GraphPage {
 
   public searchQuery: string;
 
-  constructor(public explorerService: ExplorerService, public searchService: SearchService, public authService: AuthService,
-              private platform: Platform, private navCtrl: NavController, protected renderer: Renderer) {
+  constructor(public explorerService: ExplorerService, public searchService: SearchService, public dataService: DataService,
+              private platform: Platform, private navCtrl: NavController, private renderer: Renderer, private navParams: NavParams) {
     this.searchQuery = null;
   }
 
@@ -29,7 +28,12 @@ export class GraphPage {
   }
 
   ionViewDidEnter(): void {
-    this.explorerService.exploreGraph(true);
+    let seedId = this.navParams.get('seedId');
+    if(seedId && seedId != 'default') {
+      this.explorerService.navigateTo(this.navParams.get('seedId'), true);
+    } else {
+      this.explorerService.exploreGraph(true);
+    }
   }
 
   navigateTo(node): void {

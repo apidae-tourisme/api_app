@@ -1,28 +1,19 @@
 import {Injectable} from "@angular/core";
-import {Http, URLSearchParams} from "@angular/http";
+import {URLSearchParams} from "@angular/http";
 import 'rxjs/Rx';
 import {InAppBrowser} from "ionic-native";
 import {Storage} from "@ionic/storage";
 import {Platform} from "ionic-angular";
-import {Seed} from "../components/seed.model";
-import {DataService} from "./data.service";
+import {ApiAppConfig} from "./apiapp.config";
 
 @Injectable()
 export class AuthService {
 
-  private config: any;
-  public userSeed: Seed;
-
-  constructor(private http: Http, private platform: Platform, private storage: Storage,
-              private dataService: DataService){
-    this.config = {
-      backEndUrl: 'http://apiapp-bo.hotentic.com/api',
-      authPath: '/auth/apidae'
-    };
+  constructor(private platform: Platform, private storage: Storage){
   }
 
   authUrl(): string {
-    return this.config.backEndUrl + this.config.authPath;
+    return ApiAppConfig.API_URL + ApiAppConfig.AUTH_PATH;
   }
 
   authenticate(success, error): void {
@@ -67,21 +58,6 @@ export class AuthService {
       }
     }
     return null;
-  }
-
-  loadUserSeed(success, error) {
-    if(this.userSeed) {
-      success();
-    } else {
-      this.getLocalAuthData().then(authData => {
-        if(authData && authData.uid) {
-          this.dataService.getNodeDetails(authData.uid).subscribe(data => {
-            this.userSeed = new Seed(data.node, false, false);
-            success();
-          }, error);
-        }
-      }, error);
-    }
   }
 
   logOut() {

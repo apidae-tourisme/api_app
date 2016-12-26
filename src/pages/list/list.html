@@ -8,9 +8,9 @@
     <ion-toolbar no-border>
       <ion-searchbar (ionInput)="filterNodes($event)" (ionFocus)="loadResults()" [(ngModel)]="searchQuery" placeholder="Rechercher" debounce="500"></ion-searchbar>
     </ion-toolbar>
-    <ion-buttons right *ngIf="authService.userSeed">
-      <button ion-button (click)="navigateTo(authService.userSeed.id, true, true)">
-        <img id="avatar_logo" *ngIf="authService.userSeed.picture" src="{{authService.userSeed.picture}}"/>
+    <ion-buttons right *ngIf="dataService.userSeed">
+      <button ion-button (click)="navigateTo(dataService.userSeed.id, true, true)">
+        <img id="avatar_logo" *ngIf="dataService.userSeed.picture" src="{{dataService.userSeed.picture}}"/>
       </button>
     </ion-buttons>
   </ion-navbar>
@@ -35,7 +35,7 @@
         <ion-icon name="arrow-back" large></ion-icon>
       </button>
     </ion-buttons>
-    <ion-title text-center>
+    <ion-title text-center *ngIf="explorerService.rootNode">
       <button ion-button clear (click)="displayDetails()" id="title_button">
         <img *ngIf="explorerService.rootNode.picture" src="{{explorerService.rootNode.picture}}"/>
         <div *ngIf="!explorerService.rootNode.picture" class="font_avatar {{explorerService.rootNode.category}}" text-center>{{explorerService.rootNode.code}}&nbsp;</div>
@@ -69,7 +69,7 @@
   <div class="loading_spinner" *ngIf="!searchService.nodes && searchService.showSearch" text-center><ion-spinner name="dots"></ion-spinner><span light>Chargement en cours</span></div>
   <ion-list *ngIf="searchService.showSearch && searchService.nodes.length > 0" id="search_results">
     <ion-item *ngFor="let node of searchService.nodes" text-wrap (click)="navigateTo(node.id, true, true)">
-      <ion-avatar item-left>
+      <ion-avatar item-left class="bg_seed {{node.category}}">
         <ion-img *ngIf="node.picture" [src]="node.picture"></ion-img>
         <div *ngIf="!node.picture" text-center><i class="ion-md-custom-{{node.category}}"></i></div>
       </ion-avatar>

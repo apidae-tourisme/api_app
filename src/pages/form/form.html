@@ -55,5 +55,16 @@
       <ion-label stacked>Fin</ion-label>
       <ion-datetime displayFormat="DD/MM/YYYY" [(ngModel)]="node.endDate"></ion-datetime>
     </ion-item>
+    <ion-item no-lines class="label_only">
+      <ion-label stacked>Graines liées</ion-label>
+    </ion-item>
+    <ion-item *ngFor="let seed of node.seeds" no-lines>
+      <ion-avatar item-left class="bg_seed {{seed.category}}">
+        <ion-img *ngIf="seed.picture" [src]="seed.picture"></ion-img>
+        <div *ngIf="!seed.picture" text-center><i class="ion-md-custom-{{seed.category}}"></i></div>
+      </ion-avatar>
+      <h2>{{seed.label}}</h2>
+      <button ion-button item-right block large class="button-md-danger"><i class="ion-close"></i></button>
+    </ion-item>
   </ion-list>
 </ion-content>

@@ -21,6 +21,7 @@ export class Seed {
   updateDate: string;
   startDate: string;
   endDate: string;
+  seeds: Array<any>;
 
   public constructor(nodeData: any, public isRoot: boolean, public isPrevious: boolean) {
     this.id = nodeData.id;
@@ -41,6 +42,7 @@ export class Seed {
     this.updateDate = this.formatDate(nodeData.updated_at);
     this.startDate = this.formatDate(nodeData.start_date);
     this.endDate = this.formatDate(nodeData.end_date);
+    this.seeds = [];
   }
 
   public categoryColor() {

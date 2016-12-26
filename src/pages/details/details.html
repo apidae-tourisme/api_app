@@ -8,9 +8,9 @@
     <ion-toolbar no-border>
       <ion-searchbar (ionInput)="filterNodes($event)" (ionFocus)="searchService.loadNodes()" [(ngModel)]="searchQuery" placeholder="Rechercher" debounce="500"></ion-searchbar>
     </ion-toolbar>
-    <ion-buttons right *ngIf="authService.userSeed">
-      <button ion-button (click)="navigateTo(authService.userSeed.id, true, true)">
-        <img id="avatar_logo" *ngIf="authService.userSeed.picture" src="{{authService.userSeed.picture}}"/>
+    <ion-buttons right *ngIf="dataService.userSeed">
+      <button ion-button (click)="navigateTo(dataService.userSeed.id, true, true)">
+        <img id="avatar_logo" *ngIf="dataService.userSeed.picture" src="{{dataService.userSeed.picture}}"/>
       </button>
     </ion-buttons>
   </ion-navbar>
@@ -29,7 +29,7 @@
       </button>
     </ion-buttons>
   </ion-toolbar>
-  <ion-toolbar class="toolbar_header" *ngIf="!searchService.showSearch && node" color="lighter">
+  <ion-toolbar class="toolbar_header" *ngIf="explorerService.rootNode && !searchService.showSearch" color="lighter">
     <ion-buttons left text-center>
       <button color="link" *ngIf="explorerService.previousNode" ion-button (click)="navigateTo(explorerService.previousNode.id, false)" class="close_toolbar">
         <ion-icon name="arrow-back" large></ion-icon>
@@ -37,11 +37,11 @@
     </ion-buttons>
     <ion-title text-center>
       <div id="title_details" class="button-inner">
-        <img *ngIf="node.picture" src="{{node.picture}}"/>
-        <div *ngIf="!node.picture" class="font_avatar" text-center>{{node.code}}&nbsp;</div>
+        <img *ngIf="explorerService.rootNode.picture" src="{{explorerService.rootNode.picture}}"/>
+        <div *ngIf="!explorerService.rootNode.picture" class="font_avatar" text-center>{{explorerService.rootNode.code}}&nbsp;</div>
         <div>
-          <p text-left>{{node.label}}</p>
-          <p text-left>{{node.description}}</p>
+          <p text-left>{{explorerService.rootNode.label}}</p>
+          <p text-left>{{explorerService.rootNode.description}}</p>
         </div>
       </div>
     </ion-title>
@@ -54,8 +54,8 @@
 </ion-header>
 
 <ion-content>
-  <ion-list *ngIf="!searchService.showSearch && node" id="list_details" no-lines>
-    <ion-item right *ngIf="authService.userSeed && node.id == authService.userSeed.id">
+  <ion-list *ngIf="explorerService.rootNode && !searchService.showSearch" id="list_details" no-lines>
+    <ion-item right *ngIf="dataService.userSeed && explorerService.rootNode.id == dataService.userSeed.id">
       <div class="button-md button-large-md button-md-lighter selectable" large>
         <a ion-button icon-only item-left color="person" (click)="logOut()" large>
           <ion-icon name="exit"></ion-icon>
@@ -63,58 +63,58 @@
         <span class="button_label">Déconnexion</span>
       </div>
     </ion-item>
-    <ion-item *ngIf="node.telephone" class="selectable">
+    <ion-item *ngIf="explorerService.rootNode.telephone" class="selectable">
       <div class="button-md button-large-md button-md-lighter selectable" large>
-        <a ion-button icon-only item-left color="event" [href]="sanitizeUrl('tel:' + node.telephone)" large>
+        <a ion-button icon-only item-left color="event" [href]="sanitizeUrl('tel:' + explorerService.rootNode.telephone)" large>
           <ion-icon md="ios-call"></ion-icon>
         </a>
-        <span class="button_label">{{node.telephone}}</span>
+        <span class="button_label">{{explorerService.rootNode.telephone}}</span>
       </div>
     </ion-item>
-    <ion-item *ngIf="node.mobilePhone" class="selectable">
+    <ion-item *ngIf="explorerService.rootNode.mobilePhone" class="selectable">
       <div class="button-md button-large-md button-md-lighter selectable" large>
-        <a ion-button icon-only item-left color="event" [href]="sanitizeUrl('tel:' + node.mobilePhone)" large>
+        <a ion-button icon-only item-left color="event" [href]="sanitizeUrl('tel:' + explorerService.rootNode.mobilePhone)" large>
           <ion-icon md="ios-call"></ion-icon>
         </a>
-        <span class="button_label">{{node.mobilePhone}}</span>
+        <span class="button_label">{{explorerService.rootNode.mobilePhone}}</span>
       </div>
-      <a ion-button large item-right icon-only color="product" [href]="sanitizeUrl('sms:' + node.mobilePhone)" class="button_eol"><ion-icon md="ios-chatbubbles"></ion-icon></a>
+      <a ion-button large item-right icon-only color="product" [href]="sanitizeUrl('sms:' + explorerService.rootNode.mobilePhone)" class="button_eol"><ion-icon md="ios-chatbubbles"></ion-icon></a>
     </ion-item>
-    <ion-item *ngIf="node.email" class="selectable" text-wrap>
+    <ion-item *ngIf="explorerService.rootNode.email" class="selectable" text-wrap>
       <div class="button-md button-large-md button-md-lighter selectable" large>
-        <a ion-button icon-only item-left color="product" [href]="sanitizeUrl('mailto:' + node.email)" large>
+        <a ion-button icon-only item-left color="product" [href]="sanitizeUrl('mailto:' + explorerService.rootNode.email)" large>
           <ion-icon name="mail"></ion-icon>
         </a>
-        <p class="button_label label_sm">{{node.email}}</p>
+        <p class="button_label label_sm">{{explorerService.rootNode.email}}</p>
       </div>
     </ion-item>
-    <ion-item *ngIf="node.url" class="selectable" text-wrap>
+    <ion-item *ngIf="explorerService.rootNode.url" class="selectable" text-wrap>
       <div class="button-md button-large-md button-md-lighter selectable" large>
-        <a ion-button icon-only item-left color="product" (click)="openUrl(node.url)" large>
+        <a ion-button icon-only item-left color="product" (click)="openUrl(explorerService.rootNode.url)" large>
           <ion-icon md="ios-desktop"></ion-icon>
         </a>
-        <p class="button_label label_sm">{{node.url}}</p>
+        <p class="button_label label_sm">{{explorerService.rootNode.url}}</p>
       </div>
     </ion-item>
-    <ion-item *ngIf="node.creationDate" class="selectable">
+    <ion-item *ngIf="explorerService.rootNode.creationDate" class="selectable">
       <ion-label>Date de création</ion-label>
-      <ion-datetime [(ngModel)]="node.creationDate" displayFormat="DD/MM/YYYY" disabled="true"></ion-datetime>
+      <ion-datetime [(ngModel)]="explorerService.rootNode.creationDate" displayFormat="DD/MM/YYYY" disabled="true"></ion-datetime>
     </ion-item>
-    <ion-item *ngIf="node.updateDate" class="selectable">
+    <ion-item *ngIf="explorerService.rootNode.updateDate" class="selectable">
       <ion-label>Dernière mise à jour</ion-label>
-      <ion-datetime [(ngModel)]="node.updateDate" displayFormat="DD/MM/YYYY" disabled="true"></ion-datetime>
+      <ion-datetime [(ngModel)]="explorerService.rootNode.updateDate" displayFormat="DD/MM/YYYY" disabled="true"></ion-datetime>
     </ion-item>
-    <ion-item *ngIf="node.startDate" class="selectable">
+    <ion-item *ngIf="explorerService.rootNode.startDate" class="selectable">
       <ion-label>Date de début</ion-label>
-      <ion-datetime [(ngModel)]="node.startDate" displayFormat="DD/MM/YYYY" disabled="true"></ion-datetime>
+      <ion-datetime [(ngModel)]="explorerService.rootNode.startDate" displayFormat="DD/MM/YYYY" disabled="true"></ion-datetime>
     </ion-item>
-    <ion-item *ngIf="node.endDate" class="selectable">
+    <ion-item *ngIf="explorerService.rootNode.endDate" class="selectable">
       <ion-label>Date de fin</ion-label>
-      <ion-datetime [(ngModel)]="node.endDate" displayFormat="DD/MM/YYYY" disabled="true"></ion-datetime>
+      <ion-datetime [(ngModel)]="explorerService.rootNode.endDate" displayFormat="DD/MM/YYYY" disabled="true"></ion-datetime>
     </ion-item>
   </ion-list>
 
-  <div class="loading_spinner" *ngIf="(searchService.showSearch && !searchService.nodes) || (!searchService.showSearch && !node)" text-center><ion-spinner name="dots"></ion-spinner><span light>Chargement en cours</span></div>
+  <div class="loading_spinner" *ngIf="(searchService.showSearch && !searchService.nodes) || (!searchService.showSearch && loading)" text-center><ion-spinner name="dots"></ion-spinner><span light>Chargement en cours</span></div>
   <ion-list *ngIf="searchService.showSearch && searchService.nodes.length > 0" id="search_results">
     <ion-item *ngFor="let nd of searchService.nodes" text-wrap (click)="navigateTo(nd.id, true, true)">
       <ion-avatar item-left class="bg_seed {{node.category}}">

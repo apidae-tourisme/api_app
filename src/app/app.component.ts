@@ -13,7 +13,7 @@ export class ApiApp {
   rootPage = LoginPage;
 
   constructor(platform: Platform, private authService: AuthService, private explorerService: ExplorerService,
-              private networkContact: NetworkContext) {
+              private networkContext: NetworkContext) {
     platform.ready().then(() => {
       StatusBar.hide();
     });

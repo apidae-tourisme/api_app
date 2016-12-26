@@ -1,38 +1,54 @@
 import {Injectable} from "@angular/core";
-import {Http} from "@angular/http";
+import {Http, Headers} from "@angular/http";
 import {Observable} from "rxjs";
 import 'rxjs/Rx';
+import {Seed} from "../components/seed.model";
+import {ApiAppConfig} from "./apiapp.config";
 
 @Injectable()
 export class DataService {
 
-  config: any;
+  public userSeed: Seed;
+  public userId: number;
 
   constructor(private http: Http){
-    this.config = {
-      root: "root",
-      backEndUrl: "http://apiapp-bo.hotentic.com/api"
-    }
   }
 
   getNodeData(rootNodeId) : Observable<any> {
-    let url = this.config.backEndUrl + "/graph/node/" + (rootNodeId || "default") + ".json";
-    return this.http.get(url).map(resp => {
+    let url = ApiAppConfig.API_URL + "/seeds/" + (rootNodeId || "default") + ".json";
+    return this.http.get(url, this.userHeader()).map(resp => {
       return resp.json();
     });
   }
 
   getAllNodesData() : Observable<any> {
-    let url = this.config.backEndUrl + "/graph/nodes.json";
-    return this.http.get(url).map(resp => {
+    let url = ApiAppConfig.API_URL + "/seeds.json";
+    return this.http.get(url, this.userHeader()).map(resp => {
       return resp.json();
     });
   }
 
   getNodeDetails(nodeId) : Observable<any> {
-    let url = this.config.backEndUrl + "/graph/details/" + nodeId + ".json";
-    return this.http.get(url).map(resp => {
+    let url = ApiAppConfig.API_URL + "/seeds/" + nodeId + "/details.json";
+    return this.http.get(url, this.userHeader()).map(resp => {
       return resp.json();
     });
+  }
+
+  saveNode(seed) : Observable<any> {
+    let nodeId = seed.id;
+    let url = ApiAppConfig.API_URL + "/seeds";
+    console.log("saving : " + JSON.stringify(seed));
+    if(nodeId) {
+      url += "/" + nodeId + ".json";
+      return this.http.patch(url, {seed: seed}, this.userHeader());
+    } else {
+      url += ".json";
+      return this.http.post(url, {seed: seed}, this.userHeader());
+    }
+  }
+
+  userHeader() : any {
+    return {headers: new Headers({'Uid': this.userId})};
   }
 }

@@ -1,5 +1,5 @@
 import {NgModule} from '@angular/core';
-import {IonicApp, IonicModule, Tabs} from 'ionic-angular';
+import {IonicApp, IonicModule, DeepLinkConfig} from 'ionic-angular';
 import {ApiApp} from './app.component';
 import {TabsPage} from '../pages/tabs/tabs';
 import {GraphPage} from "../pages/graph/graph";
@@ -12,11 +12,19 @@ import {MapPage} from "../pages/map/map";
 import {AuthService} from "../providers/auth.service";
 import {LoginPage} from "../pages/login/login";
 import {DetailsPage} from "../pages/details/details";
-import { Storage } from '@ionic/storage';
+import {Storage} from '@ionic/storage';
 import {SearchService} from "../providers/search.service";
 import {FormPage} from "../pages/form/form";
 import {SeedType} from "../pages/form/seed-type";
 import {Seeds} from "../providers/seeds";
+import {ApiAppConfig} from "../providers/apiapp.config";
+
+export const deepLinkConfig: DeepLinkConfig = {
+  links: [
+    { component: LoginPage, name: 'Connexion', segment: '' },
+    { component: TabsPage, name: 'Tabs', segment: ':seedId/:mode' }
+  ]
+};
 
 @NgModule({
   declarations: [
@@ -38,7 +46,7 @@ import {Seeds} from "../providers/seeds";
         autoFocusAssist: false,
         mode: 'md',
         tabsPlacement: 'bottom'
-      }
+      }, deepLinkConfig
     )
   ],
   bootstrap: [IonicApp],
@@ -60,7 +68,8 @@ import {Seeds} from "../providers/seeds";
     SearchService,
     NetworkContext,
     Storage,
-    Seeds
+    Seeds,
+    ApiAppConfig
   ]
 })
 export class AppModule {

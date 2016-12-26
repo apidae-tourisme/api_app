@@ -44,7 +44,7 @@ export class ExplorerService {
       for (let i = 0; i < nodes.length; i++) {
         let node = nodes[i];
         if (node.id) {
-          let networkNode = new Seed(node, node.id == this.networkContext.node, this.networkContext.isPrevious(node.id));
+          let networkNode = new Seed(node, node.is_root, this.networkContext.isPrevious(node.id));
           if(networkNode.isRoot) {
             this.rootNode = networkNode;
           }

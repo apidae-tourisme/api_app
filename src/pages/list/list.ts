@@ -1,9 +1,9 @@
 import {Component, ViewChild, Renderer} from '@angular/core';
-import {NavController, Content, Platform} from 'ionic-angular';
+import {NavController, Content, Platform, NavParams} from 'ionic-angular';
 import {ExplorerService} from "../../providers/explorer.service";
 import {SearchService} from "../../providers/search.service";
-import {AuthService} from "../../providers/auth.service";
 import {FormPage} from "../form/form";
+import {DataService} from "../../providers/data.service";
 
 @Component({
   templateUrl: 'list.html'
@@ -13,8 +13,9 @@ export class ListPage {
 
   public searchQuery: string;
 
-  constructor(public navCtrl: NavController, protected renderer: Renderer, public searchService: SearchService,
-              public explorerService: ExplorerService, public authService: AuthService, protected platform: Platform) {
+  constructor(public navCtrl: NavController, private navParams: NavParams, private renderer: Renderer,
+              public searchService: SearchService, public explorerService: ExplorerService,
+              public dataService: DataService, protected platform: Platform) {
     this.searchQuery = null;
   }
 
@@ -24,7 +25,12 @@ export class ListPage {
   }
 
   ionViewDidEnter(): void {
-    this.explorerService.exploreGraph(true);
+    let seedId = this.navParams.get('seedId');
+    if(seedId && seedId != 'default') {
+      this.navigateTo(seedId, true);
+    } else {
+      this.explorerService.exploreGraph(true);
+    }
   }
 
   navigateTo(node, reset, clear?): void {

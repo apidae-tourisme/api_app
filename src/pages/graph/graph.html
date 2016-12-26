@@ -8,9 +8,9 @@
     <ion-toolbar no-border>
       <ion-searchbar (ionInput)="filterNodes($event)" (ionFocus)="loadResults()" [(ngModel)]="searchQuery" placeholder="Rechercher" debounce="500"></ion-searchbar>
     </ion-toolbar>
-    <ion-buttons right *ngIf="authService.userSeed">
-      <button ion-button (click)="navigateTo(authService.userSeed.id)">
-        <img id="avatar_logo" *ngIf="authService.userSeed.picture" [src]="authService.userSeed.picture"/>
+    <ion-buttons right *ngIf="dataService.userSeed">
+      <button ion-button (click)="navigateTo(dataService.userSeed.id)">
+        <img id="avatar_logo" *ngIf="dataService.userSeed.picture" [src]="dataService.userSeed.picture"/>
       </button>
     </ion-buttons>
   </ion-navbar>
