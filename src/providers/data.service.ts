@@ -46,7 +46,6 @@ export class DataService {
     let nodeId = seed.id;
     let url = ApiAppConfig.API_URL + "/seeds";
     let seedParams = seed.submitParams();
-    console.log("saving : " + JSON.stringify(seedParams));
     if(nodeId) {
       url += "/" + nodeId + ".json";
       return this.http.patch(url, {seed: seedParams}, this.userHeader());
