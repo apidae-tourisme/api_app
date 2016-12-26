@@ -49,7 +49,7 @@
     <ion-spinner name="dots"></ion-spinner><span light>Chargement en cours</span>
   </div>
   <div class="loading_spinner" *ngIf="searchService.showSearch && !searchService.searching && searchService.nodes.length == 0" text-center>
-    Saisissez votre recherche
+    Veuillez saisir le(s) terme(s) recherché(s)
   </div>
   <ion-list *ngIf="searchService.showSearch && searchService.nodes.length > 0" id="search_results">
     <ion-item *ngFor="let node of searchService.nodes" text-wrap (click)="navigateTo(node.id)">

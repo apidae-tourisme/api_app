@@ -1,0 +1,38 @@
+<ion-header>
+  <ion-navbar color="lighter" hideBackButton="true">
+    <ion-buttons left>
+      <button ion-button icon-only color="link" (click)="dismiss()" large>
+        <ion-icon name="arrow-back" large></ion-icon>
+      </button>
+    </ion-buttons>
+    <ion-toolbar no-border>
+      <ion-searchbar (ionInput)="filterNodes($event)" (ionFocus)="loadResults()" [(ngModel)]="searchQuery" placeholder="Rechercher" debounce="500"></ion-searchbar>
+    </ion-toolbar>
+    <ion-buttons right></ion-buttons>
+  </ion-navbar>
+  <ion-toolbar *ngIf="searchService.nodes" color="lighter" class="toolbar_header">
+    <ion-title text-center>
+      <div>{{searchService.nodes.length == 0 ? 'Aucun' : searchService.nodes.length}} résultat{{searchService.nodes.length > 1 ? 's' : ''}}</div>
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content id="search_seeds">
+  <div class="loading_spinner" *ngIf="!searchService.nodes && searchService.showSearch" text-center>
+    <ion-spinner name="dots"></ion-spinner><span light>Chargement en cours</span>
+  </div>
+  <div class="loading_spinner" *ngIf="searchService.showSearch && !searchService.searching && searchService.nodes.length == 0" text-center>
+    Veuillez saisir le nom de la graine à lier
+  </div>
+  <ion-list *ngIf="searchService.showSearch && searchService.nodes.length > 0" id="search_results">
+    <ion-item *ngFor="let node of searchService.nodes" text-wrap (click)="selectSeed(node)">
+      <ion-avatar item-left class="bg_seed {{node.category}}">
+        <ion-img *ngIf="node.picture" [src]="node.picture"></ion-img>
+        <div *ngIf="!node.picture" text-center><i class="ion-md-custom-{{node.category}}"></i></div>
+      </ion-avatar>
+      <h2>{{node.label}}</h2>
+      <p text-nowrap>{{node.description}}</p>
+      <ion-icon item-right color="link" name="arrow-forward" large></ion-icon>
+    </ion-item>
+  </ion-list>
+</ion-content>

@@ -8,6 +8,7 @@ import {AuthService} from "../../providers/auth.service";
 import {LoginPage} from "../login/login";
 import {DataService} from "../../providers/data.service";
 import {FormPage} from "../form/form";
+import {Seed} from "../../components/seed.model";
 
 @Component({
   templateUrl: 'details.html'
@@ -36,7 +37,7 @@ export class DetailsPage {
   }
 
   openUrl(url): void {
-    let browser = new InAppBrowser(url, '_blank', 'location=no');
+    new InAppBrowser(url, '_blank', 'location=no');
   }
 
   homeNode(): void {
@@ -76,7 +77,12 @@ export class DetailsPage {
   }
 
   editSeed(): void {
-    this.navCtrl.push(FormPage, {node: this.explorerService.rootNode});
+    this.dataService.editNode(this.explorerService.rootNode.id).subscribe(data => {
+      console.log("node : " + JSON.stringify(data.node));
+      this.navCtrl.push(FormPage, {node: new Seed(data.node, false, false)});
+    }, error => {
+      console.log("Failed to load node " + this.explorerService.rootNode.id + " for edition");
+    });
   }
 
   logOut() {

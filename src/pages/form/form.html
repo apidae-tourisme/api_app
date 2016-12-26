@@ -15,7 +15,7 @@
 </ion-header>
 
 <ion-content id="seed_form">
-  <div padding>
+  <div padding *ngIf="!node.id">
     <button ion-button block large ngClass="bg_{{node.category}}" (click)="seedTypes()">
       <i class="{{'ion-md-custom-' + node.category}}"></i>&nbsp;{{node.typeLabel()}}
     </button>
@@ -41,7 +41,7 @@
       <ion-label stacked>Visuel</ion-label>
     </ion-item>
     <ion-item>
-      <ion-avatar item-left>
+      <ion-avatar item-left class="bg_seed {{node.category}}">
         <ion-img *ngIf="node.picture" [src]="node.picture"></ion-img>
         <div *ngIf="!node.picture" class="bg_seed {{node.category}}" text-center><i ngClass="ion-md-custom-{{node.code}}"></i></div>
       </ion-avatar>
@@ -58,13 +58,27 @@
     <ion-item no-lines class="label_only">
       <ion-label stacked>Graines liées</ion-label>
     </ion-item>
-    <ion-item *ngFor="let seed of node.seeds" no-lines>
+    <ion-item *ngFor="let seed of node.seeds; let i = index;" no-lines>
       <ion-avatar item-left class="bg_seed {{seed.category}}">
         <ion-img *ngIf="seed.picture" [src]="seed.picture"></ion-img>
         <div *ngIf="!seed.picture" text-center><i class="ion-md-custom-{{seed.category}}"></i></div>
       </ion-avatar>
       <h2>{{seed.label}}</h2>
-      <button ion-button item-right block large class="button-md-danger"><i class="ion-close"></i></button>
+      <button ion-button item-right large icon-only color="danger" (click)="node.seeds.splice(index, 1)"><ion-icon name="close"></ion-icon></button>
+    </ion-item>
+    <ion-item>
+      <button ion-button block large ngClass="bg_concept" (click)="addSeed()">Lier une graine</button>
+    </ion-item>
+    <ion-item no-lines class="label_only">
+      <ion-label stacked>Liens</ion-label>
+    </ion-item>
+    <ion-item *ngFor="let url of node.urls; let i = index;" no-lines>
+      <ion-label stacked>Lien {{i + 1}}</ion-label>
+      <ion-input type="text" [(ngModel)]="url.value"></ion-input>
+      <button ion-button item-right large icon-only color="danger" (click)="node.urls.splice(index, 1)"><ion-icon name="close"></ion-icon></button>
+    </ion-item>
+    <ion-item>
+      <button ion-button block large ngClass="bg_concept" (click)="addUrl()">Ajouter un lien</button>
     </ion-item>
   </ion-list>
 </ion-content>

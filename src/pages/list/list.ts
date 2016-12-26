@@ -15,7 +15,7 @@ export class ListPage {
 
   constructor(public navCtrl: NavController, private navParams: NavParams, private renderer: Renderer,
               public searchService: SearchService, public explorerService: ExplorerService,
-              public dataService: DataService, protected platform: Platform) {
+              public dataService: DataService, private platform: Platform) {
     this.searchQuery = null;
   }
 

@@ -290,7 +290,6 @@ export class GraphComponent implements DoCheck, OnChanges {
       line = [],
       lines = 1,
       x = Number.parseInt(textElt.attr("x")),
-      y = Number.parseInt(textElt.attr("y")),
       width = (isRoot ? (layout.unitX * layout.rootScaleX) : layout.unitX) - 2 * layout.padding;
     if(reset) {
       textElt.text(null);

@@ -11,7 +11,6 @@ export class Seed {
   picture: string;
   firstName: string;
   lastName: string;
-  role: string;
   email: string;
   telephone: string;
   mobilePhone: string;
@@ -22,6 +21,7 @@ export class Seed {
   startDate: string;
   endDate: string;
   seeds: Array<any>;
+  urls: Array<any>;
 
   public constructor(nodeData: any, public isRoot: boolean, public isPrevious: boolean) {
     this.id = nodeData.id;
@@ -30,7 +30,6 @@ export class Seed {
     this.category = nodeData.label ? nodeData.label.toLowerCase() : Seed.DEFAULT_TYPE;
     this.firstName = nodeData.firstname;
     this.lastName = nodeData.lastname;
-    this.role = nodeData.role;
     this.email = nodeData.email;
     this.telephone = nodeData.telephone;
     this.mobilePhone = nodeData.mobilephone;
@@ -43,6 +42,17 @@ export class Seed {
     this.startDate = this.formatDate(nodeData.start_date);
     this.endDate = this.formatDate(nodeData.end_date);
     this.seeds = [];
+    if(nodeData.seeds) {
+      for(let i = 0; i < nodeData.seeds.length; i++) {
+        this.seeds.push(new Seed(nodeData.seeds[i], false, false));
+      }
+    }
+    this.urls = [];
+    if(nodeData.urls) {
+      for(let i = 0; i < nodeData.urls.length; i++) {
+        this.urls.push({value: nodeData.urls[i]});
+      }
+    }
   }
 
   public categoryColor() {
@@ -92,6 +102,24 @@ export class Seed {
       default:
     }
     return label;
+  }
+
+  public submitParams(): any {
+    return {
+      id: this.id,
+      name: this.label,
+      description: this.description,
+      type: this.category,
+      firstname: this.firstName,
+      lastname: this.lastName,
+      email: this.email,
+      telephone: this.telephone,
+      mobilephone: this.mobilePhone,
+      started_at: this.startDate,
+      ended_at: this.endDate,
+      seeds: this.seeds.map(function(s) { return s.id; }),
+      urls: this.urls.map(function(u) { return u.value; })
+    };
   }
 
   private formatDate(dateInSecs) {

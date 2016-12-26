@@ -35,16 +35,24 @@ export class DataService {
     });
   }
 
+  editNode(nodeId): Observable<any> {
+    let url = ApiAppConfig.API_URL + "/seeds/" + nodeId + "/edit.json";
+    return this.http.get(url, this.userHeader()).map(resp => {
+      return resp.json();
+    });
+  }
+
   saveNode(seed) : Observable<any> {
     let nodeId = seed.id;
     let url = ApiAppConfig.API_URL + "/seeds";
-    console.log("saving : " + JSON.stringify(seed));
+    let seedParams = seed.submitParams();
+    console.log("saving : " + JSON.stringify(seedParams));
     if(nodeId) {
       url += "/" + nodeId + ".json";
-      return this.http.patch(url, {seed: seed}, this.userHeader());
+      return this.http.patch(url, {seed: seedParams}, this.userHeader());
     } else {
       url += ".json";
-      return this.http.post(url, {seed: seed}, this.userHeader());
+      return this.http.post(url, {seed: seedParams}, this.userHeader());
     }
   }
 

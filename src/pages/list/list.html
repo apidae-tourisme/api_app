@@ -56,7 +56,7 @@
         <ion-item text-wrap *ngIf="!node.isRoot && !node.isPrevious">
           <ion-avatar item-left class="bg_seed {{node.category}}">
             <ion-img *ngIf="node.picture" [src]="node.picture"></ion-img>
-            <div *ngIf="!node.picture" class="font_avatar {{node.category}}" text-center>{{node.code}}</div>
+            <div *ngIf="!node.picture" text-center><i class="ion-md-custom-{{node.category}}"></i></div>
           </ion-avatar>
           <h2>{{node.label}}</h2>
           <p text-nowrap>{{node.description}}</p>
@@ -66,7 +66,13 @@
     </ion-list>
   </div>
 
-  <div class="loading_spinner" *ngIf="!searchService.nodes && searchService.showSearch" text-center><ion-spinner name="dots"></ion-spinner><span light>Chargement en cours</span></div>
+  <div class="loading_spinner" *ngIf="!searchService.nodes && searchService.showSearch" text-center>
+    <ion-spinner name="dots"></ion-spinner><span light>Chargement en cours</span>
+  </div>
+  <div class="loading_spinner" *ngIf="searchService.showSearch && !searchService.searching && searchService.nodes.length == 0" text-center>
+    Veuillez saisir le(s) terme(s) recherché(s)
+  </div>
+
   <ion-list *ngIf="searchService.showSearch && searchService.nodes.length > 0" id="search_results">
     <ion-item *ngFor="let node of searchService.nodes" text-wrap (click)="navigateTo(node.id, true, true)">
       <ion-avatar item-left class="bg_seed {{node.category}}">

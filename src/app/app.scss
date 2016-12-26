@@ -119,6 +119,17 @@
   background-image: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 67.42 76.07" fill="#ffffff"><g><g><path d="M67.42,54.11V21.93a5.84,5.84,0,0,0-2.92-5L36.64.79a5.78,5.78,0,0,0-5.83,0L2.92,16.88a5.84,5.84,0,0,0-2.92,5V54.14a5.84,5.84,0,0,0,2.92,5L30.81,75.28a5.78,5.78,0,0,0,5.83,0L64.53,59.19A5.92,5.92,0,0,0,67.42,54.11Z"/></g></g></svg>');
 }
 
+.bg_seed i[class^="ion-md-custom-"] {
+  color: white;
+}
+
+.bg_seed.concept i[class^="ion-md-custom-"],
+.bg_seed.competence i[class^="ion-md-custom-"],
+.bg_seed.action i[class^="ion-md-custom-"],
+.bg_seed.idea i[class^="ion-md-custom-"] {
+  color: map_get($colors, text_alt)
+}
+
 #apiapp ion-img img {
   min-height: inherit;
 }
@@ -343,8 +354,13 @@ ion-header .toolbar_header .button-inner > ion-icon {
   pointer-events: none;
 }
 
-#search_results ion-item ion-avatar {
+ion-list ion-item ion-avatar {
   width: 56px;
   height: 56px;
   padding: 8px;
+}
+
+ion-list ion-avatar.bg_seed i[class^="ion-md-custom-"] {
+  line-height: 40px;
+  font-size: 3rem;
 }

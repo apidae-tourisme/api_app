@@ -18,6 +18,7 @@ import {FormPage} from "../pages/form/form";
 import {SeedType} from "../pages/form/seed-type";
 import {Seeds} from "../providers/seeds";
 import {ApiAppConfig} from "../providers/apiapp.config";
+import {SearchSeeds} from "../pages/form/search-seeds";
 
 export const deepLinkConfig: DeepLinkConfig = {
   links: [
@@ -37,6 +38,7 @@ export const deepLinkConfig: DeepLinkConfig = {
     DetailsPage,
     FormPage,
     SeedType,
+    SearchSeeds,
     GraphComponent
   ],
   imports: [
@@ -59,7 +61,8 @@ export const deepLinkConfig: DeepLinkConfig = {
     ListPage,
     DetailsPage,
     FormPage,
-    SeedType
+    SeedType,
+    SearchSeeds
   ],
   providers: [
     AuthService,

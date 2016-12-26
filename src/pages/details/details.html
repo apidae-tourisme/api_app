@@ -88,12 +88,12 @@
         <p class="button_label label_sm">{{explorerService.rootNode.email}}</p>
       </div>
     </ion-item>
-    <ion-item *ngIf="explorerService.rootNode.url" class="selectable" text-wrap>
+    <ion-item *ngFor="let url of explorerService.rootNode.urls" class="selectable" text-wrap>
       <div class="button-md button-large-md button-md-lighter selectable" large>
-        <a ion-button icon-only item-left color="product" (click)="openUrl(explorerService.rootNode.url)" large>
+        <a ion-button icon-only item-left color="product" (click)="openUrl(url.value)" large>
           <ion-icon md="ios-desktop"></ion-icon>
         </a>
-        <p class="button_label label_sm">{{explorerService.rootNode.url}}</p>
+        <p class="button_label label_sm">{{url.value}}</p>
       </div>
     </ion-item>
     <ion-item *ngIf="explorerService.rootNode.creationDate" class="selectable">
@@ -114,10 +114,16 @@
     </ion-item>
   </ion-list>
 
-  <div class="loading_spinner" *ngIf="(searchService.showSearch && !searchService.nodes) || (!searchService.showSearch && loading)" text-center><ion-spinner name="dots"></ion-spinner><span light>Chargement en cours</span></div>
+  <div class="loading_spinner" *ngIf="searchService.showSearch && !searchService.nodes" text-center>
+    <ion-spinner name="dots"></ion-spinner><span light>Chargement en cours</span>
+  </div>
+  <div class="loading_spinner" *ngIf="searchService.showSearch && !searchService.searching && searchService.nodes.length == 0" text-center>
+    Veuillez saisir le(s) terme(s) recherché(s)
+  </div>
+
   <ion-list *ngIf="searchService.showSearch && searchService.nodes.length > 0" id="search_results">
     <ion-item *ngFor="let nd of searchService.nodes" text-wrap (click)="navigateTo(nd.id, true, true)">
-      <ion-avatar item-left class="bg_seed {{node.category}}">
+      <ion-avatar item-left class="bg_seed {{nd.category}}">
         <ion-img *ngIf="nd.picture" [src]="nd.picture"></ion-img>
         <div *ngIf="!nd.picture" text-center><i class="ion-md-custom-{{nd.category}}"></i></div>
       </ion-avatar>
