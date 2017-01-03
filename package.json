@@ -10,7 +10,8 @@
     "emulate:before": "build",
     "deploy:before": "build",
     "build:before": "build",
-    "run:before": "build"
+    "run:before": "build",
+    "ionic:serve": "ionic-app-scripts serve --sourceMap source-map --iscordovaserve --wwwDir platforms/browser/www/ --buildDir platforms/browser/www/build"
   },
   "dependencies": {
     "@angular/common": "2.2.1",
@@ -27,6 +28,7 @@
     "ionic-native": "2.2.11",
     "ionicons": "3.0.0",
     "rxjs": "5.0.0-beta.12",
+    "urijs": "^1.18.4",
     "zone.js": "0.6.26"
   },
   "devDependencies": {
@@ -41,19 +43,19 @@
     "cordova-plugin-statusbar",
     "ionic-plugin-keyboard",
     "cordova-plugin-nativestorage",
-    "cordova-plugin-inappbrowser"
+    "cordova-plugin-inappbrowser",
+    "cordova-plugin-wkwebview-engine",
+    {
+      "locator": "https://git-wip-us.apache.org/repos/asf/cordova-plugins.git#master:local-webserver",
+      "id": "cordova-labs-local-webserver"
+    },
+    "cordova-plugin-camera",
+    "cordova-plugin-file-transfer"
   ],
   "cordovaPlatforms": [
-    {
-      "platform": "android",
-      "version": "",
-      "locator": "android"
-    },
-    {
-      "platform": "ios",
-      "version": "",
-      "locator": "ios"
-    }
+    "android",
+    "ios",
+    "browser"
   ],
   "description": "api_app: ApiApp"
 }

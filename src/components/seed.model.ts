@@ -109,6 +109,7 @@ export class Seed {
       id: this.id,
       name: this.label,
       description: this.description,
+      thumbnail: this.picture,
       type: this.category,
       firstname: this.firstName,
       lastname: this.lastName,

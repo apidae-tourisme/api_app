@@ -1,0 +1,32 @@
+<ion-header>
+  <ion-navbar color="lighter" hideBackButton="true">
+    <ion-buttons left>
+      <button ion-button icon-only color="link" (click)="dismiss()" large>
+        <ion-icon name="arrow-back" large></ion-icon>
+      </button>
+    </ion-buttons>
+    <ion-title text-center>Modifier le visuel</ion-title>
+    <ion-buttons right>
+      <button ion-button icon-only color="link" (click)="submitFile()" large>
+        <ion-icon name="checkmark-circle-outline" large></ion-icon>
+      </button>
+    </ion-buttons>
+  </ion-navbar>
+</ion-header>
+
+<ion-content id="edit_avatar" padding>
+  <div *ngIf="avatar.src" text-center>
+    <h5>Prévisualisation de l'image :</h5>
+    <ion-row>
+      <ion-col width-25></ion-col>
+      <ion-col width-50><img src="{{avatar.src}}"/></ion-col>
+      <ion-col width-25></ion-col>
+    </ion-row>
+  </div>
+  <button ion-button block large icon-left color="link" (click)="selectImage()">
+    <ion-icon name="image"></ion-icon>Choisir une image
+  </button>
+  <button ion-button block large icon-left color="link" (click)="captureImage()">
+    <ion-icon name="camera"></ion-icon>Prendre une photo
+  </button>
+</ion-content>

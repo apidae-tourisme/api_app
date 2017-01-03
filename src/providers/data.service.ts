@@ -55,6 +55,11 @@ export class DataService {
     }
   }
 
+  savePicture(picture) : Observable<any> {
+    let url = ApiAppConfig.API_URL + '/pictures';
+    return this.http.post(url, {});
+  }
+
   userHeader() : any {
     return {headers: new Headers({'Uid': this.userId})};
   }

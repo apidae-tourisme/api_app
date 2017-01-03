@@ -3,8 +3,8 @@
   <name>ApiApp</name>
   <description>ApiApp (beta version)</description>
   <author email="contact@hotentic.com" href="http://www.hotentic.com/">Hôtentic</author>
-  <content src="index.html"/>
-  <!--<content src="http://localhost:8080"/>-->
+  <!--<content src="index.html"/>-->
+  <content src="http://localhost:8080"/>
   <preference name="webviewbounce" value="false"/>
   <preference name="UIWebViewBounce" value="false"/>
   <preference name="DisallowOverscroll" value="true"/>
@@ -15,9 +15,9 @@
   <preference name="FadeSplashScreenDuration" value="0"/>
   <preference name="SplashScreenBackgroundColor" value="0xFFFFFFFF"/>
   <preference name="SplashScreen" value="screen"/>
-  <preference name="ShowSplashScreen" value="true" />
-  <preference name="AutoHideSplashScreen" value="true" />
-  <preference name="Fullscreen" value="true" />
+  <preference name="ShowSplashScreen" value="true"/>
+  <preference name="AutoHideSplashScreen" value="true"/>
+  <preference name="Fullscreen" value="true"/>
 
   <access origin="*"/>
   <allow-navigation href="*"/>
@@ -30,7 +30,7 @@
   <platform name="android">
     <allow-intent href="market:*"/>
     <feature name="SplashScreen">
-      <param name="android-package" value="org.apache.cordova.splashscreen.SplashScreen" />
+      <param name="android-package" value="org.apache.cordova.splashscreen.SplashScreen"/>
     </feature>
     <icon src="resources/android/icon/drawable-ldpi-icon.png" density="ldpi"/>
     <icon src="resources/android/icon/drawable-mdpi-icon.png" density="mdpi"/>
@@ -99,4 +99,6 @@
   <plugin name="ionic-plugin-keyboard" spec="~2.2.1"/>
   <plugin name="cordova-plugin-nativestorage" spec="~2.0.2"/>
   <plugin name="cordova-plugin-inappbrowser" spec="~1.5.0"/>
+  <plugin name="cordova-plugin-camera" spec="~2.3.1"/>
+  <plugin name="cordova-plugin-file-transfer" spec="~1.6.1"/>
 </widget>

@@ -5,6 +5,7 @@ import {SeedType} from "./seed-type";
 import {DataService} from "../../providers/data.service";
 import {ExplorerService} from "../../providers/explorer.service";
 import {SearchSeeds} from "./search-seeds";
+import {EditAvatar} from "./edit-avatar";
 
 @Component({
   templateUrl: 'form.html'
@@ -52,6 +53,15 @@ export class FormPage {
 
   addUrl(): void {
     this.node.urls.push({value: 'http://'});
+  }
+
+  editAvatar(): void {
+    let avatarModal = this.modalCtrl.create(EditAvatar);
+    avatarModal.onDidDismiss(data => {
+      console.log("dismissed avatar modal : " + data.imageUrl);
+      this.node.picture = data.imageUrl;
+    });
+    avatarModal.present();
   }
 
   presentToast(msg, onDismiss) {
