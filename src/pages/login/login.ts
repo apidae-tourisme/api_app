@@ -60,6 +60,6 @@ export class LoginPage {
   }
 
   navigateHome(): void {
-    this.navCtrl.setRoot(TabsPage, {'seedId': 'default'}, {animate: false});
+    this.navCtrl.setRoot(TabsPage, {animate: false});
   }
 }

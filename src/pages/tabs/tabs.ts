@@ -15,10 +15,8 @@ export class TabsPage {
   tab1Root: any = GraphPage;
   tab2Root: any = DetailsPage;
   tab3Root: any = ListPage;
-  seedParams: any;
 
-  constructor(private navParams: NavParams) {
-    this.seedParams = {seedId: navParams.data.seedId};
+  constructor(public navParams: NavParams) {
   }
 
   ionViewDidEnter() {

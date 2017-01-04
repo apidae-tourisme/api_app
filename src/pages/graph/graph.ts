@@ -22,22 +22,13 @@ export class GraphPage {
     this.explorerService.navigateTo(event.newRoot, false);
   }
 
-  homeNode(): void {
-    this.explorerService.navigateHome();
-    this.clearResults();
-  }
-
   ionViewDidEnter(): void {
-    let seedId = this.navParams.get('seedId');
-    if(seedId && seedId != 'default') {
-      this.explorerService.navigateTo(this.navParams.get('seedId'), true);
-    } else {
-      this.explorerService.exploreGraph(false);
-    }
+    let seedId = this.navParams.get('seedId') || this.explorerService.currentNode();
+    this.explorerService.navigateTo(seedId, false);
   }
 
-  navigateTo(node): void {
-    this.explorerService.navigateTo(node, false);
+  navigateTo(node, reset): void {
+    this.explorerService.navigateTo(node, reset);
     this.clearResults();
   }
 

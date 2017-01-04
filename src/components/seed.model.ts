@@ -61,7 +61,7 @@ export class Seed {
   }
 
   public noIcon() {
-    return !this.picture && (this.category == 'concept' || this.category == 'action');
+    return !this.picture && this.category == 'concept';
   }
 
   public typeLabel() {

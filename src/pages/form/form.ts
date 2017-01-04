@@ -18,10 +18,12 @@ export class FormPage {
               public dataService: DataService, private explorerService: ExplorerService,
               private toastCtrl: ToastController) {
     this.node = params.get('node') || new Seed({}, false, false);
+    this.node.startDate = new Date().toISOString();
+    this.node.endDate = new Date().toISOString();
   }
 
   dismissForm(): void {
-    this.refreshContext(() => {
+    this.explorerService.navigateTo(this.node.id, false, () => {
       this.navCtrl.pop();
     });
   }
@@ -74,9 +76,5 @@ export class FormPage {
     });
     toast.onDidDismiss(onDismiss);
     toast.present();
-  }
-
-  refreshContext(onComplete): void {
-    this.explorerService.exploreGraph(false, onComplete);
   }
 }

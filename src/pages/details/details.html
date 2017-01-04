@@ -1,7 +1,7 @@
 <ion-header>
   <ion-navbar color="lighter" hideBackButton="true">
     <ion-buttons left>
-      <button ion-button (click)="homeNode()">
+      <button ion-button (click)="navigateTo(null, true, true, true)">
         <img id="header_logo" src="assets/img/logo-apiapp-mini.svg"/>
       </button>
     </ion-buttons>
@@ -9,7 +9,7 @@
       <ion-searchbar (ionInput)="filterNodes($event)" (ionFocus)="searchService.loadNodes()" [(ngModel)]="searchQuery" placeholder="Rechercher" debounce="500"></ion-searchbar>
     </ion-toolbar>
     <ion-buttons right *ngIf="dataService.userSeed">
-      <button ion-button (click)="navigateTo(dataService.userSeed.id, true, true)">
+      <button ion-button (click)="navigateTo(dataService.userSeed.id, true, true, true)">
         <img id="avatar_logo" *ngIf="dataService.userSeed.picture" src="{{dataService.userSeed.picture}}"/>
       </button>
     </ion-buttons>
@@ -31,7 +31,7 @@
   </ion-toolbar>
   <ion-toolbar class="toolbar_header" *ngIf="explorerService.rootNode && !searchService.showSearch" color="lighter">
     <ion-buttons left text-center>
-      <button color="link" *ngIf="explorerService.previousNode" ion-button (click)="navigateTo(explorerService.previousNode.id, false)" class="close_toolbar">
+      <button color="link" *ngIf="explorerService.previousNode()" ion-button (click)="navigateTo(explorerService.previousNode(), false, false)" class="close_toolbar">
         <ion-icon name="arrow-back" large></ion-icon>
       </button>
     </ion-buttons>
@@ -122,9 +122,9 @@
   </div>
 
   <ion-list *ngIf="searchService.showSearch && searchService.nodes.length > 0" id="search_results">
-    <ion-item *ngFor="let nd of searchService.nodes" text-wrap (click)="navigateTo(nd.id, false, true)">
+    <ion-item *ngFor="let nd of searchService.nodes" text-wrap (click)="navigateTo(nd.id, false, false, true)">
       <ion-avatar item-left class="bg_seed {{nd.category}}">
-        <ion-img *ngIf="nd.picture" [src]="nd.picture"></ion-img>
+        <img *ngIf="nd.picture" src="{{nd.picture}}"/>
         <div *ngIf="!nd.picture" text-center><i class="ion-md-custom-{{nd.category}}"></i></div>
       </ion-avatar>
       <h2>{{nd.label}}</h2>

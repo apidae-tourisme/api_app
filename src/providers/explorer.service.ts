@@ -1,56 +1,54 @@
 import {Injectable} from "@angular/core";
 import {DataService} from "./data.service";
 import 'rxjs/Rx';
-import {NetworkContext} from "../providers/network.context";
 import {Seed} from "../components/seed.model";
 
 @Injectable()
 export class ExplorerService {
 
-  networkContext: NetworkContext;
   networkData: any;
   rootNode: Seed;
-  previousNode: Seed;
+  nav: Array<Seed>;
+  skipExplore: boolean;
 
   constructor(private dataService: DataService) {
-    this.networkContext = new NetworkContext();
+    this.nav = [];
   }
 
   navigateTo(newNode: string, reset, onComplete?): void {
-    this.networkContext.changeNode(newNode, reset);
-    this.exploreGraph(false, onComplete);
+    if(this.skipExplore) {
+      this.skipExplore = false;
+      if(onComplete) {
+        onComplete();
+      }
+    } else {
+      this.exploreGraph(reset, newNode, onComplete);
+    }
   }
 
-  navigateHome(onComplete?): void {
-    this.networkContext.changeNode(null, true);
-    this.exploreGraph(false, onComplete);
-  }
-
-  exploreGraph(resetData: boolean, onComplete?): void {
+  private exploreGraph(resetData: boolean, newNode, onComplete?): void {
     if(resetData) {
       this.networkData = null;
+      this.nav = [];
     }
 
-    this.dataService.getNodeData(this.networkContext.node).subscribe(data => {
+    this.dataService.getNodeData(newNode).subscribe(data => {
       let parsedData: any = {
         nodes: [],
         edges: []
       };
       let nodes = data.nodes;
-      if(!this.networkContext.node) {
-        this.networkContext.node = nodes[0].id;
-      }
-      let previous = this.rootNode;
+      let currentRoot = this.rootNode;
+      let newPrevious = this.newPreviousNode(newNode, currentRoot);
 
       for (let i = 0; i < nodes.length; i++) {
         let node = nodes[i];
         if (node.id) {
-          let networkNode = new Seed(node, node.is_root, this.networkContext.isPrevious(node.id));
+          let networkNode = new Seed(node, node.is_root, node.id == newPrevious);
           if(networkNode.isRoot) {
             this.rootNode = networkNode;
           }
           if(networkNode.isPrevious) {
-            this.previousNode = networkNode;
             parsedData.previousNode = networkNode;
           }
           parsedData.nodes.push(networkNode);
@@ -58,20 +56,58 @@ export class ExplorerService {
       }
       parsedData.edges = data.links;
 
-      if(previous && !parsedData.previousNode && !resetData) {
-        previous.disconnected = true;
-        this.previousNode = previous;
-        parsedData.previousNode = previous;
+      if(currentRoot && !parsedData.previousNode && !resetData) {
+        parsedData.previousNode = currentRoot;
+        parsedData.previousNode.disconnected = true;
       }
 
-      this.networkData = parsedData;
-      if(this.networkContext.previousNodes.length == 0) {
-        this.previousNode = null;
+      // Node unchanged (switched tabs or refresh)
+      if(newNode && newNode == this.currentNode()) {
+        parsedData.previousNode = this.networkData.previousNode;
       }
+      // Node changed - Nav backward
+      else if(newNode && newNode == this.previousNode()) {
+        this.nav.pop();
+        if(this.nav.length == 1) {
+          parsedData.previousNode = null;
+        } else {
+          parsedData.previousNode = this.nav[this.nav.length - 2];
+        }
+      }
+      // Node changed - Nav forward
+      else {
+        this.nav.push(this.rootNode);
+      }
+
+      console.log('rootNode : ' + this.rootNode.id);
+      console.log('previousNode : ' + (parsedData.previousNode ? parsedData.previousNode.id : null));
+      console.log('nav : ' + this.nav.map(function(s) {return s.id;}));
+
+      this.networkData = parsedData;
 
       if(onComplete) {
         onComplete();
       }
     });
+  }
+
+  currentNode(): string {
+    return this.nav.length > 0 ? this.nav[this.nav.length - 1].id : null;
+  }
+
+  previousNode(): string {
+    return this.nav.length > 1 ? this.nav[this.nav.length - 2].id : null;
+  }
+
+  newPreviousNode(newNode, currentRoot): string {
+    if(currentRoot && newNode != currentRoot.id) {
+      return newNode == this.previousNode() ? this.beforePreviousNode() : currentRoot.id;
+    } else {
+      return null;
+    }
+  }
+
+  beforePreviousNode(): Seed {
+    return this.nav.length > 2 ? this.nav[this.nav.length - 3] : null;
   }
 }

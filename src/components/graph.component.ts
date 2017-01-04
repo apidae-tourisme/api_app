@@ -159,6 +159,8 @@ export class GraphComponent implements DoCheck, OnChanges {
     let nodes = networkNodes(this.networkData.nodes, this.networkData.previousNode);
     let edges = networkEdges(this.networkData.edges, this.networkData.previousNode);
 
+    // debugger;
+
     let simulation = d3.forceSimulation()
       .alphaMin(0.1)
       .force("link", d3.forceLink().id(function (d) { return d.id; })

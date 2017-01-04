@@ -49,11 +49,11 @@
     </ion-item>
     <ion-item *ngIf="node.category != 'person'">
       <ion-label stacked>Début</ion-label>
-      <ion-datetime displayFormat="DD/MM/YYYY" [(ngModel)]="node.startDate"></ion-datetime>
+      <ion-datetime displayFormat="DD/MM/YYYY" pickerFormat="DD/MM/YYYY" min="2010" max="2030" cancelText="Fermer" doneText="OK" [(ngModel)]="node.startDate"></ion-datetime>
     </ion-item>
     <ion-item *ngIf="node.category != 'person'">
       <ion-label stacked>Fin</ion-label>
-      <ion-datetime displayFormat="DD/MM/YYYY" [(ngModel)]="node.endDate"></ion-datetime>
+      <ion-datetime displayFormat="DD/MM/YYYY" pickerFormat="DD/MM/YYYY" min="2010" max="2030" [(ngModel)]="node.endDate"></ion-datetime>
     </ion-item>
     <ion-item no-lines class="label_only">
       <ion-label stacked>Graines liées</ion-label>

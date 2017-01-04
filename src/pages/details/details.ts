@@ -26,10 +26,8 @@ export class DetailsPage {
   }
 
   ionViewDidEnter(): void {
-    let seedId = this.navParams.get('seedId');
-    if(seedId && seedId != 'default') {
-      this.navigateTo(seedId, true, false);
-    }
+    let seedId = this.navParams.get('seedId') || this.explorerService.currentNode();
+    this.explorerService.navigateTo(seedId, false);
   }
 
   sanitizeUrl(url): SafeUrl {
@@ -40,19 +38,19 @@ export class DetailsPage {
     new InAppBrowser(url, '_blank', 'location=no');
   }
 
-  homeNode(): void {
-    this.explorerService.navigateHome();
-    this.clearResults();
-    this.navCtrl.parent.select(0);
-  }
-
-  navigateTo(node, showGraph, clear?): void {
-    this.explorerService.navigateTo(node, false);
+  navigateTo(node, showGraph, reset, clear?): void {
     if(clear) {
       this.clearResults();
     }
     if(showGraph) {
-      this.navCtrl.parent.select(0);
+      this.explorerService.navigateTo(node, reset, () => {
+        this.explorerService.skipExplore = true;
+        this.navCtrl.parent.select(0);
+      });
+    } else {
+      this.explorerService.navigateTo(node, reset, () => {
+        this.content.resize()
+      });
     }
   }
 

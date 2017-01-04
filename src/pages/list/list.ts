@@ -19,28 +19,24 @@ export class ListPage {
     this.searchQuery = null;
   }
 
-  homeNode(): void {
-    this.explorerService.navigateHome(() => {this.content.resize()});
-    this.clearResults();
-    this.navCtrl.parent.select(0);
-  }
-
   ionViewDidEnter(): void {
-    let seedId = this.navParams.get('seedId');
-    if(seedId && seedId != 'default') {
-      this.navigateTo(seedId, true, false);
-    } else {
-      this.explorerService.exploreGraph(false);
-    }
+    let seedId = this.navParams.get('seedId') || this.explorerService.currentNode();
+    this.explorerService.navigateTo(seedId, false);
   }
 
-  navigateTo(node, showGraph, clear?): void {
-    this.explorerService.navigateTo(node, false, () => {this.content.resize()});
+  navigateTo(node, showGraph, reset, clear?): void {
     if(clear) {
       this.clearResults();
     }
     if(showGraph) {
-      this.navCtrl.parent.select(0);
+      this.explorerService.navigateTo(node, reset, () => {
+        this.explorerService.skipExplore = true;
+        this.navCtrl.parent.select(0);
+      });
+    } else {
+      this.explorerService.navigateTo(node, reset, () => {
+        this.content.resize()
+      });
     }
   }
 

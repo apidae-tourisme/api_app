@@ -7,7 +7,6 @@ import {ListPage} from "../pages/list/list";
 import {GraphComponent} from "../components/graph.component";
 import {DataService} from "../providers/data.service";
 import {ExplorerService} from "../providers/explorer.service";
-import {NetworkContext} from "../providers/network.context";
 import {MapPage} from "../pages/map/map";
 import {AuthService} from "../providers/auth.service";
 import {LoginPage} from "../pages/login/login";
@@ -72,7 +71,6 @@ export const deepLinkConfig: DeepLinkConfig = {
     DataService,
     ExplorerService,
     SearchService,
-    NetworkContext,
     Storage,
     Seeds,
     ApiAppConfig
