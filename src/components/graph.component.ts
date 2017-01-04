@@ -33,11 +33,13 @@ export class GraphComponent implements DoCheck, OnChanges {
       unitX: 70,
       unitY: 80,
       unitIcon: 30,
+      unitImg: 28,
       rootScaleX: 1.5,
       rootScaleY: 1.8,
       titleSize: 12,
       textSize: 10,
-      padding: 3
+      padding: 3,
+      descLength: 50
     };
   }
 
@@ -181,7 +183,7 @@ export class GraphComponent implements DoCheck, OnChanges {
 
     nodesEnter.append("use")
       .attr("transform", function(d) {return d.isRoot ? "scale(" + layout.rootScaleX + " " + layout.rootScaleY + ")" : "";})
-      .attr("filter", function(d) {return d.noIcon() ? "url(#shadow)" : "";})
+      .attr("filter", function(d) {return d.category == 'concept' ? "url(#shadow)" : "";})
       .attr("class", function(d) { return d.category + " bg_" + d.category; })
       .attr("xlink:href", "#seed");
 
@@ -192,7 +194,16 @@ export class GraphComponent implements DoCheck, OnChanges {
       .attr("width", layout.unitIcon)
       .attr("height", layout.unitIcon)
       .attr("class", function(d) { return d.category + " icon"; })
-      .attr("xlink:href", function(d) {return '#' + d.category;});
+      .attr("xlink:href", function(d) {return d.picture ? '' : ('#' + d.category);});
+
+    nodesEnter.append("image")
+      .attr("transform", function(d) {return d.isRoot ? "scale(" + layout.rootScaleX + ")" : "";})
+      .attr("class", "img-node")
+      .attr("x", (layout.unitX - layout.unitImg) / 2)
+      .attr("y", (layout.unitImg / 2) - (layout.padding * 2))
+      .attr("width", layout.unitImg)
+      .attr("height", layout.unitImg)
+      .attr("xlink:href", function(d) {return d.picture;});
 
     let nodesLabel = nodesEnter.append("text")
       .attr("text-anchor", "middle")
@@ -290,19 +301,22 @@ export class GraphComponent implements DoCheck, OnChanges {
       line = [],
       lines = 1,
       x = Number.parseInt(textElt.attr("x")),
+      charsCount = 0,
       width = (isRoot ? (layout.unitX * layout.rootScaleX) : layout.unitX) - 2 * layout.padding;
     if(reset) {
       textElt.text(null);
     }
     let tspan = textElt.append("tspan").attr("x", x).attr("dy", offset).attr("font-size", fontSize + "px");
-    while (word = words.pop()) {
+    while ((word = words.pop()) && charsCount <= layout.descLength) {
       line.push(word);
-      tspan.text(line.join(" "));
-      if (tspan.node().getComputedTextLength() > (width - 2 * layout.padding)) {
+      charsCount += word.length + 1;
+      tspan.text(line.join(" ") + (charsCount > layout.descLength ? '...' : ''));
+      if (line.length > 1 && tspan.node().getComputedTextLength() > (width - 2 * layout.padding)) {
         line.pop();
         tspan.text(line.join(" "));
         line = [word];
-        tspan = textElt.append("tspan").attr("x", x).attr("dy", fontSize).attr("font-size", fontSize + "px").text(word);
+        tspan = textElt.append("tspan").attr("x", x).attr("dy", fontSize).attr("font-size", fontSize + "px")
+          .text(word + (charsCount > layout.descLength ? '...' : ''));
         lines++;
       }
     }
@@ -323,7 +337,15 @@ export class GraphComponent implements DoCheck, OnChanges {
       .attr("width", this.layout.unitIcon)
       .attr("height", this.layout.unitIcon)
       .attr("class", previousNode.category + " icon")
-      .attr("xlink:href", '#' + previousNode.category);
+      .attr("xlink:href", previousNode.picture ? '' : ('#' + previousNode.category));
+
+    prevNode.append("image")
+      .attr("class", "img-node")
+      .attr("x", (this.layout.unitX - this.layout.unitImg) / 2 + this.layout.padding * 2)
+      .attr("y", (this.layout.unitImg / 2) - this.layout.padding)
+      .attr("width", this.layout.unitImg)
+      .attr("height", this.layout.unitImg)
+      .attr("xlink:href", previousNode.picture);
 
     let prevText = prevNode.append("text");
     prevText.attr("text-anchor", "middle")
@@ -341,11 +363,13 @@ export class GraphComponent implements DoCheck, OnChanges {
       .attr("class", "icon")
       .text('\uf27d');
 
-    this.linksContainer.append("line")
-      .attr("x1", this.layout.unitX / 2 + this.layout.padding * 2)
-      .attr("y1", this.layout.unitY / 2 + this.layout.padding * 2)
-      .attr("x2", this.dimensions.width / 2)
-      .attr("y2", this.dimensions.height / 2);
+    if(!previousNode.disconnected) {
+      this.linksContainer.append("line")
+        .attr("x1", this.layout.unitX / 2 + this.layout.padding * 2)
+        .attr("y1", this.layout.unitY / 2 + this.layout.padding * 2)
+        .attr("x2", this.dimensions.width / 2)
+        .attr("y2", this.dimensions.height / 2);
+    }
 
     prevNode.on("click", () => {
       this.newRoot = previousNode.id;

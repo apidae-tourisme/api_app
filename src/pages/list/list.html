@@ -74,7 +74,7 @@
   </div>
 
   <ion-list *ngIf="searchService.showSearch && searchService.nodes.length > 0" id="search_results">
-    <ion-item *ngFor="let node of searchService.nodes" text-wrap (click)="navigateTo(node.id, true, true)">
+    <ion-item *ngFor="let node of searchService.nodes" text-wrap (click)="navigateTo(node.id, false, true)">
       <ion-avatar item-left class="bg_seed {{node.category}}">
         <ion-img *ngIf="node.picture" [src]="node.picture"></ion-img>
         <div *ngIf="!node.picture" text-center><i class="ion-md-custom-{{node.category}}"></i></div>

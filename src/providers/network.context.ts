@@ -13,7 +13,7 @@ export class NetworkContext {
     } else {
       if(this.isPrevious(newNode)) {
         this.previousNodes.pop();
-      } else {
+      } else if(newNode != this.node) {
         this.previousNodes.push(this.node);
       }
     }

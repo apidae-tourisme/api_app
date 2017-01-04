@@ -139,13 +139,18 @@
 }
 
 #avatar_logo {
-  width: 45px;
-  border-radius: 25px;
+  height: 48px;
+  max-width: 48px;
+  border-radius: 24px;
 }
 
 ion-header .bar-buttons-md[left] > button {
   padding: 0;
   margin-right: 0;
+}
+
+ion-header .bar-buttons-md > button.bar-button-md {
+  height: auto;
 }
 
 ion-searchbar.searchbar-md .searchbar-input {
@@ -321,7 +326,7 @@ ion-header .toolbar_header .toolbar-title ion-img {
 ion-header .toolbar_header .toolbar-title img {
   min-width: inherit;
   max-width: 50px;
-  max-height: 50px;
+  height: 50px;
   margin: 10px;
 }
 

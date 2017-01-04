@@ -32,12 +32,12 @@ export class GraphPage {
     if(seedId && seedId != 'default') {
       this.explorerService.navigateTo(this.navParams.get('seedId'), true);
     } else {
-      this.explorerService.exploreGraph(true);
+      this.explorerService.exploreGraph(false);
     }
   }
 
   navigateTo(node): void {
-    this.explorerService.navigateTo(node, true);
+    this.explorerService.navigateTo(node, false);
     this.clearResults();
   }
 

@@ -7,13 +7,9 @@ graph tspan.icon {
   font-family: 'Ionicons';
 }
 
-//graph image.img-node {
-//  clip-path: circle(16px at 16px 16px);
-//}
-//
-//graph image.img-node.root {
-//  clip-path: circle(24px at 24px 24px);
-//}
+graph image.img-node {
+  clip-path: circle(12px at 14px 14px);
+}
 
 graph use.icon,
 graph text.label {

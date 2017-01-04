@@ -28,7 +28,7 @@ export class DetailsPage {
   ionViewDidEnter(): void {
     let seedId = this.navParams.get('seedId');
     if(seedId && seedId != 'default') {
-      this.navigateTo(seedId, true);
+      this.navigateTo(seedId, true, false);
     }
   }
 
@@ -43,12 +43,16 @@ export class DetailsPage {
   homeNode(): void {
     this.explorerService.navigateHome();
     this.clearResults();
+    this.navCtrl.parent.select(0);
   }
 
-  navigateTo(node, reset, clear?): void {
-    this.explorerService.navigateTo(node, reset);
+  navigateTo(node, showGraph, clear?): void {
+    this.explorerService.navigateTo(node, false);
     if(clear) {
       this.clearResults();
+    }
+    if(showGraph) {
+      this.navCtrl.parent.select(0);
     }
   }
 

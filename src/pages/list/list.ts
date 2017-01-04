@@ -22,21 +22,25 @@ export class ListPage {
   homeNode(): void {
     this.explorerService.navigateHome(() => {this.content.resize()});
     this.clearResults();
+    this.navCtrl.parent.select(0);
   }
 
   ionViewDidEnter(): void {
     let seedId = this.navParams.get('seedId');
     if(seedId && seedId != 'default') {
-      this.navigateTo(seedId, true);
+      this.navigateTo(seedId, true, false);
     } else {
-      this.explorerService.exploreGraph(true);
+      this.explorerService.exploreGraph(false);
     }
   }
 
-  navigateTo(node, reset, clear?): void {
-    this.explorerService.navigateTo(node, reset, () => {this.content.resize()});
+  navigateTo(node, showGraph, clear?): void {
+    this.explorerService.navigateTo(node, false, () => {this.content.resize()});
     if(clear) {
       this.clearResults();
+    }
+    if(showGraph) {
+      this.navCtrl.parent.select(0);
     }
   }
 

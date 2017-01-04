@@ -20,6 +20,7 @@ export class Seed {
   updateDate: string;
   startDate: string;
   endDate: string;
+  disconnected: boolean;
   seeds: Array<any>;
   urls: Array<any>;
 
@@ -60,7 +61,7 @@ export class Seed {
   }
 
   public noIcon() {
-    return this.category == 'concept' || this.category == 'task';
+    return !this.picture && (this.category == 'concept' || this.category == 'action');
   }
 
   public typeLabel() {

@@ -1,6 +1,6 @@
 import {Component} from '@angular/core';
 import {Platform} from 'ionic-angular';
-import {StatusBar} from 'ionic-native';
+import {StatusBar, Splashscreen} from 'ionic-native';
 import {LoginPage} from "../pages/login/login";
 import {AuthService} from "../providers/auth.service";
 import {ExplorerService} from "../providers/explorer.service";
@@ -15,7 +15,10 @@ export class ApiApp {
   constructor(platform: Platform, private authService: AuthService, private explorerService: ExplorerService,
               private networkContext: NetworkContext) {
     platform.ready().then(() => {
-      StatusBar.hide();
+      StatusBar.styleDefault();
+      if(platform.is('core')) {
+        Splashscreen.hide();
+      }
     });
   }
 }

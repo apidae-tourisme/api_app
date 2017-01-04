@@ -40,6 +40,7 @@ export class ExplorerService {
       if(!this.networkContext.node) {
         this.networkContext.node = nodes[0].id;
       }
+      let previous = this.rootNode;
 
       for (let i = 0; i < nodes.length; i++) {
         let node = nodes[i];
@@ -56,6 +57,12 @@ export class ExplorerService {
         }
       }
       parsedData.edges = data.links;
+
+      if(previous && !parsedData.previousNode && !resetData) {
+        previous.disconnected = true;
+        this.previousNode = previous;
+        parsedData.previousNode = previous;
+      }
 
       this.networkData = parsedData;
       if(this.networkContext.previousNodes.length == 0) {
