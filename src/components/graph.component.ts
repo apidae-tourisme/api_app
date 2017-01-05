@@ -207,6 +207,14 @@ export class GraphComponent implements DoCheck, OnChanges {
       .attr("height", layout.unitImg)
       .attr("xlink:href", function(d) {return d.picture;});
 
+    nodesEnter.append("text")
+      .attr("transform", function(d) {return d.isRoot ? "scale(" + layout.rootScaleX + ")" : "";})
+      .attr("x", (layout.unitX - layout.textSize) / 2)
+      .attr("y", layout.padding)
+      .attr("font-size", layout.titleSize)
+      .attr("class", "icon")
+      .text(function(d) {return d.scope == 'private' ? '\uf31d' : ''});
+
     let nodesLabel = nodesEnter.append("text")
       .attr("text-anchor", "middle")
       .attr("x", function(d) {return (d.isRoot ? (layout.unitX * layout.rootScaleX) : layout.unitX) / 2;})

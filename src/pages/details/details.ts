@@ -28,6 +28,7 @@ export class DetailsPage {
   ionViewDidEnter(): void {
     let seedId = this.navParams.get('seedId') || this.explorerService.currentNode();
     this.explorerService.navigateTo(seedId, false);
+    this.clearResults();
   }
 
   sanitizeUrl(url): SafeUrl {

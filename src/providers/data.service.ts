@@ -48,10 +48,14 @@ export class DataService {
     let seedParams = seed.submitParams();
     if(nodeId) {
       url += "/" + nodeId + ".json";
-      return this.http.patch(url, {seed: seedParams}, this.userHeader());
+      return this.http.patch(url, {seed: seedParams}, this.userHeader()).map(resp => {
+        return resp.json();
+      });
     } else {
       url += ".json";
-      return this.http.post(url, {seed: seedParams}, this.userHeader());
+      return this.http.post(url, {seed: seedParams}, this.userHeader()).map(resp => {
+        return resp.json();
+      });
     }
   }
 

@@ -21,6 +21,7 @@ export class Seed {
   startDate: string;
   endDate: string;
   disconnected: boolean;
+  scope: string;
   seeds: Array<any>;
   urls: Array<any>;
 
@@ -42,6 +43,7 @@ export class Seed {
     this.updateDate = this.formatDate(nodeData.updated_at);
     this.startDate = this.formatDate(nodeData.start_date);
     this.endDate = this.formatDate(nodeData.end_date);
+    this.scope = nodeData.scope;
     this.seeds = [];
     if(nodeData.seeds) {
       for(let i = 0; i < nodeData.seeds.length; i++) {
@@ -119,8 +121,9 @@ export class Seed {
       mobilephone: this.mobilePhone,
       started_at: this.startDate,
       ended_at: this.endDate,
-      seeds: this.seeds.map(function(s) { return s.id; }),
-      urls: this.urls.map(function(u) { return u.value; })
+      scope: this.scope,
+      seeds: this.seeds.map(function(s) { return s.id; }) || [],
+      urls: this.urls.map(function(u) { return u.value; }) || []
     };
   }
 

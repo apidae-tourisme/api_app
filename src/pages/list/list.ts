@@ -22,6 +22,7 @@ export class ListPage {
   ionViewDidEnter(): void {
     let seedId = this.navParams.get('seedId') || this.explorerService.currentNode();
     this.explorerService.navigateTo(seedId, false);
+    this.clearResults();
   }
 
   navigateTo(node, showGraph, reset, clear?): void {

@@ -17,24 +17,53 @@ export class FormPage {
   constructor(private navCtrl: NavController, private params: NavParams, public modalCtrl: ModalController,
               public dataService: DataService, private explorerService: ExplorerService,
               private toastCtrl: ToastController) {
-    this.node = params.get('node') || new Seed({}, false, false);
+    this.node = params.get('node') || new Seed({scope: 'private'}, false, false);
     this.node.startDate = new Date().toISOString();
     this.node.endDate = new Date().toISOString();
   }
 
   dismissForm(): void {
-    this.explorerService.navigateTo(this.node.id, false, () => {
-      this.navCtrl.pop();
+    this.navCtrl.pop({}, () => {
+      this.explorerService.navigateTo(this.node.id, true, () => {
+        this.explorerService.skipExplore = true;
+        this.navCtrl.parent.select(0);
+      });
     });
   }
 
   submitForm(): void {
     this.dataService.saveNode(this.node).subscribe(data => {
+      this.node.id = data.node.id;
       this.presentToast("La graine a été enregistrée.", () => {this.dismissForm();});
     }, error => {
       this.presentToast("Une erreur est survenue pendant l'enregistrement de la graine.", () => {});
       console.log("submit error : " + JSON.stringify(error))
     });
+  }
+
+  clearStartDate(): void {
+    this.node.startDate = null;
+  }
+
+  clearEndDate(): void {
+    this.node.endDate = null;
+  }
+
+  toggleScope(): void {
+    console.log('toggle scope');
+    this.node.scope = this.node.scope == 'private' ? 'public' : 'private';
+  }
+
+  scopeIcon(): string {
+    return this.node.scope == 'public' ? 'unlock' : 'lock';
+  }
+
+  scopeLabel(): string {
+    return this.node.scope == 'public' ? 'Graine publique' : 'Graine privée';
+  }
+
+  scopeColor(): string {
+    return this.node.scope == 'public' ? 'link' : 'text_alt';
   }
 
   seedTypes(): void {
@@ -60,8 +89,9 @@ export class FormPage {
   editAvatar(): void {
     let avatarModal = this.modalCtrl.create(EditAvatar);
     avatarModal.onDidDismiss(data => {
-      console.log("dismissed avatar modal : " + data.imageUrl);
-      this.node.picture = data.imageUrl;
+      if(data) {
+        this.node.picture = data.imageUrl;
+      }
     });
     avatarModal.present();
   }

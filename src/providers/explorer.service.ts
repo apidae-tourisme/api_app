@@ -79,9 +79,10 @@ export class ExplorerService {
         this.nav.push(this.rootNode);
       }
 
-      console.log('rootNode : ' + this.rootNode.id);
-      console.log('previousNode : ' + (parsedData.previousNode ? parsedData.previousNode.id : null));
-      console.log('nav : ' + this.nav.map(function(s) {return s.id;}));
+      // Debug logs
+      // console.log('rootNode : ' + this.rootNode.id);
+      // console.log('previousNode : ' + (parsedData.previousNode ? parsedData.previousNode.id : null));
+      // console.log('nav : ' + this.nav.map(function(s) {return s.id;}));
 
       this.networkData = parsedData;
 
