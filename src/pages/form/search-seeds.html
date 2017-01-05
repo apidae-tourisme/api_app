@@ -27,7 +27,7 @@
   <ion-list *ngIf="searchService.showSearch && searchService.nodes.length > 0" id="search_results">
     <ion-item *ngFor="let node of searchService.nodes" text-wrap (click)="selectSeed(node)">
       <ion-avatar item-left class="bg_seed {{node.category}}">
-        <ion-img *ngIf="node.picture" [src]="node.picture"></ion-img>
+        <img *ngIf="node.picture" src="{{node.picture}}"/>
         <div *ngIf="!node.picture" text-center><i class="ion-md-custom-{{node.category}}"></i></div>
       </ion-avatar>
       <h2>{{node.label}}</h2>

@@ -51,7 +51,7 @@
     </ion-item>
     <ion-item>
       <ion-avatar item-left class="bg_seed {{node.category}}">
-        <ion-img *ngIf="node.picture" [src]="node.picture"></ion-img>
+        <img *ngIf="node.picture" src="{{node.picture}}"/>
         <div *ngIf="!node.picture" class="bg_seed {{node.category}}" text-center><i ngClass="ion-md-custom-{{node.code}}"></i></div>
       </ion-avatar>
       <button ion-button item-right block large class="button-md-link" (click)="editAvatar()">{{node.picture ? 'Modifier le ' : 'Ajouter un '}}visuel</button>
@@ -79,7 +79,7 @@
     </ion-item>
     <ion-item *ngFor="let seed of node.seeds; let i = index;" no-lines>
       <ion-avatar item-left class="bg_seed {{seed.category}}">
-        <ion-img *ngIf="seed.picture" [src]="seed.picture"></ion-img>
+        <img *ngIf="seed.picture" src="{{seed.picture}}"/>
         <div *ngIf="!seed.picture" text-center><i class="ion-md-custom-{{seed.category}}"></i></div>
       </ion-avatar>
       <h2>{{seed.label}}</h2>

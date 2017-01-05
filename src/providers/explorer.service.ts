@@ -27,10 +27,6 @@ export class ExplorerService {
   }
 
   private exploreGraph(resetData: boolean, newNode, onComplete?): void {
-    if(resetData) {
-      this.networkData = null;
-      this.nav = [];
-    }
 
     this.dataService.getNodeData(newNode).subscribe(data => {
       let parsedData: any = {
@@ -40,6 +36,7 @@ export class ExplorerService {
       let nodes = data.nodes;
       let currentRoot = this.rootNode;
       let newPrevious = this.newPreviousNode(newNode, currentRoot);
+      let prevDisconnected = true;
 
       for (let i = 0; i < nodes.length; i++) {
         let node = nodes[i];
@@ -50,19 +47,22 @@ export class ExplorerService {
           }
           if(networkNode.isPrevious) {
             parsedData.previousNode = networkNode;
+            prevDisconnected = false;
           }
           parsedData.nodes.push(networkNode);
         }
       }
       parsedData.edges = data.links;
 
-      if(currentRoot && !parsedData.previousNode && !resetData) {
-        parsedData.previousNode = currentRoot;
-        parsedData.previousNode.disconnected = true;
+      // Reset - no history
+      if(resetData) {
+        this.networkData = null;
+        this.nav = [];
+        this.nav.push(this.rootNode);
+        parsedData.previousNode = null;
       }
-
       // Node unchanged (switched tabs or refresh)
-      if(newNode && newNode == this.currentNode()) {
+      else if(newNode && newNode == this.currentNode()) {
         parsedData.previousNode = this.networkData.previousNode;
       }
       // Node changed - Nav backward
@@ -77,6 +77,10 @@ export class ExplorerService {
       // Node changed - Nav forward
       else {
         this.nav.push(this.rootNode);
+      }
+
+      if(parsedData.previousNode) {
+        parsedData.previousNode.disconnected = prevDisconnected;
       }
 
       // Debug logs
@@ -108,7 +112,7 @@ export class ExplorerService {
     }
   }
 
-  beforePreviousNode(): Seed {
-    return this.nav.length > 2 ? this.nav[this.nav.length - 3] : null;
+  beforePreviousNode(): string {
+    return this.nav.length > 2 ? this.nav[this.nav.length - 3].id : null;
   }
 }
