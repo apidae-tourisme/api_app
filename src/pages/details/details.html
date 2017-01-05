@@ -11,6 +11,7 @@
     <ion-buttons right *ngIf="dataService.userSeed">
       <button ion-button (click)="navigateTo(dataService.userSeed.id, true, true, true)">
         <img id="avatar_logo" *ngIf="dataService.userSeed.picture" src="{{dataService.userSeed.picture}}"/>
+        <i id="avatar_icon" *ngIf="!dataService.userSeed.picture" class="ion-md-custom-person"></i>
       </button>
     </ion-buttons>
   </ion-navbar>
@@ -65,7 +66,7 @@
     </ion-item>
     <ion-item *ngIf="explorerService.rootNode.telephone" class="selectable">
       <div class="button-md button-large-md button-md-lighter selectable" large>
-        <a ion-button icon-only item-left color="event" [href]="sanitizeUrl('tel:' + explorerService.rootNode.telephone)" large>
+        <a ion-button icon-only item-left color="event" (click)="openUrl('tel:' + explorerService.rootNode.telephone, true)" large>
           <ion-icon md="ios-call"></ion-icon>
         </a>
         <span class="button_label">{{explorerService.rootNode.telephone}}</span>
@@ -73,16 +74,16 @@
     </ion-item>
     <ion-item *ngIf="explorerService.rootNode.mobilePhone" class="selectable">
       <div class="button-md button-large-md button-md-lighter selectable" large>
-        <a ion-button icon-only item-left color="event" [href]="sanitizeUrl('tel:' + explorerService.rootNode.mobilePhone)" large>
+        <a ion-button icon-only item-left color="event" (click)="openUrl('tel:' + explorerService.rootNode.mobilePhone, true)" large>
           <ion-icon md="ios-call"></ion-icon>
         </a>
         <span class="button_label">{{explorerService.rootNode.mobilePhone}}</span>
       </div>
-      <a ion-button large item-right icon-only color="product" [href]="sanitizeUrl('sms:' + explorerService.rootNode.mobilePhone)" class="button_eol"><ion-icon md="ios-chatbubbles"></ion-icon></a>
+      <a ion-button large item-right icon-only color="product" (click)="openUrl('sms:' + explorerService.rootNode.mobilePhone, true)" class="button_eol"><ion-icon md="ios-chatbubbles"></ion-icon></a>
     </ion-item>
     <ion-item *ngIf="explorerService.rootNode.email" class="selectable" text-wrap>
       <div class="button-md button-large-md button-md-lighter selectable" large>
-        <a ion-button icon-only item-left color="product" [href]="sanitizeUrl('mailto:' + explorerService.rootNode.email)" large>
+        <a ion-button icon-only item-left color="product" (click)="openUrl('mailto:' + explorerService.rootNode.email, true)" large>
           <ion-icon name="mail"></ion-icon>
         </a>
         <p class="button_label label_sm">{{explorerService.rootNode.email}}</p>
@@ -91,7 +92,7 @@
     <ion-item *ngFor="let url of explorerService.rootNode.urls" class="selectable" text-wrap>
       <div class="button-md button-large-md button-md-lighter selectable" large>
         <a ion-button icon-only item-left color="product" (click)="openUrl(url.value)" large>
-          <ion-icon md="ios-desktop"></ion-icon>
+          <ion-icon [md]="urlIcon(url.value)"></ion-icon>
         </a>
         <p class="button_label label_sm">{{url.value}}</p>
       </div>

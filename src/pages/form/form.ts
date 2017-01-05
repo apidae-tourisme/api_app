@@ -22,19 +22,21 @@ export class FormPage {
     this.node.endDate = new Date().toISOString();
   }
 
-  dismissForm(): void {
+  dismissForm(showGraph?): void {
     this.navCtrl.pop({}, () => {
-      this.explorerService.navigateTo(this.node.id, true, () => {
-        this.explorerService.skipExplore = true;
-        this.navCtrl.parent.select(0);
-      });
+      if(showGraph) {
+        this.explorerService.navigateTo(this.node.id, true, () => {
+          this.explorerService.skipExplore = true;
+          this.navCtrl.parent.select(0);
+        });
+      }
     });
   }
 
   submitForm(): void {
     this.dataService.saveNode(this.node).subscribe(data => {
       this.node.id = data.node.id;
-      this.presentToast("La graine a été enregistrée.", () => {this.dismissForm();});
+      this.presentToast("La graine a été enregistrée.", () => {this.dismissForm(true);});
     }, error => {
       this.presentToast("Une erreur est survenue pendant l'enregistrement de la graine.", () => {});
       console.log("submit error : " + JSON.stringify(error))

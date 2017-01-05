@@ -49,11 +49,6 @@ export class GraphPage {
   filterNodes(ev: any) {
     this.searchService.filterNodes(ev);
     this.content.resize();
-
-    // Temp fix on iOS - Searchbar keeps focus even when another button is clicked
-    if(this.platform.is('ios')) {
-      this.renderer.invokeElementMethod(ev.target, 'blur');
-    }
   }
 
   createSeed() {

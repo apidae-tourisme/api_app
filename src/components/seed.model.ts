@@ -22,6 +22,7 @@ export class Seed {
   endDate: string;
   disconnected: boolean;
   scope: string;
+  ownerId: string;
   seeds: Array<any>;
   urls: Array<any>;
 
@@ -44,6 +45,7 @@ export class Seed {
     this.startDate = this.formatDate(nodeData.start_date);
     this.endDate = this.formatDate(nodeData.end_date);
     this.scope = nodeData.scope || 'public';
+    this.ownerId = nodeData.owner_id;
     this.seeds = [];
     if(nodeData.seeds) {
       for(let i = 0; i < nodeData.seeds.length; i++) {

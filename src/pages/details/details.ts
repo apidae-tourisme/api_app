@@ -35,8 +35,8 @@ export class DetailsPage {
     return this.sanitizer.bypassSecurityTrustUrl(url);
   }
 
-  openUrl(url): void {
-    new InAppBrowser(url, '_blank', 'location=no');
+  openUrl(url, useSystem?): void {
+    new InAppBrowser(url, useSystem ? '_system' : '_blank', 'location=no');
   }
 
   navigateTo(node, showGraph, reset, clear?): void {
@@ -68,11 +68,6 @@ export class DetailsPage {
 
   filterNodes(ev: any) {
     this.searchService.filterNodes(ev);
-
-    // Temp fix on iOS - Searchbar keeps focus even when another button is clicked
-    if(this.platform.is('ios')) {
-      this.renderer.invokeElementMethod(ev.target, 'blur');
-    }
   }
 
   createSeed() {
@@ -85,6 +80,18 @@ export class DetailsPage {
     }, error => {
       console.log("Failed to load node " + this.explorerService.rootNode.id + " for edition");
     });
+  }
+
+  urlIcon(url): string {
+    let supportedUrls = ['@', 'facebook', 'twitter', 'linkedin', 'instagram', 'youtube', 'dropbox', 'google', 'github', 'dribbble',
+      'pinterest', 'reddit', 'rss', 'skype', 'snapchat', 'tumblr', 'vimeo'];
+
+    for(let i = 0; i < supportedUrls.length; i++) {
+      if(url.indexOf(supportedUrls[i]) != -1) {
+        return 'logo-' + supportedUrls[i];
+      }
+    }
+    return 'ios-desktop';
   }
 
   logOut() {

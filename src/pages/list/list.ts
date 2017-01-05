@@ -56,11 +56,6 @@ export class ListPage {
 
   filterNodes(ev: any) {
     this.searchService.filterNodes(ev);
-
-    // Temp fix on iOS - Searchbar keeps focus even when another button is clicked
-    if(this.platform.is('ios')) {
-      this.renderer.invokeElementMethod(ev.target, 'blur');
-    }
   }
 
   createSeed() {
