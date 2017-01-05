@@ -43,7 +43,7 @@ export class Seed {
     this.updateDate = this.formatDate(nodeData.updated_at);
     this.startDate = this.formatDate(nodeData.start_date);
     this.endDate = this.formatDate(nodeData.end_date);
-    this.scope = nodeData.scope;
+    this.scope = nodeData.scope || 'public';
     this.seeds = [];
     if(nodeData.seeds) {
       for(let i = 0; i < nodeData.seeds.length; i++) {

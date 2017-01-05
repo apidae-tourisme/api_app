@@ -74,8 +74,11 @@ export class ExplorerService {
           parsedData.previousNode = this.nav[this.nav.length - 2];
         }
       }
-      // Node changed - Nav forward
+      // Node changed - Nav forward / search
       else {
+        if(!parsedData.previousNode) {
+          parsedData.previousNode = currentRoot;
+        }
         this.nav.push(this.rootNode);
       }
 

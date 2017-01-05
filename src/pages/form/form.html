@@ -54,7 +54,12 @@
         <img *ngIf="node.picture" src="{{node.picture}}"/>
         <div *ngIf="!node.picture" class="bg_seed {{node.category}}" text-center><i ngClass="ion-md-custom-{{node.code}}"></i></div>
       </ion-avatar>
-      <button ion-button item-right block large class="button-md-link" (click)="editAvatar()">{{node.picture ? 'Modifier le ' : 'Ajouter un '}}visuel</button>
+      <button ion-button item-right large icon-only color="link" (click)="editAvatar()">
+        <ion-icon name="create"></ion-icon>
+      </button>
+      <button ion-button item-right large icon-only color="danger" (click)="clearAvatar()">
+        <ion-icon name="close"></ion-icon>
+      </button>
     </ion-item>
     <ion-item *ngIf="node.category != 'person'">
       <ion-label stacked>Début</ion-label>

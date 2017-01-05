@@ -50,7 +50,6 @@ export class FormPage {
   }
 
   toggleScope(): void {
-    console.log('toggle scope');
     this.node.scope = this.node.scope == 'private' ? 'public' : 'private';
   }
 
@@ -94,6 +93,10 @@ export class FormPage {
       }
     });
     avatarModal.present();
+  }
+
+  clearAvatar(): void {
+    this.node.picture = null;
   }
 
   presentToast(msg, onDismiss) {
