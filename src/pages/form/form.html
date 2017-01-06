@@ -37,10 +37,10 @@
       <ion-label stacked>Description</ion-label>
       <ion-textarea rows="4" [(ngModel)]="node.description"></ion-textarea>
     </ion-item>
-    <ion-item *ngIf="dataService.userSeed.id == node.ownerId || node.scope == 'public'" no-lines class="label_only">
+    <ion-item *ngIf="dataService.userSeed.email == node.contributor || node.scope == 'public'" no-lines class="label_only">
       <ion-label stacked>Visibilité</ion-label>
     </ion-item>
-    <ion-item *ngIf="dataService.userSeed.id == node.ownerId || node.scope == 'public'">
+    <ion-item *ngIf="dataService.userSeed.email == node.contributor || node.scope == 'public'">
       <ion-label>{{scopeLabel()}}</ion-label>
       <button ion-button item-right large icon-only [color]="scopeColor()" (click)="toggleScope()">
         <ion-icon [name]="scopeIcon()"></ion-icon>

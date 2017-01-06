@@ -53,6 +53,7 @@ export class FormPage {
 
   toggleScope(): void {
     this.node.scope = this.node.scope == 'private' ? 'public' : 'private';
+    this.node.contributor = this.dataService.userSeed.email;
   }
 
   scopeIcon(): string {
