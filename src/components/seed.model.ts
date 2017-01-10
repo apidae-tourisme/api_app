@@ -15,12 +15,12 @@ export class Seed {
   telephone: string;
   mobilePhone: string;
   url: string;
-  fixed: boolean;
   creationDate: string;
   updateDate: string;
   startDate: string;
   endDate: string;
   disconnected: boolean;
+  archived: boolean;
   scope: string;
   contributor: string;
   seeds: Array<any>;
@@ -37,13 +37,13 @@ export class Seed {
     this.telephone = nodeData.telephone;
     this.mobilePhone = nodeData.mobilephone;
     this.setCode();
-    this.setPicture(nodeData.thumbnail);
+    this.picture = this.normalize(nodeData.thumbnail);
     this.url = this.normalize(nodeData.url);
-    this.fixed = true;
     this.creationDate = this.formatDate(nodeData.created_at);
     this.updateDate = this.formatDate(nodeData.updated_at);
     this.startDate = this.formatDate(nodeData.start_date);
     this.endDate = this.formatDate(nodeData.end_date);
+    this.archived = nodeData.archived;
     this.scope = nodeData.scope || 'public';
     this.contributor = nodeData.last_contributor;
     this.seeds = [];
@@ -123,6 +123,7 @@ export class Seed {
       mobilephone: this.mobilePhone,
       started_at: this.startDate,
       ended_at: this.endDate,
+      archived: this.archived,
       scope: this.scope,
       seeds: this.seeds.map(function(s) { return s.id; }) || [],
       urls: this.urls.map(function(u) { return u.value; }) || []
@@ -145,12 +146,6 @@ export class Seed {
       }
     } else {
       return null;
-    }
-  }
-
-  private setPicture(picUrl): void {
-    if (picUrl && (picUrl.indexOf("jpg") != -1 || picUrl.indexOf("logo") != -1)) {
-      this.picture = (picUrl.indexOf("http") != - 1) ? picUrl : ('http://' + picUrl);
     }
   }
 

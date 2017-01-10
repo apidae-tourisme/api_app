@@ -52,6 +52,8 @@ export class LoginPage {
           }, function() {
             console.log('User seed retrieval failed');
           });
+        } else {
+          console.log('Invalid auth data');
         }
       }, function() {
         console.log('Local auth data is invalid');

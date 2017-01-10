@@ -27,9 +27,12 @@ export class AuthService {
         if(callBackUrl && callBackUrl.indexOf('auth_token') != -1 && callBackUrl.indexOf('client_id') != -1 &&
           callBackUrl.indexOf('uid') != -1) {
           let callBackParams = callBackUrl.slice(callBackUrl.indexOf('?'));
-          this.setLocalAuthData(callBackParams);
+          this.setLocalAuthData(callBackParams).then(() => {
+            success();
+          }).catch((err) => {
+            console.log('Unable to set local auth data : ' + err);
+          });
           browser.close();
-          success();
         }
       });
       browser.on('loaderror').subscribe(data => {
@@ -51,13 +54,13 @@ export class AuthService {
         client:         params.get('client_id'),
         expiry:         params.get('expiry'),
         tokenType:      params.get('tokenType'),
-        uid:            params.get('uid')
+        uid:            params.get('uid').replace(/\D/g,'')
       };
       if(this.isValidAuth(authData)) {
         return this.storage.set('authData', authData);
       }
     }
-    return null;
+    return Promise.reject('Could not set local auth data');
   }
 
   logOut() {

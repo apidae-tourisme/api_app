@@ -21,8 +21,8 @@ export class DataService {
     });
   }
 
-  getAllNodesData() : Observable<any> {
-    let url = ApiAppConfig.API_URL + "/seeds.json";
+  searchNodes(query) : Observable<any> {
+    let url = ApiAppConfig.API_URL + "/seeds.json?query=" + query;
     return this.http.get(url, this.userHeader()).map(resp => {
       return resp.json();
     });
@@ -62,6 +62,11 @@ export class DataService {
   savePicture(picture) : Observable<any> {
     let url = ApiAppConfig.API_URL + '/pictures';
     return this.http.post(url, {});
+  }
+
+  clearUser(): void {
+    this.userSeed = null;
+    this.userId = null;
   }
 
   userHeader() : any {

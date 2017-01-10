@@ -1,23 +1,14 @@
-ion-toolbar #title_button {
-  height: 64px;
-  margin: 0;
+ion-icon.item_lock {
+  position: absolute;
+  top:0;
+  left: 38px;
 }
 
-ion-toolbar #title_button img {
-  border-radius: 25px;
+ion-list ion-item.item-md ion-avatar {
+  padding: 6px;
 }
 
-ion-toolbar #title_button p {
-  text-transform: none;
-  margin: 0;
-}
-
-ion-toolbar #title_button p:first-child {
-  color: map-get($colors, text_main);
-  font-size: $font-size-base;
-}
-
-ion-toolbar #title_button p:last-child {
-  color: map-get($colors, text_alt);
-  font-size: 1.1rem;
+.item-md ion-avatar img {
+  width: 44px;
+  height: 44px;
 }

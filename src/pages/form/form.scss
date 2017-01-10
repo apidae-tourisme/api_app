@@ -59,3 +59,9 @@
 input.cordova-camera-select {
   display: none;
 }
+
+#avatar_preview {
+  max-width: 100px;
+  height: 100px;
+  border-radius: 50%;
+}

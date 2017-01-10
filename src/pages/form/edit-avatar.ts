@@ -42,7 +42,6 @@ export class EditAvatar {
       };
       fileTransfer.upload(dataDirectory + fileName, ApiAppConfig.API_URL + '/pictures', options)
         .then((data) => {
-          console.log('upload successful : ' + JSON.stringify(data.response));
           loading.dismiss();
           this.viewCtrl.dismiss({imageUrl: JSON.parse(data.response)['picture'].thumbnail});
         }, (err) => {

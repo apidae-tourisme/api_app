@@ -17,16 +17,16 @@
 <ion-content id="edit_avatar" padding>
   <div *ngIf="avatar.src" text-center>
     <h5>Prévisualisation de l'image :</h5>
-    <ion-row>
-      <ion-col width-25></ion-col>
-      <ion-col width-50><img src="{{avatar.src}}"/></ion-col>
-      <ion-col width-25></ion-col>
-    </ion-row>
+    <img id="avatar_preview" src="{{avatar.src}}"/>
   </div>
+  <p *ngIf="!avatar.src" text-center>
+    Sélectionnez une image existante ou prenez une nouvelle photo ci-dessous.
+  </p>
+  <br/>
   <button ion-button block large icon-left color="link" (click)="selectImage()">
     <ion-icon name="image"></ion-icon>Choisir une image
   </button>
-  <button ion-button block large icon-left color="link" (click)="captureImage()">
+  <button ion-button block large icon-left color="product" (click)="captureImage()" margin-top>
     <ion-icon name="camera"></ion-icon>Prendre une photo
   </button>
 </ion-content>

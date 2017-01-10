@@ -6,7 +6,7 @@
       </button>
     </ion-buttons>
     <ion-toolbar no-border>
-      <ion-searchbar (ionInput)="filterNodes($event)" (ionFocus)="searchService.loadNodes()" [(ngModel)]="searchQuery" placeholder="Rechercher" debounce="800"></ion-searchbar>
+      <ion-searchbar (ionInput)="searchNodes($event)" (ionFocus)="searchService.toggleSearch()" [(ngModel)]="searchQuery" placeholder="Rechercher" debounce="800"></ion-searchbar>
     </ion-toolbar>
     <ion-buttons right *ngIf="dataService.userSeed">
       <button ion-button (click)="navigateTo(dataService.userSeed.id, true, true, true)">
@@ -37,12 +37,17 @@
       </button>
     </ion-buttons>
     <ion-title text-center>
-      <div id="title_details" class="button-inner">
-        <img *ngIf="explorerService.rootNode.picture" src="{{explorerService.rootNode.picture}}"/>
-        <div *ngIf="!explorerService.rootNode.picture" class="font_avatar" text-center>{{explorerService.rootNode.code}}&nbsp;</div>
-        <div>
-          <p text-left>{{explorerService.rootNode.label}}</p>
-          <p text-left>{{explorerService.rootNode.description}}</p>
+      <div class="inline">
+        <div class="header_title button-inner">
+          <ion-icon *ngIf="explorerService.rootNode.scope == 'private'" name="lock" class="item_lock"></ion-icon>
+          <ion-avatar item-left class="bg_seed {{explorerService.rootNode.category}}">
+            <img *ngIf="explorerService.rootNode.picture" src="{{explorerService.rootNode.picture}}"/>
+            <div *ngIf="!explorerService.rootNode.picture" text-center><i class="ion-md-custom-{{explorerService.rootNode.category}}"></i></div>
+          </ion-avatar>
+          <div>
+            <p text-left>{{explorerService.rootNode.label}}</p>
+            <p text-left>{{explorerService.rootNode.description}}</p>
+          </div>
         </div>
       </div>
     </ion-title>
@@ -58,7 +63,7 @@
   <ion-list *ngIf="explorerService.rootNode && !searchService.showSearch" id="list_details" no-lines>
     <ion-item right *ngIf="dataService.userSeed && explorerService.rootNode.id == dataService.userSeed.id">
       <div class="button-md button-large-md button-md-lighter selectable" large>
-        <a ion-button icon-only item-left color="person" (click)="logOut()" large>
+        <a ion-button icon-only item-left class="button-md-person" (click)="logOut()" large>
           <ion-icon name="exit"></ion-icon>
         </a>
         <span class="button_label">Déconnexion</span>
@@ -66,7 +71,7 @@
     </ion-item>
     <ion-item *ngIf="explorerService.rootNode.telephone" class="selectable">
       <div class="button-md button-large-md button-md-lighter selectable" large>
-        <a ion-button icon-only item-left color="event" (click)="openUrl('tel:' + explorerService.rootNode.telephone, true)" large>
+        <a ion-button icon-only item-left class="button-md-event"  (click)="openUrl('tel:' + explorerService.rootNode.telephone, true)" large>
           <ion-icon md="ios-call"></ion-icon>
         </a>
         <span class="button_label">{{explorerService.rootNode.telephone}}</span>
@@ -74,7 +79,7 @@
     </ion-item>
     <ion-item *ngIf="explorerService.rootNode.mobilePhone" class="selectable">
       <div class="button-md button-large-md button-md-lighter selectable" large>
-        <a ion-button icon-only item-left color="event" (click)="openUrl('tel:' + explorerService.rootNode.mobilePhone, true)" large>
+        <a ion-button icon-only item-left class="button-md-event"  (click)="openUrl('tel:' + explorerService.rootNode.mobilePhone, true)" large>
           <ion-icon md="ios-call"></ion-icon>
         </a>
         <span class="button_label">{{explorerService.rootNode.mobilePhone}}</span>
@@ -83,7 +88,7 @@
     </ion-item>
     <ion-item *ngIf="explorerService.rootNode.email" class="selectable" text-wrap>
       <div class="button-md button-large-md button-md-lighter selectable" large>
-        <a ion-button icon-only item-left color="product" (click)="openUrl('mailto:' + explorerService.rootNode.email, true)" large>
+        <a ion-button icon-only item-left class="button-md-product"  (click)="openUrl('mailto:' + explorerService.rootNode.email, true)" large>
           <ion-icon name="mail"></ion-icon>
         </a>
         <p class="button_label label_sm">{{explorerService.rootNode.email}}</p>
@@ -91,11 +96,27 @@
     </ion-item>
     <ion-item *ngFor="let url of explorerService.rootNode.urls" class="selectable" text-wrap>
       <div class="button-md button-large-md button-md-lighter selectable" large>
-        <a ion-button icon-only item-left color="product" (click)="openUrl(url.value)" large>
+        <a ion-button icon-only item-left class="button-md-product"  (click)="openUrl(url.value)" large>
           <ion-icon [md]="urlIcon(url.value)"></ion-icon>
         </a>
         <p class="button_label label_sm">{{url.value}}</p>
       </div>
+    </ion-item>
+    <ion-item *ngIf="explorerService.rootNode.startDate" class="selectable date_item">
+      <div class="button-md button-large-md button-md-lighter selectable" large>
+        <span class="button_label">Début</span>
+      </div>
+      <span item-right class="button-md button-large-md button-md-event selectable button_eol">
+        {{dateFormat(explorerService.rootNode.startDate)}}
+      </span>
+    </ion-item>
+    <ion-item *ngIf="explorerService.rootNode.endDate" class="selectable date_item">
+      <div class="button-md button-large-md button-md-lighter selectable" large>
+        <span class="button_label">Fin</span>
+      </div>
+      <span item-right class="button-md button-large-md button-md-event selectable button_eol">
+        {{dateFormat(explorerService.rootNode.endDate)}}
+      </span>
     </ion-item>
     <ion-item *ngIf="explorerService.rootNode.creationDate" class="selectable">
       <ion-label>Date de création</ion-label>
@@ -104,14 +125,6 @@
     <ion-item *ngIf="explorerService.rootNode.updateDate" class="selectable">
       <ion-label>Dernière mise à jour</ion-label>
       <ion-datetime [(ngModel)]="explorerService.rootNode.updateDate" displayFormat="DD/MM/YYYY" disabled="true"></ion-datetime>
-    </ion-item>
-    <ion-item *ngIf="explorerService.rootNode.startDate" class="selectable">
-      <ion-label>Date de début</ion-label>
-      <ion-datetime [(ngModel)]="explorerService.rootNode.startDate" displayFormat="DD/MM/YYYY" disabled="true"></ion-datetime>
-    </ion-item>
-    <ion-item *ngIf="explorerService.rootNode.endDate" class="selectable">
-      <ion-label>Date de fin</ion-label>
-      <ion-datetime [(ngModel)]="explorerService.rootNode.endDate" displayFormat="DD/MM/YYYY" disabled="true"></ion-datetime>
     </ion-item>
   </ion-list>
 
@@ -124,6 +137,7 @@
 
   <ion-list *ngIf="searchService.showSearch && searchService.nodes.length > 0" id="search_results">
     <ion-item *ngFor="let nd of searchService.nodes" text-wrap (click)="navigateTo(nd.id, false, false, true)">
+      <ion-icon *ngIf="nd.scope == 'private'" name="lock" class="item_lock"></ion-icon>
       <ion-avatar item-left class="bg_seed {{nd.category}}">
         <img *ngIf="nd.picture" src="{{nd.picture}}"/>
         <div *ngIf="!nd.picture" text-center><i class="ion-md-custom-{{nd.category}}"></i></div>

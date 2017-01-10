@@ -1,5 +1,5 @@
-import {Component, Renderer, ViewChild} from '@angular/core';
-import {App, NavParams, Events, NavController, Platform, Content, AlertController} from 'ionic-angular';
+import {Component, ViewChild} from '@angular/core';
+import {App, NavParams, Events, NavController, Content, AlertController} from 'ionic-angular';
 import {DomSanitizer, SafeUrl} from "@angular/platform-browser";
 import {InAppBrowser} from "ionic-native";
 import {ExplorerService} from "../../providers/explorer.service";
@@ -20,15 +20,16 @@ export class DetailsPage {
 
   constructor(private app: App, private navCtrl: NavController, public events: Events, private sanitizer: DomSanitizer,
               public explorerService: ExplorerService, public searchService: SearchService, public authService: AuthService,
-              private platform: Platform, private renderer: Renderer, public alertCtrl: AlertController,
-              private dataService: DataService, private navParams: NavParams) {
+              public alertCtrl: AlertController, private dataService: DataService, private navParams: NavParams) {
     this.searchQuery = null;
   }
 
   ionViewDidEnter(): void {
-    let seedId = this.navParams.get('seedId') || this.explorerService.currentNode();
-    this.explorerService.navigateTo(seedId, false);
-    this.clearResults();
+    let seedId = this.navParams.get('seedId');
+    if(seedId) {
+      this.explorerService.navigateTo(seedId, false);
+      this.clearResults();
+    }
   }
 
   sanitizeUrl(url): SafeUrl {
@@ -36,7 +37,7 @@ export class DetailsPage {
   }
 
   openUrl(url, useSystem?): void {
-    new InAppBrowser(url, useSystem ? '_system' : '_blank', 'location=no');
+    new InAppBrowser(url.indexOf('@') == -1 ? url : ('mailto:' + url), useSystem ? '_system' : '_blank', 'location=no');
   }
 
   navigateTo(node, showGraph, reset, clear?): void {
@@ -45,7 +46,6 @@ export class DetailsPage {
     }
     if(showGraph) {
       this.explorerService.navigateTo(node, reset, () => {
-        this.explorerService.skipExplore = true;
         this.navCtrl.parent.select(0);
       });
     } else {
@@ -56,7 +56,8 @@ export class DetailsPage {
   }
 
   loadResults(): void {
-    this.searchService.loadNodes(() => {this.content.resize()});
+    this.searchService.toggleSearch();
+    this.content.resize();
   }
 
   clearResults(): void {
@@ -66,8 +67,8 @@ export class DetailsPage {
     this.searchQuery = null;
   }
 
-  filterNodes(ev: any) {
-    this.searchService.filterNodes(ev);
+  searchNodes(evt): void {
+    this.searchService.searchNodes(evt, () => {this.content.resize()})
   }
 
   createSeed() {
@@ -83,15 +84,29 @@ export class DetailsPage {
   }
 
   urlIcon(url): string {
-    let supportedUrls = ['@', 'facebook', 'twitter', 'linkedin', 'instagram', 'youtube', 'dropbox', 'google', 'github', 'dribbble',
+    let supportedUrls = ['facebook', 'twitter', 'linkedin', 'instagram', 'youtube', 'dropbox', 'google', 'github', 'dribbble',
       'pinterest', 'reddit', 'rss', 'skype', 'snapchat', 'tumblr', 'vimeo'];
 
     for(let i = 0; i < supportedUrls.length; i++) {
       if(url.indexOf(supportedUrls[i]) != -1) {
         return 'logo-' + supportedUrls[i];
+      } else if(url.indexOf('@') != -1) {
+        return 'md-mail';
       }
     }
     return 'ios-desktop';
+  }
+
+  dateFormat(date): string {
+    if(date) {
+      let dateObj = new Date(date);
+      return [this.lpad(dateObj.getDate()), this.lpad(dateObj.getMonth() + 1), dateObj.getFullYear()].join('/');
+    }
+    return '';
+  }
+
+  lpad(d): string {
+    return d < 10 ? ('0' + d) : d;
   }
 
   logOut() {
@@ -104,7 +119,8 @@ export class DetailsPage {
           text: 'Oui',
           handler: () => {
             this.authService.logOut().then(() => {
-              this.dataService.userSeed = null;
+              this.dataService.clearUser();
+              this.explorerService.clearData();
               this.app.getRootNav().setRoot(LoginPage);
             });
           }

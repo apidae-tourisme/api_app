@@ -9,21 +9,19 @@ export class ExplorerService {
   networkData: any;
   rootNode: Seed;
   nav: Array<Seed>;
-  skipExplore: boolean;
 
   constructor(private dataService: DataService) {
     this.nav = [];
+    this.networkData = {
+      nodes: [],
+      edges: []
+    }
   }
 
   navigateTo(newNode: string, reset, onComplete?): void {
-    if(this.skipExplore) {
-      this.skipExplore = false;
-      if(onComplete) {
-        onComplete();
-      }
-    } else {
-      this.exploreGraph(reset, newNode, onComplete);
-    }
+    // Debug log
+    // console.log('navigateTo : ' + newNode + ' - reset : ' + reset);
+    this.exploreGraph(reset, newNode, onComplete);
   }
 
   private exploreGraph(resetData: boolean, newNode, onComplete?): void {
@@ -35,7 +33,7 @@ export class ExplorerService {
       };
       let nodes = data.nodes;
       let currentRoot = this.rootNode;
-      let newPrevious = this.newPreviousNode(newNode, currentRoot);
+      let newPrevious = resetData ? null : this.newPreviousNode(newNode, currentRoot);
       let prevDisconnected = true;
 
       for (let i = 0; i < nodes.length; i++) {
@@ -117,5 +115,11 @@ export class ExplorerService {
 
   beforePreviousNode(): string {
     return this.nav.length > 2 ? this.nav[this.nav.length - 3].id : null;
+  }
+
+  clearData(): void {
+    this.nav = [];
+    this.networkData = null;
+    this.rootNode = null;
   }
 }

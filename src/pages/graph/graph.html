@@ -6,7 +6,7 @@
       </button>
     </ion-buttons>
     <ion-toolbar no-border>
-      <ion-searchbar (ionInput)="filterNodes($event)" (ionFocus)="loadResults()" [(ngModel)]="searchQuery" placeholder="Rechercher" debounce="800"></ion-searchbar>
+      <ion-searchbar (ionInput)="searchNodes($event)" (ionFocus)="loadResults()" [(ngModel)]="searchQuery" placeholder="Rechercher" debounce="800"></ion-searchbar>
     </ion-toolbar>
     <ion-buttons right *ngIf="dataService.userSeed">
       <button ion-button (click)="navigateTo(dataService.userSeed.id, true)">
@@ -17,7 +17,7 @@
   </ion-navbar>
   <ion-toolbar color="lighter" class="toolbar_header" *ngIf="searchService.showSearch">
     <ion-buttons left text-center>
-      <button ion-button color="link" (click)="clearResults()" class="close_toolbar">
+      <button ion-button color="link" (click)="closeSearch()" class="close_toolbar">
         <ion-icon name="arrow-back" large></ion-icon>
       </button>
     </ion-buttons>
@@ -34,12 +34,11 @@
 
 <ion-content id="graph_wrapper">
   <div *ngIf="!searchService.showSearch">
-    <div class="loading_spinner" *ngIf="!explorerService.networkData" text-center>
+    <div class="loading_spinner" *ngIf="!initComplete" text-center>
       <ion-spinner name="dots"></ion-spinner>
-      <span color="light">Chargement en cours</span>
+      <span ion-text color="light">Chargement en cours</span>
     </div>
-    <graph *ngIf="explorerService.networkData" [networkData]="explorerService.networkData" (showDetails)="displayDetails()"
-           (rootChange)="rootNodeChange($event);"></graph>
+    <graph *ngIf="initComplete" (showDetails)="displayDetails()" (rootChange)="rootNodeChange($event);"></graph>
     <div id="graph_bg">
       <img src="assets/img/flowers-left.png"/>
       <img src="assets/img/flowers-right.png"/>
@@ -54,6 +53,7 @@
   </div>
   <ion-list *ngIf="searchService.showSearch && searchService.nodes.length > 0" id="search_results">
     <ion-item *ngFor="let node of searchService.nodes" text-wrap (click)="navigateTo(node.id, false)">
+      <ion-icon *ngIf="node.scope == 'private'" name="lock" class="item_lock"></ion-icon>
       <ion-avatar item-left class="bg_seed {{node.category}}">
         <img *ngIf="node.picture" src="{{node.picture}}"/>
         <div *ngIf="!node.picture" text-center><i class="ion-md-custom-{{node.category}}"></i></div>

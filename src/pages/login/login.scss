@@ -1,10 +1,52 @@
-#auth_panel {
+#login {
+  background-color: map_get($colors, bg);
   position: relative;
-  top: 25vh;
 }
 
-#auth_panel img,
-#auth_panel button {
+#auth_panel {
+  position: absolute;
+  top: 30vh;
+  width: 100%;
+}
+
+#auth_panel img {
   width: 60%;
   max-width: 240px;
+}
+
+#auth_panel button {
+  width: 50%;
+  max-width: 220px;
+  margin-top: 20px;
+  text-transform: none;
+  font-weight: bold;
+}
+
+#footer {
+  position: absolute;
+  width: 100%;
+  bottom: 7vh;
+}
+
+#footer img {
+  width: 120px;
+}
+
+#login_bg > img {
+  position: absolute;
+  bottom: 0;
+}
+
+#login_bg > img:first-child {
+  width: 35%;
+  height: auto;
+  max-width: 160px;
+  left: 0;
+}
+
+#login_bg > img:last-child {
+  width: 45%;
+  height: auto;
+  max-width: 200px;
+  right: 0;
 }

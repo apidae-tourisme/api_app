@@ -17,26 +17,50 @@ export class FormPage {
   constructor(private navCtrl: NavController, private params: NavParams, public modalCtrl: ModalController,
               public dataService: DataService, private explorerService: ExplorerService,
               private toastCtrl: ToastController) {
-    this.node = params.get('node') || new Seed({scope: 'private'}, false, false);
-    this.node.startDate = new Date().toISOString();
-    this.node.endDate = new Date().toISOString();
+    this.node = params.get('node') || new Seed(
+      {scope: 'private', last_contributor: this.dataService.userSeed.email, archived: false}, false, false);
   }
 
-  dismissForm(showGraph?): void {
-    this.navCtrl.pop({}, () => {
-      if(showGraph) {
-        this.explorerService.navigateTo(this.node.id, true, () => {
-          this.explorerService.skipExplore = true;
-          this.navCtrl.parent.select(0);
+  dismissForm(showGraph, refreshUser): void {
+    if(showGraph) {
+      let nextNode = this.node.archived ? this.explorerService.previousNode() : this.node.id;
+      if(refreshUser) {
+        this.updateUserSeed(() => {
+          this.explorerService.navigateTo(nextNode, true, () => {
+            let graphTab = this.navCtrl.parent.getByIndex(0);
+            if(this.navCtrl.parent.getSelected() != graphTab) {
+              this.navCtrl.parent.select(graphTab);
+            }
+            this.navCtrl.pop();
+          });
+        })
+      } else {
+        this.explorerService.navigateTo(nextNode, true, () => {
+          let graphTab = this.navCtrl.parent.getByIndex(0);
+          if(this.navCtrl.parent.getSelected() != graphTab) {
+            this.navCtrl.parent.select(graphTab);
+          }
+          this.navCtrl.pop();
         });
       }
+    } else {
+      this.navCtrl.pop();
+    }
+  }
+
+  updateUserSeed(onComplete): void {
+    this.dataService.getNodeDetails(this.dataService.userId).subscribe(data => {
+      this.dataService.userSeed = new Seed(data.node, false, false);
+      onComplete();
     });
   }
 
   submitForm(): void {
     this.dataService.saveNode(this.node).subscribe(data => {
       this.node.id = data.node.id;
-      this.presentToast("La graine a été enregistrée.", () => {this.dismissForm(true);});
+      this.presentToast("La graine a été enregistrée.", () => {
+        this.dismissForm(true, this.node.id == this.dataService.userSeed.id);
+      });
     }, error => {
       this.presentToast("Une erreur est survenue pendant l'enregistrement de la graine.", () => {});
       console.log("submit error : " + JSON.stringify(error))
@@ -68,6 +92,22 @@ export class FormPage {
     return this.node.scope == 'public' ? 'link' : 'text_alt';
   }
 
+  toggleArchive(): void {
+    this.node.archived = !this.node.archived;
+  }
+
+  archiveIcon(): string {
+    return this.node.archived ? 'filing' : 'pulse';
+  }
+
+  archiveLabel(): string {
+    return this.node.archived ? 'Graine à archiver' : 'Graine active';
+  }
+
+  archiveColor(): string {
+    return this.node.archived ? 'person' : 'product';
+  }
+
   seedTypes(): void {
     let typesModal = this.modalCtrl.create(SeedType, {type: this.node.category});
     typesModal.onDidDismiss(data => {
@@ -79,7 +119,9 @@ export class FormPage {
   addSeed(): void {
     let seedsModal = this.modalCtrl.create(SearchSeeds, {type: this.node.category});
     seedsModal.onDidDismiss(data => {
-      this.node.seeds.push(data.seed);
+      if(data && data.seed) {
+        this.node.seeds.push(data.seed);
+      }
     });
     seedsModal.present();
   }

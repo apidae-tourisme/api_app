@@ -6,7 +6,7 @@
       </button>
     </ion-buttons>
     <ion-toolbar no-border>
-      <ion-searchbar (ionInput)="filterNodes($event)" (ionFocus)="loadResults()" [(ngModel)]="searchQuery" placeholder="Rechercher" debounce="800"></ion-searchbar>
+      <ion-searchbar (ionInput)="searchNodes($event)" (ionFocus)="loadResults()" [(ngModel)]="searchQuery" placeholder="Rechercher" debounce="800"></ion-searchbar>
     </ion-toolbar>
     <ion-buttons right *ngIf="dataService.userSeed">
       <button ion-button (click)="navigateTo(dataService.userSeed.id, true, true, true)">
@@ -37,9 +37,12 @@
       </button>
     </ion-buttons>
     <ion-title text-center *ngIf="explorerService.rootNode">
-      <button ion-button clear (click)="displayDetails()" id="title_button">
-        <img *ngIf="explorerService.rootNode.picture" src="{{explorerService.rootNode.picture}}"/>
-        <div *ngIf="!explorerService.rootNode.picture" class="font_avatar {{explorerService.rootNode.category}}" text-center>{{explorerService.rootNode.code}}&nbsp;</div>
+      <button ion-button clear (click)="displayDetails()" class="header_title">
+        <ion-icon *ngIf="explorerService.rootNode.scope == 'private'" name="lock" class="item_lock"></ion-icon>
+        <ion-avatar item-left class="bg_seed {{explorerService.rootNode.category}}">
+          <img *ngIf="explorerService.rootNode.picture" src="{{explorerService.rootNode.picture}}"/>
+          <div *ngIf="!explorerService.rootNode.picture" text-center><i class="ion-md-custom-{{explorerService.rootNode.category}}"></i></div>
+        </ion-avatar>
         <div>
           <p text-left>{{explorerService.rootNode.label}}</p>
           <p text-left>{{explorerService.rootNode.description}}</p>
@@ -55,6 +58,7 @@
     <ion-list id="scroll_nodes" *ngIf="explorerService.networkData && explorerService.networkData.nodes">
       <div *ngFor="let node of explorerService.networkData.nodes" (click)="navigateTo(node.id, false, false)">
         <ion-item text-wrap *ngIf="!node.isRoot && !node.isPrevious">
+          <ion-icon *ngIf="node.scope == 'private'" name="lock" class="item_lock"></ion-icon>
           <ion-avatar item-left class="bg_seed {{node.category}}">
             <img *ngIf="node.picture" src="{{node.picture}}"/>
             <div *ngIf="!node.picture" text-center><i class="ion-md-custom-{{node.category}}"></i></div>
@@ -76,6 +80,7 @@
 
   <ion-list *ngIf="searchService.showSearch && searchService.nodes.length > 0" id="search_results">
     <ion-item *ngFor="let node of searchService.nodes" text-wrap (click)="navigateTo(node.id, false, false, true)">
+      <ion-icon *ngIf="node.scope == 'private'" name="lock" class="item_lock"></ion-icon>
       <ion-avatar item-left class="bg_seed {{node.category}}">
         <img *ngIf="node.picture" src="{{node.picture}}"/>
         <div *ngIf="!node.picture" text-center><i class="ion-md-custom-{{node.category}}"></i></div>

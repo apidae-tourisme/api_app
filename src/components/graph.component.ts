@@ -1,4 +1,4 @@
-import {Component, ElementRef, Input, OnChanges, EventEmitter, Output, DoCheck, SimpleChanges} from "@angular/core";
+import {Component, ElementRef, EventEmitter, Output, DoCheck} from "@angular/core";
 
 declare var d3: any;
 
@@ -6,9 +6,8 @@ declare var d3: any;
   selector: 'graph',
   template: `<ng-content></ng-content>`
 })
-export class GraphComponent implements DoCheck, OnChanges {
+export class GraphComponent implements DoCheck {
 
-  @Input() networkData: any;
   @Output() rootChange = new EventEmitter();
   @Output() showDetails = new EventEmitter();
 
@@ -124,21 +123,7 @@ export class GraphComponent implements DoCheck, OnChanges {
     this.nodesContainer = this.zoomContainer.append("g")
       .attr("class", "nodes");
 
-    this.drawNetwork();
     this.defaultTransform = d3.zoomTransform(this.zoomContainer);
-    this.newRoot = this.nodesContainer.selectAll("g").select(function(d, i) { return d.isRoot ? d : null; }).datum().id;
-  }
-
-  ngOnChanges(changes: SimpleChanges): void {
-    if(this.svg && this.nodesContainer && this.linksContainer) {
-      this.linksContainer.selectAll("*").remove();
-      this.nodesContainer.selectAll("*").remove();
-      this.drawNetwork();
-      if(this.networkData.previousNode) {
-        this.drawPrevious(this.networkData.previousNode);
-      }
-      this.zoomContainer.attr("transform", this.defaultTransform);
-    }
   }
 
   ngDoCheck(): void {
@@ -153,86 +138,128 @@ export class GraphComponent implements DoCheck, OnChanges {
     }
   }
 
-  drawNetwork(): void {
-    let layout = this.layout;
-
-    let nodes = networkNodes(this.networkData.nodes, this.networkData.previousNode);
-    let edges = networkEdges(this.networkData.edges, this.networkData.previousNode);
-
-    // debugger;
-
-    let simulation = d3.forceSimulation()
-      .alphaMin(0.1)
-      .force("link", d3.forceLink().id(function (d) { return d.id; })
-        .distance(function (link, index) { return index < 10 ? layout.unitX : (layout.unitX * 2);}))
-      .force("charge", d3.forceManyBody().strength(function(node, index) {
-        return node.isRoot ? -2500 : -800;
-      }))
-      .force("center", d3.forceCenter(this.dimensions.width / 2, this.dimensions.height / 2));
-
-    let linksData = this.linksContainer
-      .selectAll("line")
-      .data(edges);
-
-    let linkEnter = linksData
-      .enter().append("line");
-
-    let nodesData = this.nodesContainer
-      .selectAll("g")
-      .data(nodes);
-
-    let nodesEnter = nodesData.enter().append("g");
-
-    nodesEnter.append("use")
-      .attr("transform", function(d) {return d.isRoot ? "scale(" + layout.rootScaleX + " " + layout.rootScaleY + ")" : "";})
-      .attr("filter", function(d) {return d.category == 'concept' ? "url(#shadow)" : "";})
-      .attr("class", function(d) { return d.category + " bg_" + d.category; })
-      .attr("xlink:href", "#seed");
-
-    nodesEnter.append("use")
-      .attr("transform", function(d) {return d.isRoot ? "scale(" + layout.rootScaleX + ")" : "";})
-      .attr("x", (layout.unitX - layout.unitIcon) / 2)
-      .attr("y", (layout.unitIcon / 2) - (layout.padding * 2))
-      .attr("width", layout.unitIcon)
-      .attr("height", layout.unitIcon)
-      .attr("class", function(d) { return d.category + " icon"; })
-      .attr("xlink:href", function(d) {return d.picture ? '' : ('#' + d.category);});
-
-    nodesEnter.append("image")
-      .attr("transform", function(d) {return d.isRoot ? "scale(" + layout.rootScaleX + ")" : "";})
-      .attr("class", "img-node")
-      .attr("x", (layout.unitX - layout.unitImg) / 2)
-      .attr("y", (layout.unitImg / 2) - (layout.padding * 2))
-      .attr("width", layout.unitImg)
-      .attr("height", layout.unitImg)
-      .attr("xlink:href", function(d) {return d.picture;});
-
-    nodesEnter.append("text")
-      .attr("transform", function(d) {return d.isRoot ? "scale(" + layout.rootScaleX + ")" : "";})
-      .attr("x", (layout.unitX - layout.textSize) / 2)
-      .attr("y", layout.padding)
-      .attr("font-size", layout.titleSize)
-      .attr("class", "icon")
-      .text(function(d) {return d.scope == 'private' ? '\uf31d' : ''});
-
-    let nodesLabel = nodesEnter.append("text")
-      .attr("text-anchor", "middle")
-      .attr("x", function(d) {return (d.isRoot ? (layout.unitX * layout.rootScaleX) : layout.unitX) / 2;})
-      .attr("y", function(d) { return (layout.unitIcon * 1.5 - layout.padding * 2) * (d.noIcon() ? 0.75 : (d.isRoot ? layout.rootScaleX : 1)) + 2 * layout.padding; })
-      .attr("class", function(d) { return d.category + " label"; })
-      .attr("dy", "1em")
-      .html(function (d) {
-        return d.isRoot ? (d.label + "|" + (d.description || '')) : d.label;
-      });
-
-    simulation.nodes(nodes).on("tick", ticked);
-    simulation.force("link").links(edges);
-
-    this.nodesContainer.selectAll("g").on("click", changeRootNode);
-
+  drawNetwork(networkData): void {
     let that = this;
+    let layout = this.layout;
+    let nodes = networkNodes(networkData.nodes, networkData.previousNode);
+    let edges = networkEdges(networkData.edges, networkData.previousNode);
 
-    wrapLabels(nodesLabel, that);
+    // Debug log
+    // console.log('drawNetwork with ' + nodes.length + ' nodes and ' + edges.length + ' edges');
+
+    // Check that DOM is ready and data is consistent
+    if(this.svg && this.nodesContainer && this.linksContainer && (nodes.length == edges.length + 1)) {
+      this.linksContainer.selectAll("*").remove();
+      this.nodesContainer.selectAll("*").remove();
+
+      let simulation = d3.forceSimulation()
+        .alphaMin(0.1)
+        .force("link", d3.forceLink().id(function (d) {
+          return d.id;
+        })
+          .distance(function (link, index) {
+            return index < 10 ? layout.unitX : (layout.unitX * 2);
+          }))
+        .force("charge", d3.forceManyBody().strength(function (node, index) {
+          return node.isRoot ? -2500 : -800;
+        }))
+        .force("center", d3.forceCenter(this.dimensions.width / 2, this.dimensions.height / 2));
+
+      let linksData = this.linksContainer
+        .selectAll("line")
+        .data(edges);
+
+      let linkEnter = linksData
+        .enter().append("line");
+
+      let nodesData = this.nodesContainer
+        .selectAll("g")
+        .data(nodes);
+
+      let nodesEnter = nodesData.enter().append("g");
+
+      nodesEnter.append("use")
+        .attr("transform", function (d) {
+          return d.isRoot ? "scale(" + layout.rootScaleX + " " + layout.rootScaleY + ")" : "";
+        })
+        .attr("filter", function (d) {
+          return d.category == 'concept' ? "url(#shadow)" : "";
+        })
+        .attr("class", function (d) {
+          return d.category + " bg_" + d.category;
+        })
+        .attr("xlink:href", "#seed");
+
+      nodesEnter.append("use")
+        .attr("transform", function (d) {
+          return d.isRoot ? "scale(" + layout.rootScaleX + ")" : "";
+        })
+        .attr("x", (layout.unitX - layout.unitIcon) / 2)
+        .attr("y", (layout.unitIcon / 2) - (layout.padding * 2))
+        .attr("width", layout.unitIcon)
+        .attr("height", layout.unitIcon)
+        .attr("class", function (d) {
+          return d.category + " icon";
+        })
+        .attr("xlink:href", function (d) {
+          return d.picture ? '' : ('#' + d.category);
+        });
+
+      nodesEnter.append("image")
+        .attr("transform", function (d) {
+          return d.isRoot ? "scale(" + layout.rootScaleX + ")" : "";
+        })
+        .attr("class", "img-node")
+        .attr("x", (layout.unitX - layout.unitImg) / 2)
+        .attr("y", (layout.unitImg / 2) - (layout.padding * 2))
+        .attr("width", layout.unitImg)
+        .attr("height", layout.unitImg)
+        .attr("xlink:href", function (d) {
+          return d.picture;
+        });
+
+      nodesEnter.append("text")
+        .attr("transform", function (d) {
+          return d.isRoot ? "scale(" + layout.rootScaleX + ")" : "";
+        })
+        .attr("x", (layout.unitX - layout.titleSize) / 2 + layout.padding * 0.5)
+        .attr("y", layout.padding)
+        .attr("font-size", layout.titleSize)
+        .attr("class", "icon")
+        .text(function (d) {
+          return d.scope == 'private' ? '\uf31d' : ''
+        });
+
+      let nodesLabel = nodesEnter.append("text")
+        .attr("text-anchor", "middle")
+        .attr("x", function (d) {
+          return (d.isRoot ? (layout.unitX * layout.rootScaleX) : layout.unitX) / 2;
+        })
+        .attr("y", function (d) {
+          return (layout.unitIcon * 1.5 - layout.padding * 2) * (d.noIcon() ? 0.75 : (d.isRoot ? layout.rootScaleX : 1)) + 2 * layout.padding;
+        })
+        .attr("class", function (d) {
+          return d.category + " label";
+        })
+        .attr("dy", "1em")
+        .html(function (d) {
+          return d.isRoot ? (d.label + "|" + (d.description || '')) : d.label;
+        });
+
+      simulation.nodes(nodes).on("tick", () => {
+        updateNodesAndLinks(linkEnter, nodesEnter);
+      });
+      simulation.force("link").links(edges);
+
+      this.nodesContainer.selectAll("g").on("click", changeRootNode);
+      this.zoomContainer.attr("transform", this.defaultTransform);
+
+      if (networkData.previousNode) {
+        this.drawPrevious(networkData.previousNode);
+      }
+
+      wrapLabels(nodesLabel, that);
+    }
 
     function changeRootNode() {
       let clickedNode = d3.select(this);
@@ -257,8 +284,8 @@ export class GraphComponent implements DoCheck, OnChanges {
       });
     }
 
-    function ticked() {
-      linkEnter
+    function updateNodesAndLinks(links, nodes) {
+      links
         .attr("x1", function (d) {
           let x = d.source.isPrevious ? (layout.unitX / 2 + layout.padding) : d.source.x;
           return parseFloat(x);
@@ -274,7 +301,7 @@ export class GraphComponent implements DoCheck, OnChanges {
           return parseFloat(d.target.y);
         });
 
-      nodesEnter
+      nodes
         .attr("transform", function (d) {
           let tx = d.isPrevious ? layout.padding : (d.x - (layout.unitX * (d.isRoot ? layout.rootScaleX : 1) / 2));
           let ty = d.isPrevious ? layout.padding : (d.y - (layout.unitY * (d.isRoot ? layout.rootScaleY : 1) / 2));
@@ -356,6 +383,13 @@ export class GraphComponent implements DoCheck, OnChanges {
       .attr("width", this.layout.unitImg)
       .attr("height", this.layout.unitImg)
       .attr("xlink:href", previousNode.picture);
+
+    prevNode.append("text")
+      .attr("x", (this.layout.unitX - this.layout.titleSize) / 2 + this.layout.padding * 2.5)
+      .attr("y", this.layout.padding * 4)
+      .attr("font-size", this.layout.titleSize)
+      .attr("class", "icon")
+      .text(previousNode.scope == 'private' ? '\uf31d' : '');
 
     let prevText = prevNode.append("text");
     prevText.attr("text-anchor", "middle")

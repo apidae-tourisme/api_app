@@ -1,5 +1,5 @@
-import {Component, Renderer, ViewChild} from "@angular/core";
-import {ViewController, Platform, Content} from "ionic-angular";
+import {Component, ViewChild} from "@angular/core";
+import {ViewController, Content} from "ionic-angular";
 import {SearchService} from "../../providers/search.service";
 
 @Component({
@@ -10,8 +10,7 @@ export class SearchSeeds {
 
   public searchQuery: string;
 
-  constructor(public viewCtrl: ViewController, private renderer: Renderer, public searchService: SearchService,
-              private platform: Platform) {
+  constructor(public viewCtrl: ViewController, public searchService: SearchService) {
     this.searchQuery = null;
   }
 
@@ -26,7 +25,8 @@ export class SearchSeeds {
   }
 
   loadResults(): void {
-    this.searchService.loadNodes(() => {this.content.resize()});
+    this.searchService.toggleSearch();
+    this.content.resize();
   }
 
   clearResults(): void {
@@ -34,12 +34,7 @@ export class SearchSeeds {
     this.searchQuery = null;
   }
 
-  filterNodes(ev: any) {
-    this.searchService.filterNodes(ev);
-
-    // Temp fix on iOS - Searchbar keeps focus even when another button is clicked
-    if(this.platform.is('ios')) {
-      this.renderer.invokeElementMethod(ev.target, 'blur');
-    }
+  searchNodes(evt): void {
+    this.searchService.searchNodes(evt, () => {this.content.resize()})
   }
 }

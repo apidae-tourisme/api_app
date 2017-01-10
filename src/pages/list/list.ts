@@ -1,5 +1,5 @@
-import {Component, ViewChild, Renderer} from '@angular/core';
-import {NavController, Content, Platform, NavParams} from 'ionic-angular';
+import {Component, ViewChild} from '@angular/core';
+import {NavController, Content, NavParams} from 'ionic-angular';
 import {ExplorerService} from "../../providers/explorer.service";
 import {SearchService} from "../../providers/search.service";
 import {FormPage} from "../form/form";
@@ -13,36 +13,37 @@ export class ListPage {
 
   public searchQuery: string;
 
-  constructor(public navCtrl: NavController, private navParams: NavParams, private renderer: Renderer,
-              public searchService: SearchService, public explorerService: ExplorerService,
-              public dataService: DataService, private platform: Platform) {
+  constructor(public navCtrl: NavController, private navParams: NavParams, public searchService: SearchService,
+              public explorerService: ExplorerService, public dataService: DataService) {
     this.searchQuery = null;
   }
 
-  ionViewDidEnter(): void {
+  ionViewDidLoad(): void {
     let seedId = this.navParams.get('seedId') || this.explorerService.currentNode();
     this.explorerService.navigateTo(seedId, false);
     this.clearResults();
   }
 
   navigateTo(node, showGraph, reset, clear?): void {
-    if(clear) {
-      this.clearResults();
-    }
     if(showGraph) {
       this.explorerService.navigateTo(node, reset, () => {
-        this.explorerService.skipExplore = true;
+        if(clear) {
+          this.clearResults();
+        }
         this.navCtrl.parent.select(0);
       });
     } else {
       this.explorerService.navigateTo(node, reset, () => {
-        this.content.resize()
+        if(clear) {
+          this.clearResults();
+        }
       });
     }
   }
 
   loadResults(): void {
-    this.searchService.loadNodes(() => {this.content.resize()});
+    this.searchService.toggleSearch();
+    this.content.resize();
   }
 
   clearResults(): void {
@@ -50,12 +51,12 @@ export class ListPage {
     this.searchQuery = null;
   }
 
-  displayDetails() {
-    this.navCtrl.parent.select(1);
+  searchNodes(evt): void {
+    this.searchService.searchNodes(evt, () => {this.content.resize()})
   }
 
-  filterNodes(ev: any) {
-    this.searchService.filterNodes(ev);
+  displayDetails() {
+    this.navCtrl.parent.select(1);
   }
 
   createSeed() {
