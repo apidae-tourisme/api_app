@@ -37,7 +37,8 @@ export class DetailsPage {
   }
 
   openUrl(url, useSystem?): void {
-    new InAppBrowser(url.indexOf('@') == -1 ? url : ('mailto:' + url), useSystem ? '_system' : '_blank', 'location=no');
+    let trimmedUrl = url.replace(/\s/g, '');
+    new InAppBrowser(trimmedUrl.indexOf('@') == -1 ? trimmedUrl : ('mailto:' + trimmedUrl), useSystem ? '_system' : '_blank', 'location=no');
   }
 
   navigateTo(node, showGraph, reset, clear?): void {
