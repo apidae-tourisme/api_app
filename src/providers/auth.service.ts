@@ -1,10 +1,12 @@
 import {Injectable} from "@angular/core";
 import {URLSearchParams} from "@angular/http";
 import 'rxjs/Rx';
-import {InAppBrowser} from "ionic-native";
 import {Storage} from "@ionic/storage";
 import {Platform} from "ionic-angular";
 import {ApiAppConfig} from "./apiapp.config";
+import {InAppBrowser} from "ionic-native";
+
+declare var window: any;
 
 @Injectable()
 export class AuthService {
@@ -18,7 +20,7 @@ export class AuthService {
 
   authenticate(success, error): void {
     let authUrl = this.authUrl() + '?auth_origin_url=' + encodeURIComponent(window.location.href);
-    if(this.platform.is('core')) {
+    if(this.platform.is('core') || this.platform.is('mobileweb')) {
       window.location.href = authUrl;
     } else {
       let browser = new InAppBrowser(authUrl, '_blank', 'location=no');
@@ -29,6 +31,8 @@ export class AuthService {
           let callBackParams = callBackUrl.slice(callBackUrl.indexOf('?'));
           this.setLocalAuthData(callBackParams).then(() => {
             success();
+          }, (error) => {
+            console.log('Local auth is invalid');
           }).catch((err) => {
             console.log('Unable to set local auth data : ' + err);
           });

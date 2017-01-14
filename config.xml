@@ -3,7 +3,8 @@
   <name>ApiApp</name>
   <description>ApiApp</description>
   <author email="contact@hotentic.com" href="http://www.hotentic.com/">Hôtentic</author>
-  <content src="http://localhost:8080"/>
+  <content src="index.html"/>
+  <!--<content src="http://localhost:8080"/>-->
   <preference name="webviewbounce" value="false"/>
   <preference name="UIWebViewBounce" value="false"/>
   <preference name="DisallowOverscroll" value="true"/>
@@ -16,7 +17,7 @@
   <preference name="SplashScreen" value="screen"/>
   <preference name="ShowSplashScreen" value="true"/>
   <preference name="AutoHideSplashScreen" value="true"/>
-  <preference name="Fullscreen" value="true"/>
+  <preference name="Fullscreen" value="false"/>
   <access origin="*"/>
   <allow-navigation href="*"/>
   <allow-intent href="http://*/*"/>

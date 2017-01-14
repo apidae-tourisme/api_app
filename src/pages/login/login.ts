@@ -1,5 +1,5 @@
 import {Component} from '@angular/core';
-import {NavController, Platform} from 'ionic-angular';
+import {NavController, Platform, AlertController} from 'ionic-angular';
 import {AuthService} from "../../providers/auth.service";
 import {TabsPage} from "../tabs/tabs";
 import {DataService} from "../../providers/data.service";
@@ -10,20 +10,34 @@ import {Seed} from "../../components/seed.model";
 })
 export class LoginPage {
 
+  public msg: string;
+
   constructor(public navCtrl: NavController, public authService: AuthService, private platform: Platform,
-              private dataService: DataService) {
+              private dataService: DataService, private alertCtrl: AlertController) {
   }
 
   ionViewDidEnter() {
     let url = window.location.href;
     if(url.indexOf('auth_token') != -1 && url.indexOf('client_id') != -1 && url.indexOf('uid') != -1) {
       let callBackParams = url.slice(url.indexOf('?'));
-      let storedAuth = this.authService.setLocalAuthData(callBackParams);
-      if(storedAuth) {
-        storedAuth.then(() => {
-          window.location.href = '/';
+      this.authService.setLocalAuthData(callBackParams).then(() => {
+        window.location.href = '/';
+      }, (error) => {
+        let alert = this.alertCtrl.create({
+          title: "Echec de l'authentification",
+          message: "Nous n'avons pas pu vous identifier. Veuillez vous assurer que votre compte utilisateur ApiApp est actif.",
+          buttons: [
+            {
+              text: 'Fermer',
+              handler: () => {
+                window.location.href = '/';
+              }
+            }
+          ]
         });
-      }
+        alert.present();
+        console.log('Local auth loading failed');
+      });
     } else {
       this.platform.ready().then(() => {
         this.authService.getLocalAuthData().then(authData => {
