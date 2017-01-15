@@ -20,6 +20,14 @@ export class AuthService {
 
   authenticate(success, error): void {
     let authUrl = this.authUrl() + '?auth_origin_url=' + encodeURIComponent(window.location.href);
+    console.log('cordova : ' + this.platform.is('cordova'));
+    console.log('core : ' + this.platform.is('core'));
+    console.log('ios : ' + this.platform.is('ios'));
+    console.log('ipad : ' + this.platform.is('ipad'));
+    console.log('iphone : ' + this.platform.is('iphone'));
+    console.log('mobile : ' + this.platform.is('mobile'));
+    console.log('mobileweb : ' + this.platform.is('mobileweb'));
+    console.log('tablet : ' + this.platform.is('tablet'));
     if(this.platform.is('core') || this.platform.is('mobileweb')) {
       window.location.href = authUrl;
     } else {
