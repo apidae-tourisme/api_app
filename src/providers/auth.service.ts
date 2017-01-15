@@ -2,16 +2,15 @@ import {Injectable} from "@angular/core";
 import {URLSearchParams} from "@angular/http";
 import 'rxjs/Rx';
 import {Storage} from "@ionic/storage";
-import {Platform} from "ionic-angular";
 import {ApiAppConfig} from "./apiapp.config";
-import {InAppBrowser} from "ionic-native";
+import {InAppBrowser, Device} from "ionic-native";
 
 declare var window: any;
 
 @Injectable()
 export class AuthService {
 
-  constructor(private platform: Platform, private storage: Storage){
+  constructor(private storage: Storage){
   }
 
   authUrl(): string {
@@ -20,15 +19,8 @@ export class AuthService {
 
   authenticate(success, error): void {
     let authUrl = this.authUrl() + '?auth_origin_url=' + encodeURIComponent(window.location.href);
-    console.log('cordova : ' + this.platform.is('cordova'));
-    console.log('core : ' + this.platform.is('core'));
-    console.log('ios : ' + this.platform.is('ios'));
-    console.log('ipad : ' + this.platform.is('ipad'));
-    console.log('iphone : ' + this.platform.is('iphone'));
-    console.log('mobile : ' + this.platform.is('mobile'));
-    console.log('mobileweb : ' + this.platform.is('mobileweb'));
-    console.log('tablet : ' + this.platform.is('tablet'));
-    if(this.platform.is('core') || this.platform.is('mobileweb')) {
+    console.log('Device : ' + Device.platform);
+    if(Device.platform === 'browser') {
       window.location.href = authUrl;
     } else {
       let browser = new InAppBrowser(authUrl, '_blank', 'location=no');
