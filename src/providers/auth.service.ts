@@ -4,13 +4,14 @@ import 'rxjs/Rx';
 import {Storage} from "@ionic/storage";
 import {ApiAppConfig} from "./apiapp.config";
 import {InAppBrowser, Device} from "ionic-native";
+import {Platform} from "ionic-angular";
 
 declare var window: any;
 
 @Injectable()
 export class AuthService {
 
-  constructor(private storage: Storage){
+  constructor(private storage: Storage, private platform: Platform){
   }
 
   authUrl(): string {
@@ -19,7 +20,7 @@ export class AuthService {
 
   authenticate(success, error): void {
     let authUrl = this.authUrl() + '?auth_origin_url=' + encodeURIComponent(window.location.href);
-    if(Device.platform === 'browser') {
+    if(!this.platform.is('cordova')) {
       window.location.href = authUrl;
     } else {
       let browser = new InAppBrowser(authUrl, '_blank', 'location=no');

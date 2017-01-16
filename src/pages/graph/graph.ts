@@ -90,6 +90,10 @@ export class GraphPage {
     this.navCtrl.push(FormPage);
   }
 
+  resizeContent() {
+    this.content.resize();
+  }
+
   drawNetwork() {
     if(this.graph) {
       this.graph.drawNetwork(this.explorerService.networkData);

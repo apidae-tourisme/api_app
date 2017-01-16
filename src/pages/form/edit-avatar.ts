@@ -21,7 +21,6 @@ export class EditAvatar {
               private sanitizer: DomSanitizer, private platform: Platform) {
     this.avatar = {};
     this.isWeb = !platform.is('cordova');
-    console.log('isWeb : ' + this.isWeb);
   }
 
   dismiss() {

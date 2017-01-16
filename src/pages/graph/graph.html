@@ -6,7 +6,7 @@
       </button>
     </ion-buttons>
     <ion-toolbar no-border>
-      <ion-searchbar (ionInput)="searchNodes($event)" (ionFocus)="loadResults()" [(ngModel)]="searchQuery" placeholder="Rechercher" debounce="800"></ion-searchbar>
+      <ion-searchbar (ionInput)="searchNodes($event)" (ionFocus)="loadResults()" (ionBlur)="resizeContent()" [(ngModel)]="searchQuery" placeholder="Rechercher" debounce="800"></ion-searchbar>
     </ion-toolbar>
     <ion-buttons right *ngIf="dataService.userSeed">
       <button ion-button (click)="navigateTo(dataService.userSeed.id, false)">
