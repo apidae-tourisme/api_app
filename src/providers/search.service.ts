@@ -42,10 +42,10 @@ export class SearchService {
   }
 
   clearNodes(onComplete?): void {
-    this.showSearch = false;
     this.nodes = [];
     if(onComplete) {
       onComplete();
+      this.showSearch = false;
     }
   }
 }
