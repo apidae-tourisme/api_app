@@ -43,11 +43,9 @@ export class SearchService {
 
   clearNodes(onComplete?): void {
     this.nodes = [];
+    this.showSearch = false;
     if(onComplete) {
       onComplete();
-      this.showSearch = false;
-    } else {
-      this.showSearch = false;
     }
   }
 }

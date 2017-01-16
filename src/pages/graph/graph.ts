@@ -60,6 +60,7 @@ export class GraphPage {
 
   loadResults(): void {
     this.searchService.toggleSearch();
+    this.graph = null;
   }
 
   clearResults(): void {
@@ -88,10 +89,6 @@ export class GraphPage {
 
   createSeed() {
     this.navCtrl.push(FormPage);
-  }
-
-  resizeContent() {
-    this.content.resize();
   }
 
   drawNetwork() {
