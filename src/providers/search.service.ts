@@ -46,6 +46,8 @@ export class SearchService {
     if(onComplete) {
       onComplete();
       this.showSearch = false;
+    } else {
+      this.showSearch = false;
     }
   }
 }
