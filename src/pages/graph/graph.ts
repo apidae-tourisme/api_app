@@ -70,9 +70,9 @@ export class GraphPage {
   closeSearch(): void {
     this.searchQuery = null;
     this.searchService.clearNodes(() => {
+      console.log('clearing nodes');
       let timer = Observable.timer(1000);
       timer.subscribe(() => {
-        this.content.resize();
         this.drawNetwork();
       });
     });
@@ -96,6 +96,7 @@ export class GraphPage {
 
   drawNetwork() {
     if(this.graph) {
+      console.log('drawing graph');
       this.graph.drawNetwork(this.explorerService.networkData);
     }
   }
