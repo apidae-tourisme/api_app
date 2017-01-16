@@ -19,25 +19,11 @@
     <h5>Prévisualisation de l'image :</h5>
     <img id="avatar_preview" [src]="sanitizeUrl(avatar.src)"/>
   </div>
-  <p *ngIf="!isWeb" text-center>
+  <p text-center>
     Sélectionnez une image existante ou prenez une nouvelle photo ci-dessous.
   </p>
-  <p *ngIf="isWeb" text-center>
-    Sélectionnez une image ci-dessous.
-  </p>
-  <div *ngIf="isWeb">
-    <ion-item no-lines class="label_only">
-      <ion-label stacked>Prendre une photo</ion-label>
-    </ion-item>
-    <div class="item item-block item-md">
-      <input type="file" accept="image/*" capture (change)="updateSrc($event)">
-    </div>
-    <ion-item no-lines class="label_only">
-      <ion-label stacked>Sélectionner une image</ion-label>
-    </ion-item>
-    <div class="item item-block item-md">
-      <input type="file" accept="image/*" (change)="updateSrc($event)">
-    </div>
+  <div *ngIf="isWeb" class="item item-block item-md">
+    <input type="file" accept="image/*" (change)="updateSrc($event)">
   </div>
   <div *ngIf="!isWeb">
     <br/>

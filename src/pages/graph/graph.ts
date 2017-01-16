@@ -70,10 +70,10 @@ export class GraphPage {
   closeSearch(): void {
     this.searchQuery = null;
     this.searchService.clearNodes(() => {
-      let timer = Observable.timer(200);
+      let timer = Observable.timer(1000);
       timer.subscribe(() => {
-        this.drawNetwork();
         this.content.resize();
+        this.drawNetwork();
       });
     });
   }
