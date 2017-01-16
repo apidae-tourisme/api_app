@@ -1,7 +1,7 @@
 <ion-header>
   <ion-navbar color="lighter" hideBackButton="true">
     <ion-buttons left>
-      <button ion-button (click)="navigateTo(null, true, true, true)">
+      <button ion-button (click)="navigateTo(null, true, false, true)">
         <img id="header_logo" src="assets/img/logo-apiapp-mini.svg"/>
       </button>
     </ion-buttons>
@@ -9,7 +9,7 @@
       <ion-searchbar (ionInput)="searchNodes($event)" (ionFocus)="searchService.toggleSearch()" [(ngModel)]="searchQuery" placeholder="Rechercher" debounce="800"></ion-searchbar>
     </ion-toolbar>
     <ion-buttons right *ngIf="dataService.userSeed">
-      <button ion-button (click)="navigateTo(dataService.userSeed.id, true, true, true)">
+      <button ion-button (click)="navigateTo(dataService.userSeed.id, true, false, true)">
         <img id="avatar_logo" *ngIf="dataService.userSeed.picture" src="{{dataService.userSeed.picture}}"/>
         <i id="avatar_icon" *ngIf="!dataService.userSeed.picture" class="ion-md-custom-person"></i>
       </button>
@@ -88,7 +88,7 @@
     </ion-item>
     <ion-item *ngIf="explorerService.rootNode.email" class="selectable" text-wrap>
       <div class="button-md button-large-md button-md-lighter selectable" large>
-        <a ion-button icon-only item-left class="button-md-product"  (click)="openUrl(explorerService.rootNode.email, true)" large>
+        <a ion-button icon-only item-left class="button-md-product" (click)="openUrl(explorerService.rootNode.email, true)" large>
           <ion-icon name="mail"></ion-icon>
         </a>
         <p class="button_label label_sm">{{explorerService.rootNode.email}}</p>

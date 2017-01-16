@@ -80,6 +80,17 @@
       <ion-input type="tel" [(ngModel)]="node.mobilePhone"></ion-input>
     </ion-item>
     <ion-item no-lines class="label_only">
+      <ion-label stacked>Liens</ion-label>
+    </ion-item>
+    <ion-item *ngFor="let url of node.urls; let i = index;" no-lines>
+      <ion-label stacked>Lien {{i + 1}}</ion-label>
+      <ion-input type="text" [(ngModel)]="url.value"></ion-input>
+      <button ion-button item-right large icon-only color="danger" (click)="node.urls.splice(i, 1)"><ion-icon name="close"></ion-icon></button>
+    </ion-item>
+    <ion-item>
+      <button ion-button block large ngClass="bg_concept" (click)="addUrl()">Ajouter un lien</button>
+    </ion-item>
+    <ion-item no-lines class="label_only">
       <ion-label stacked>Graines liées</ion-label>
     </ion-item>
     <ion-item *ngFor="let seed of node.seeds; let i = index;" no-lines>
@@ -92,17 +103,6 @@
     </ion-item>
     <ion-item>
       <button ion-button block large ngClass="bg_concept" (click)="addSeed()">Lier une graine</button>
-    </ion-item>
-    <ion-item no-lines class="label_only">
-      <ion-label stacked>Liens</ion-label>
-    </ion-item>
-    <ion-item *ngFor="let url of node.urls; let i = index;" no-lines>
-      <ion-label stacked>Lien {{i + 1}}</ion-label>
-      <ion-input type="text" [(ngModel)]="url.value"></ion-input>
-      <button ion-button item-right large icon-only color="danger" (click)="node.urls.splice(i, 1)"><ion-icon name="close"></ion-icon></button>
-    </ion-item>
-    <ion-item>
-      <button ion-button block large ngClass="bg_concept" (click)="addUrl()">Ajouter un lien</button>
     </ion-item>
     <ion-item *ngIf="node.id" no-lines class="label_only">
       <ion-label stacked>Archivage</ion-label>

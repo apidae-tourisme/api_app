@@ -38,6 +38,7 @@ export class GraphComponent implements DoCheck {
       titleSize: 12,
       textSize: 10,
       padding: 3,
+      seedsLength: 30,
       descLength: 50
     };
   }
@@ -339,21 +340,22 @@ export class GraphComponent implements DoCheck {
       lines = 1,
       x = Number.parseInt(textElt.attr("x")),
       charsCount = 0,
+      textLength = ((textElt.datum() && textElt.datum().isRoot) ? layout.descLength : layout.seedsLength),
       width = (isRoot ? (layout.unitX * layout.rootScaleX) : layout.unitX) - 2 * layout.padding;
     if(reset) {
       textElt.text(null);
     }
     let tspan = textElt.append("tspan").attr("x", x).attr("dy", offset).attr("font-size", fontSize + "px");
-    while ((word = words.pop()) && charsCount <= layout.descLength) {
+    while ((word = words.pop()) && charsCount <= textLength) {
       line.push(word);
       charsCount += word.length + 1;
-      tspan.text(line.join(" ") + (charsCount > layout.descLength ? '...' : ''));
+      tspan.text(line.join(" ") + (charsCount > textLength ? '...' : ''));
       if (line.length > 1 && tspan.node().getComputedTextLength() > (width - 2 * layout.padding)) {
         line.pop();
         tspan.text(line.join(" "));
         line = [word];
         tspan = textElt.append("tspan").attr("x", x).attr("dy", fontSize).attr("font-size", fontSize + "px")
-          .text(word + (charsCount > layout.descLength ? '...' : ''));
+          .text(word + (charsCount > textLength ? '...' : ''));
         lines++;
       }
     }

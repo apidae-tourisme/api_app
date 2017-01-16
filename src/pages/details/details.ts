@@ -38,7 +38,12 @@ export class DetailsPage {
 
   openUrl(url, useSystem?): void {
     let trimmedUrl = url.replace(/\s/g, '');
-    new InAppBrowser(trimmedUrl.indexOf('@') == -1 ? trimmedUrl : ('mailto:' + trimmedUrl), useSystem ? '_system' : '_blank', 'location=no');
+    let isEmail = trimmedUrl.indexOf('@') != -1;
+    let phoneRegexp = new RegExp(/\d+/);
+    if(!isEmail && !trimmedUrl.match(phoneRegexp) && trimmedUrl.indexOf('http') == -1) {
+      trimmedUrl = 'http://' + trimmedUrl;
+    }
+    new InAppBrowser(isEmail ? ('mailto:' + trimmedUrl) : trimmedUrl, (useSystem || isEmail) ? '_system' : '_blank', 'location=yes');
   }
 
   navigateTo(node, showGraph, reset, clear?): void {

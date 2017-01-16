@@ -28,7 +28,12 @@ export class GraphPage {
 
   // This is to prevent multiple controller instances in some cases (see https://github.com/driftyco/ionic/issues/5960)
   ionViewCanEnter(): boolean {
-    return this.navCtrl.length() == 0 || this.navCtrl.getActive().name == 'FormPage';
+    let validState = this.navCtrl.length() == 0 || this.navCtrl.getActive().name == 'FormPage';
+    if(!validState) {
+      console.log("Blocked invalid state in Graph page - navCtrl length : " +
+        this.navCtrl.length() + ' - active page : ' + this.navCtrl.getActive().name);
+    }
+    return validState;
   }
 
   // initComplete flag prevents the graph from being rendered more than once (see https://github.com/driftyco/ionic/issues/5960)
@@ -55,7 +60,6 @@ export class GraphPage {
 
   loadResults(): void {
     this.searchService.toggleSearch();
-    this.content.resize();
   }
 
   clearResults(): void {

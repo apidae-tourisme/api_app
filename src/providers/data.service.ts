@@ -59,9 +59,13 @@ export class DataService {
     }
   }
 
-  savePicture(picture) : Observable<any> {
+  savePicture(pictureFile) : Observable<any> {
     let url = ApiAppConfig.API_URL + '/pictures';
-    return this.http.post(url, {});
+    let formData = new FormData();
+    formData.append('file', pictureFile);
+    return this.http.post(url, formData).map(resp => {
+      return resp.json();
+    });
   }
 
   clearUser(): void {

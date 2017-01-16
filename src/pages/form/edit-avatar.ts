@@ -1,7 +1,9 @@
-import {Component, ViewChild, ElementRef, Renderer, ApplicationRef} from "@angular/core";
-import {ViewController, NavParams, LoadingController} from "ionic-angular";
+import {Component, ViewChild} from "@angular/core";
+import {ViewController, LoadingController, Platform} from "ionic-angular";
 import {Camera, File, Transfer} from "ionic-native";
 import {ApiAppConfig} from "../../providers/apiapp.config";
+import {DataService} from "../../providers/data.service";
+import {SafeUrl, DomSanitizer} from "@angular/platform-browser";
 
 declare var cordova: any;
 
@@ -13,10 +15,12 @@ export class EditAvatar {
   @ViewChild('apiapp') wrapperElt;
 
   public avatar: any;
+  public isWeb: boolean;
 
-  constructor(public viewCtrl: ViewController, private loadingCtrl: LoadingController, private params: NavParams, private elt: ElementRef,
-              private appRef: ApplicationRef, private renderer: Renderer) {
+  constructor(public viewCtrl: ViewController, private loadingCtrl: LoadingController, private dataService: DataService,
+              private sanitizer: DomSanitizer, private platform: Platform) {
     this.avatar = {};
+    this.isWeb = !platform.is('cordova');
   }
 
   dismiss() {
@@ -24,7 +28,7 @@ export class EditAvatar {
   }
 
   submitFile() {
-    if(this.avatar.src) {
+    if(!this.isWeb && this.avatar.src) {
       let loading = this.loadingCtrl.create({
         content: "Téléchargement de l'image en cours",
         duration: 100000
@@ -47,6 +51,19 @@ export class EditAvatar {
         }, (err) => {
           console.log('upload failed : ' + JSON.stringify(err));
         });
+    } else if(this.isWeb && this.avatar.file) {
+      let loading = this.loadingCtrl.create({
+        content: "Téléchargement de l'image en cours",
+        duration: 100000
+      });
+      loading.present();
+      this.dataService.savePicture(this.avatar.file).subscribe(data => {
+          loading.dismiss();
+          this.viewCtrl.dismiss({imageUrl: data['picture'].thumbnail});
+        }, error => {
+          console.log('upload failed : ' + JSON.stringify(error));
+        }
+      );
     }
   }
 
@@ -79,10 +96,6 @@ export class EditAvatar {
     }, (err) => {
       console.log('image selection error : ' + err);
     });
-    // let inputElt = this.appRef['_rootComponents'][0].location.nativeElement.parentElement
-    //   .querySelector("input.cordova-camera-select");
-    // let clickEvent: MouseEvent = new MouseEvent("click", {bubbles: true});
-    // this.renderer.invokeElementMethod(inputElt, "dispatchEvent", [clickEvent]);
   }
 
   captureImage() {
@@ -95,5 +108,16 @@ export class EditAvatar {
     }, (err) => {
       console.log('image capture error : ' + err);
     });
+  }
+
+  updateSrc(evt) {
+    if (evt.target.files && evt.target.files[0]) {
+      this.avatar.file = evt.target.files[0];
+      this.avatar.src = window.URL.createObjectURL(evt.target.files[0]);
+    }
+  }
+
+  sanitizeUrl(url): SafeUrl {
+    return this.sanitizer.bypassSecurityTrustUrl(url);
   }
 }

@@ -15,18 +15,28 @@
 </ion-header>
 
 <ion-content id="edit_avatar" padding>
-  <div *ngIf="avatar.src" text-center>
+  <div *ngIf="avatar.src || avatar.file" text-center>
     <h5>Prévisualisation de l'image :</h5>
-    <img id="avatar_preview" src="{{avatar.src}}"/>
+    <img id="avatar_preview" [src]="sanitizeUrl(avatar.src)"/>
   </div>
-  <p *ngIf="!avatar.src" text-center>
+  <p *ngIf="!isWeb" text-center>
     Sélectionnez une image existante ou prenez une nouvelle photo ci-dessous.
   </p>
-  <br/>
-  <button ion-button block large icon-left color="link" (click)="selectImage()">
-    <ion-icon name="image"></ion-icon>Choisir une image
-  </button>
-  <button ion-button block large icon-left color="product" (click)="captureImage()" margin-top>
-    <ion-icon name="camera"></ion-icon>Prendre une photo
-  </button>
+  <p *ngIf="isWeb" text-center>
+    Sélectionnez une image ci-dessous.
+  </p>
+  <div *ngIf="isWeb" class="item item-block item-md">
+    <input type="file" accept="image/*" capture (change)="updateSrc($event)">
+  </div>
+  <div *ngIf="!isWeb">
+    <br/>
+    <button ion-button block large icon-left color="link" (click)="selectImage()">
+      <ion-icon name="image"></ion-icon>
+      Choisir une image
+    </button>
+    <button ion-button block large icon-left color="product" (click)="captureImage()" margin-top>
+      <ion-icon name="camera"></ion-icon>
+      Prendre une photo
+    </button>
+  </div>
 </ion-content>

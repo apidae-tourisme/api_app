@@ -26,7 +26,7 @@ export class FormPage {
       let nextNode = this.node.archived ? this.explorerService.previousNode() : this.node.id;
       if(refreshUser) {
         this.updateUserSeed(() => {
-          this.explorerService.navigateTo(nextNode, true, () => {
+          this.explorerService.navigateTo(nextNode, false, () => {
             let graphTab = this.navCtrl.parent.getByIndex(0);
             if(this.navCtrl.parent.getSelected() != graphTab) {
               this.navCtrl.parent.select(graphTab);
@@ -35,7 +35,7 @@ export class FormPage {
           });
         })
       } else {
-        this.explorerService.navigateTo(nextNode, true, () => {
+        this.explorerService.navigateTo(nextNode, false, () => {
           let graphTab = this.navCtrl.parent.getByIndex(0);
           if(this.navCtrl.parent.getSelected() != graphTab) {
             this.navCtrl.parent.select(graphTab);

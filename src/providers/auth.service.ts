@@ -19,7 +19,6 @@ export class AuthService {
 
   authenticate(success, error): void {
     let authUrl = this.authUrl() + '?auth_origin_url=' + encodeURIComponent(window.location.href);
-    console.log('Device : ' + Device.platform);
     if(Device.platform === 'browser') {
       window.location.href = authUrl;
     } else {

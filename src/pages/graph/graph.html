@@ -1,7 +1,7 @@
 <ion-header>
   <ion-navbar color="lighter">
     <ion-buttons left>
-      <button ion-button (click)="navigateTo(null, true)">
+      <button ion-button (click)="navigateTo(null, false)">
         <img id="header_logo" src="assets/img/logo-apiapp-mini.svg"/>
       </button>
     </ion-buttons>
@@ -9,7 +9,7 @@
       <ion-searchbar (ionInput)="searchNodes($event)" (ionFocus)="loadResults()" [(ngModel)]="searchQuery" placeholder="Rechercher" debounce="800"></ion-searchbar>
     </ion-toolbar>
     <ion-buttons right *ngIf="dataService.userSeed">
-      <button ion-button (click)="navigateTo(dataService.userSeed.id, true)">
+      <button ion-button (click)="navigateTo(dataService.userSeed.id, false)">
         <img id="avatar_logo" *ngIf="dataService.userSeed.picture" src="{{dataService.userSeed.picture}}"/>
         <i id="avatar_icon" *ngIf="!dataService.userSeed.picture" class="ion-md-custom-person"></i>
       </button>
