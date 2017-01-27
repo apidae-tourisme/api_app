@@ -1,4 +1,4 @@
-import {Component, ViewChild} from '@angular/core';
+import {Component, ViewChild, NgZone} from '@angular/core';
 import {App, NavParams, Events, NavController, Content, AlertController} from 'ionic-angular';
 import {DomSanitizer, SafeUrl} from "@angular/platform-browser";
 import {InAppBrowser} from "ionic-native";
@@ -9,6 +9,7 @@ import {LoginPage} from "../login/login";
 import {DataService} from "../../providers/data.service";
 import {FormPage} from "../form/form";
 import {Seed} from "../../components/seed.model";
+import {SearchPage} from "../search/search";
 
 @Component({
   templateUrl: 'details.html'
@@ -16,19 +17,16 @@ import {Seed} from "../../components/seed.model";
 export class DetailsPage {
   @ViewChild(Content) content: Content;
 
-  public searchQuery: string;
-
   constructor(private app: App, private navCtrl: NavController, public events: Events, private sanitizer: DomSanitizer,
               public explorerService: ExplorerService, public searchService: SearchService, public authService: AuthService,
-              public alertCtrl: AlertController, private dataService: DataService, private navParams: NavParams) {
-    this.searchQuery = null;
+              public alertCtrl: AlertController, private dataService: DataService, private navParams: NavParams,
+              private zone: NgZone) {
   }
 
   ionViewDidEnter(): void {
     let seedId = this.navParams.get('seedId');
     if(seedId) {
       this.explorerService.navigateTo(seedId, false);
-      this.clearResults();
     }
   }
 
@@ -46,10 +44,7 @@ export class DetailsPage {
     new InAppBrowser(isEmail ? ('mailto:' + trimmedUrl) : trimmedUrl, (useSystem || isEmail) ? '_system' : '_blank', 'location=yes');
   }
 
-  navigateTo(node, showGraph, reset, clear?): void {
-    if(clear) {
-      this.clearResults();
-    }
+  navigateTo(node, showGraph, reset): void {
     if(showGraph) {
       this.explorerService.navigateTo(node, reset, () => {
         this.navCtrl.parent.select(0);
@@ -61,24 +56,8 @@ export class DetailsPage {
     }
   }
 
-  loadResults(): void {
-    this.searchService.toggleSearch();
-    this.content.resize();
-  }
-
-  clearResults(): void {
-    this.searchService.clearNodes(() => {
-      this.content.resize();
-    });
-    this.searchQuery = null;
-  }
-
-  searchNodes(evt): void {
-    this.searchService.searchNodes(evt, () => {this.content.resize()})
-  }
-
-  createSeed() {
-    this.navCtrl.push(FormPage);
+  displaySearch() {
+    this.navCtrl.push(SearchPage);
   }
 
   editSeed(): void {
@@ -127,7 +106,9 @@ export class DetailsPage {
             this.authService.logOut().then(() => {
               this.dataService.clearUser();
               this.explorerService.clearData();
-              this.app.getRootNav().setRoot(LoginPage);
+              this.zone.run(() => {
+                this.app.getRootNav().setRoot(LoginPage);
+              });
             });
           }
         }

@@ -1,36 +1,21 @@
 <ion-header>
   <ion-navbar color="lighter" hideBackButton="true">
     <ion-buttons left>
-      <button ion-button (click)="navigateTo(null, true, false, true)">
+      <button ion-button (click)="navigateTo(null, true, false)">
         <img id="header_logo" src="assets/img/logo-apiapp-mini.svg"/>
       </button>
     </ion-buttons>
     <ion-toolbar no-border>
-      <ion-searchbar (ionInput)="searchNodes($event)" (ionFocus)="searchService.toggleSearch()" [(ngModel)]="searchQuery" placeholder="Rechercher" debounce="800"></ion-searchbar>
+      <ion-searchbar (ionFocus)="displaySearch()" placeholder="Rechercher"></ion-searchbar>
     </ion-toolbar>
     <ion-buttons right *ngIf="dataService.userSeed">
-      <button ion-button (click)="navigateTo(dataService.userSeed.id, true, false, true)">
+      <button ion-button (click)="navigateTo(dataService.userSeed.id, true, false)">
         <img id="avatar_logo" *ngIf="dataService.userSeed.picture" src="{{dataService.userSeed.picture}}"/>
         <i id="avatar_icon" *ngIf="!dataService.userSeed.picture" class="ion-md-custom-person"></i>
       </button>
     </ion-buttons>
   </ion-navbar>
-  <ion-toolbar color="lighter" class="toolbar_header" *ngIf="searchService.showSearch && searchService.nodes">
-    <ion-buttons left text-center>
-      <button ion-button color="link" (click)="clearResults()" class="close_toolbar">
-        <ion-icon name="arrow-back" large></ion-icon>
-      </button>
-    </ion-buttons>
-    <ion-title text-center>
-      <div>{{searchService.nodes.length == 0 ? 'Aucun' : searchService.nodes.length}} résultat{{searchService.nodes.length > 1 ? 's' : ''}}</div>
-    </ion-title>
-    <ion-buttons right text-center>
-      <button ion-button icon-only color="link" (click)="createSeed()" id="create_seed">
-        <ion-icon name="add-circle"></ion-icon>
-      </button>
-    </ion-buttons>
-  </ion-toolbar>
-  <ion-toolbar class="toolbar_header" *ngIf="explorerService.rootNode && !searchService.showSearch" color="lighter">
+  <ion-toolbar class="toolbar_header" *ngIf="explorerService.rootNode" color="lighter">
     <ion-buttons left text-center>
       <button color="link" *ngIf="explorerService.previousNode()" ion-button (click)="navigateTo(explorerService.previousNode(), false, false)" class="close_toolbar">
         <ion-icon name="arrow-back" large></ion-icon>
@@ -60,7 +45,7 @@
 </ion-header>
 
 <ion-content>
-  <ion-list *ngIf="explorerService.rootNode && !searchService.showSearch" id="list_details" no-lines>
+  <ion-list *ngIf="explorerService.rootNode" id="list_details" no-lines>
     <ion-item right *ngIf="dataService.userSeed && explorerService.rootNode.id == dataService.userSeed.id">
       <div class="button-md button-large-md button-md-lighter selectable" large>
         <a ion-button icon-only item-left class="button-md-person" (click)="logOut()" large>
@@ -125,26 +110,6 @@
     <ion-item *ngIf="explorerService.rootNode.updateDate" class="selectable">
       <ion-label>Dernière mise à jour</ion-label>
       <ion-datetime [(ngModel)]="explorerService.rootNode.updateDate" displayFormat="DD/MM/YYYY" disabled="true"></ion-datetime>
-    </ion-item>
-  </ion-list>
-
-  <div class="loading_spinner" *ngIf="searchService.showSearch && !searchService.nodes" text-center>
-    <ion-spinner name="dots"></ion-spinner><span light>Chargement en cours</span>
-  </div>
-  <div class="loading_spinner" *ngIf="searchService.showSearch && !searchService.searching && searchService.nodes.length == 0" text-center>
-    Veuillez saisir le(s) terme(s) recherché(s)
-  </div>
-
-  <ion-list *ngIf="searchService.showSearch && searchService.nodes.length > 0" id="search_results">
-    <ion-item *ngFor="let nd of searchService.nodes" text-wrap (click)="navigateTo(nd.id, false, false, true)">
-      <ion-icon *ngIf="nd.scope == 'private'" name="lock" class="item_lock"></ion-icon>
-      <ion-avatar item-left class="bg_seed {{nd.category}}">
-        <img *ngIf="nd.picture" src="{{nd.picture}}"/>
-        <div *ngIf="!nd.picture" text-center><i class="ion-md-custom-{{nd.category}}"></i></div>
-      </ion-avatar>
-      <h2>{{nd.label}}</h2>
-      <p text-nowrap>{{nd.description}}</p>
-      <ion-icon item-right color="link" name="arrow-forward" large></ion-icon>
     </ion-item>
   </ion-list>
 </ion-content>

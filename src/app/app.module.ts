@@ -19,6 +19,7 @@ import {Seeds} from "../providers/seeds";
 import {ApiAppConfig} from "../providers/apiapp.config";
 import {SearchSeeds} from "../pages/form/search-seeds";
 import {EditAvatar} from "../pages/form/edit-avatar";
+import {SearchPage} from "../pages/search/search";
 
 export const deepLinkConfig: DeepLinkConfig = {
   links: [
@@ -35,6 +36,7 @@ export const deepLinkConfig: DeepLinkConfig = {
     GraphPage,
     MapPage,
     ListPage,
+    SearchPage,
     DetailsPage,
     FormPage,
     SeedType,
@@ -60,6 +62,7 @@ export const deepLinkConfig: DeepLinkConfig = {
     GraphPage,
     MapPage,
     ListPage,
+    SearchPage,
     DetailsPage,
     FormPage,
     SeedType,

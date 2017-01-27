@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, NgZone} from '@angular/core';
 import {NavController, Platform, AlertController} from 'ionic-angular';
 import {AuthService} from "../../providers/auth.service";
 import {TabsPage} from "../tabs/tabs";
@@ -13,7 +13,7 @@ export class LoginPage {
   public msg: string;
 
   constructor(public navCtrl: NavController, public authService: AuthService, private platform: Platform,
-              private dataService: DataService, private alertCtrl: AlertController) {
+              private dataService: DataService, private alertCtrl: AlertController, private zone: NgZone) {
   }
 
   ionViewDidEnter() {
@@ -75,7 +75,10 @@ export class LoginPage {
     }
   }
 
+  // root change is wrapped in a ng zone call to prevent duplicate controller instances (see https://github.com/driftyco/ionic/issues/5960)
   navigateHome(): void {
-    this.navCtrl.setRoot(TabsPage, {animate: false});
+    this.zone.run(() => {
+      this.navCtrl.setRoot(TabsPage, {animate: false});
+    });
   }
 }

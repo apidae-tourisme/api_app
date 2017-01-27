@@ -1,12 +1,12 @@
 <ion-header>
-  <ion-navbar color="lighter">
+  <ion-navbar color="lighter" hideBackButton="true">
     <ion-buttons left>
       <button ion-button (click)="navigateTo(null, false)">
         <img id="header_logo" src="assets/img/logo-apiapp-mini.svg"/>
       </button>
     </ion-buttons>
     <ion-toolbar no-border>
-      <ion-searchbar (ionInput)="searchNodes($event)" (ionFocus)="loadResults()" [(ngModel)]="searchQuery" placeholder="Rechercher" debounce="800"></ion-searchbar>
+      <ion-searchbar (ionFocus)="displaySearch()" placeholder="Rechercher"></ion-searchbar>
     </ion-toolbar>
     <ion-buttons right *ngIf="dataService.userSeed">
       <button ion-button (click)="navigateTo(dataService.userSeed.id, false)">
@@ -15,53 +15,12 @@
       </button>
     </ion-buttons>
   </ion-navbar>
-  <ion-toolbar color="lighter" class="toolbar_header" *ngIf="searchService.showSearch">
-    <ion-buttons left text-center>
-      <button ion-button color="link" (click)="closeSearch()" class="close_toolbar">
-        <ion-icon name="arrow-back" large></ion-icon>
-      </button>
-    </ion-buttons>
-    <ion-title text-center>
-      <div>{{searchService.nodes.length == 0 ? 'Aucun' : searchService.nodes.length}} résultat{{searchService.nodes.length > 1 ? 's' : ''}}</div>
-    </ion-title>
-    <ion-buttons right text-center>
-      <button ion-button icon-only color="link" (click)="createSeed()" id="create_seed">
-        <ion-icon name="add-circle"></ion-icon>
-      </button>
-    </ion-buttons>
-  </ion-toolbar>
 </ion-header>
 
 <ion-content id="graph_wrapper">
-  <div *ngIf="!searchService.showSearch">
-    <div class="loading_spinner" *ngIf="!initComplete" text-center>
-      <ion-spinner name="dots"></ion-spinner>
-      <span ion-text color="light">Chargement en cours</span>
-    </div>
-    <graph *ngIf="initComplete" (showDetails)="displayDetails()" (rootChange)="rootNodeChange($event);"></graph>
-    <div id="graph_bg">
-      <img src="assets/img/flowers-left.png"/>
-      <img src="assets/img/flowers-right.png"/>
-    </div>
+  <graph (showDetails)="displayDetails()" (rootChange)="rootNodeChange($event);"></graph>
+  <div id="graph_bg">
+    <img src="assets/img/flowers-left.png"/>
+    <img src="assets/img/flowers-right.png"/>
   </div>
-
-  <div class="loading_spinner" *ngIf="searchService.showSearch && searchService.searching" text-center>
-    <ion-spinner name="dots"></ion-spinner><span light>Chargement en cours</span>
-  </div>
-  <div class="loading_spinner" *ngIf="searchService.showSearch && !searchService.searching && searchService.nodes.length == 0" text-center>
-    Veuillez saisir le(s) terme(s) recherché(s)
-  </div>
-  <ion-list *ngIf="searchService.showSearch && searchService.nodes.length > 0" id="search_results">
-    <ion-item *ngFor="let node of searchService.nodes" text-wrap (click)="navigateTo(node.id, false)">
-      <ion-icon *ngIf="node.scope == 'private'" name="lock" class="item_lock"></ion-icon>
-      <ion-avatar item-left class="bg_seed {{node.category}}">
-        <img *ngIf="node.picture" src="{{node.picture}}"/>
-        <div *ngIf="!node.picture" text-center><i class="ion-md-custom-{{node.category}}"></i></div>
-      </ion-avatar>
-      <h2>{{node.label}}</h2>
-      <p text-nowrap>{{node.description}}</p>
-      <ion-icon item-right color="link" name="arrow-forward" large></ion-icon>
-    </ion-item>
-  </ion-list>
-
 </ion-content>

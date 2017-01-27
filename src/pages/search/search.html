@@ -1,0 +1,46 @@
+<ion-header>
+  <ion-navbar color="lighter" hideBackButton="true">
+    <ion-buttons left>
+      <button ion-button icon-only color="link" (click)="closeSearch()" large>
+        <ion-icon name="arrow-back" large></ion-icon>
+      </button>
+    </ion-buttons>
+    <ion-toolbar no-border>
+      <ion-searchbar #search (ionInput)="searchNodes($event)" (ionFocus)="loadResults()" [(ngModel)]="searchQuery"
+                     placeholder="Rechercher" debounce="600"></ion-searchbar>
+    </ion-toolbar>
+  </ion-navbar>
+  <ion-toolbar color="lighter" class="toolbar_header">
+    <ion-buttons left>
+    </ion-buttons>
+    <ion-title *ngIf="searchQuery && searchQuery.length >= 3" text-center>
+      <div>{{searchService.nodes.length == 0 ? 'Aucun' : searchService.nodes.length}} résultat{{searchService.nodes.length > 1 ? 's' : ''}}</div>
+    </ion-title>
+    <ion-buttons right text-center>
+      <button ion-button icon-only color="link" (click)="createSeed()" id="create_seed">
+        <ion-icon name="add-circle"></ion-icon>
+      </button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <div class="loading_spinner" *ngIf="searchService.searching" text-center>
+    <ion-spinner name="dots"></ion-spinner>
+    <p ion-text color="light">Recherche en cours</p>
+  </div>
+  <div class="loading_spinner" *ngIf="!searchQuery || searchQuery.length < 3" text-center>
+    Veuillez saisir au moins 3 caractères pour lancer une recherche
+  </div>
+  <ion-list *ngIf="searchService.nodes.length > 0" id="search_results">
+    <ion-item *ngFor="let node of searchService.nodes" text-wrap (click)="navigateTo(node.id, false)">
+      <ion-icon *ngIf="node.scope == 'private'" name="lock" class="item_lock"></ion-icon>
+      <ion-avatar item-left class="bg_seed {{node.category}}">
+        <img *ngIf="node.picture" src="{{node.picture}}"/>
+        <div *ngIf="!node.picture" text-center><i class="ion-md-custom-{{node.category}}"></i></div>
+      </ion-avatar>
+      <h2>{{node.label}}</h2>
+      <p text-nowrap>{{node.description}}</p>
+      <ion-icon item-right color="link" name="arrow-forward" large></ion-icon>
+    </ion-item>
+  </ion-list>
+</ion-content>

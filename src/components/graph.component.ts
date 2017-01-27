@@ -51,11 +51,6 @@ export class GraphComponent implements DoCheck {
       .attr("width", window.innerWidth)
       .attr("height", '100%');
 
-    this.dimensions = {
-      width: this.svg.node().getBoundingClientRect().width,
-      height: this.svg.node().getBoundingClientRect().height
-    };
-
     this.zoomContainer = this.svg.append("g");
     this.svg.call(this.zoom.on("zoom", () => {
       this.zoomContainer.attr("transform", d3.event.transform);
@@ -145,8 +140,13 @@ export class GraphComponent implements DoCheck {
     let nodes = networkNodes(networkData.nodes, networkData.previousNode);
     let edges = networkEdges(networkData.edges, networkData.previousNode);
 
+    this.dimensions = {
+      width: this.svg.node().getBoundingClientRect().width,
+      height: this.svg.node().getBoundingClientRect().height
+    };
+
     // Debug log
-    // console.log('drawNetwork with ' + nodes.length + ' nodes and ' + edges.length + ' edges');
+    console.log('drawNetwork with ' + nodes.length + ' nodes and ' + edges.length + ' edges');
 
     // Check that DOM is ready and data is consistent
     if(this.svg && this.nodesContainer && this.linksContainer && (nodes.length == edges.length + 1)) {
