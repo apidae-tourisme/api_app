@@ -23,6 +23,8 @@ export class Seed {
   archived: boolean;
   scope: string;
   contributor: string;
+  author: string;
+  authorId: string;
   seeds: Array<any>;
   urls: Array<any>;
 
@@ -46,6 +48,8 @@ export class Seed {
     this.archived = nodeData.archived;
     this.scope = nodeData.scope || 'public';
     this.contributor = nodeData.last_contributor;
+    this.author = nodeData.author;
+    this.authorId = nodeData.author_id;
     this.seeds = [];
     if(nodeData.seeds) {
       for(let i = 0; i < nodeData.seeds.length; i++) {
@@ -66,6 +70,10 @@ export class Seed {
 
   public noIcon() {
     return !this.picture && this.category == 'concept';
+  }
+
+  public shortLabel(): string {
+    return this.label.length > 10 ? (this.label.substr(0, 8) + '...') : this.label;
   }
 
   public typeLabel() {

@@ -105,6 +105,10 @@ export class ExplorerService {
     return this.nav.length > 1 ? this.nav[this.nav.length - 2].id : null;
   }
 
+  previousNodeEntity(): Seed {
+    return this.nav.length > 1 ? this.nav[this.nav.length - 2] : null;
+  }
+
   newPreviousNode(newNode, currentRoot): string {
     if(currentRoot && newNode != currentRoot.id) {
       return newNode == this.previousNode() ? this.beforePreviousNode() : currentRoot.id;

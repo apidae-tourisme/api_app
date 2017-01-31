@@ -123,7 +123,8 @@
   background-image: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 67.42 76.07" fill="#ffffff"><g><g><path d="M67.42,54.11V21.93a5.84,5.84,0,0,0-2.92-5L36.64.79a5.78,5.78,0,0,0-5.83,0L2.92,16.88a5.84,5.84,0,0,0-2.92,5V54.14a5.84,5.84,0,0,0,2.92,5L30.81,75.28a5.78,5.78,0,0,0,5.83,0L64.53,59.19A5.92,5.92,0,0,0,67.42,54.11Z"/></g></g></svg>');
 }
 
-ion-title .bg_seed.concept {
+ion-title .bg_seed.concept,
+ion-buttons button.bg_seed.concept {
   background-image: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 67.42 76.07" fill="#ffffff" stroke="#666666"><g><g><path d="M67.42,54.11V21.93a5.84,5.84,0,0,0-2.92-5L36.64.79a5.78,5.78,0,0,0-5.83,0L2.92,16.88a5.84,5.84,0,0,0-2.92,5V54.14a5.84,5.84,0,0,0,2.92,5L30.81,75.28a5.78,5.78,0,0,0,5.83,0L64.53,59.19A5.92,5.92,0,0,0,67.42,54.11Z"/></g></g></svg>');
 }
 
@@ -348,10 +349,39 @@ ion-header .toolbar_header ion-buttons {
   width: 40px;
 }
 
+ion-header .toolbar_header .close_toolbar.bg_seed {
+  background-color: map_get($colors, lighter);
+  width: 50px;
+  height: 50px;
+}
+
 ion-header .toolbar_header .close_toolbar .button-inner {
   min-width: 0;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
+  padding: 0;
+}
+
+ion-header .toolbar_header .close_toolbar .button-inner .prev_label {
+  white-space: normal;
+  font-size: 8px;
+  margin-top: 10px;
+}
+
+ion-header .toolbar_header .close_toolbar .button-inner ion-icon {
+  margin-bottom: 5px;
+  font-size: 1.6rem;
+}
+
+ion-header .toolbar_header .close_toolbar .button-inner > * {
+  color: #ffffff;
+}
+
+ion-header .toolbar_header .close_toolbar.concept .button-inner > *,
+ion-header .toolbar_header .close_toolbar.competence .button-inner > *,
+ion-header .toolbar_header .close_toolbar.action .button-inner > *,
+ion-header .toolbar_header .close_toolbar.idea .button-inner > * {
+  color: map_get($colors, text_alt);
 }
 
 ion-header .toolbar_header #nodeDetails .button-inner {
@@ -359,7 +389,8 @@ ion-header .toolbar_header #nodeDetails .button-inner {
 }
 
 ion-header .toolbar_header .button-inner {
-  padding: 5px;
+  padding-top: 5px;
+  padding-bottom: 5px;
   position: relative;
 }
 
@@ -397,6 +428,7 @@ ion-toolbar .header_title {
   height: auto;
   margin: 0;
   white-space: normal;
+  padding: 0 1.1em;
 }
 
 ion-toolbar .header_title img {

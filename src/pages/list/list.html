@@ -17,7 +17,10 @@
   </ion-navbar>
   <ion-toolbar color="lighter" class="toolbar_header" no-border-bottom>
     <ion-buttons left text-center>
-      <button color="link" *ngIf="explorerService.previousNode()" ion-button (click)="navigateTo(explorerService.previousNode(), false, false)" class="close_toolbar">
+      <button color="lighter" *ngIf="explorerService.previousNode()" ion-button text-center
+              (click)="navigateTo(explorerService.previousNode(), false, false)" [class]="'close_toolbar bg_seed ' + explorerService.previousNodeEntity().category">
+        <ion-icon *ngIf="explorerService.previousNodeEntity().scope == 'private'" name="lock" class="item_lock"></ion-icon>
+        <div class="prev_label">{{explorerService.previousNodeEntity().shortLabel()}}</div>
         <ion-icon name="arrow-back" large></ion-icon>
       </button>
     </ion-buttons>
@@ -34,6 +37,7 @@
         </div>
       </button>
     </ion-title>
+    <ion-buttons right></ion-buttons>
   </ion-toolbar>
 </ion-header>
 

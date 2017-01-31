@@ -127,7 +127,7 @@ export class FormPage {
   }
 
   addUrl(): void {
-    this.node.urls.push({value: 'http://'});
+    this.node.urls.push({value: ''});
   }
 
   editAvatar(): void {

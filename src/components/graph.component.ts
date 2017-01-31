@@ -22,6 +22,7 @@ export class GraphComponent implements DoCheck {
   private rootDetails: boolean;
   private zoom;
   private zoomContainer;
+  private prevContainer;
   private defaultTransform;
   private layout;
 
@@ -44,16 +45,27 @@ export class GraphComponent implements DoCheck {
   }
 
   ngAfterViewInit() {
-    this.zoom = d3.zoom();
-    // Note : https://bl.ocks.org/mbostock/2b534b091d80a8de39219dd076b316cd - Combine drag & zoom
-
     this.svg = this.host.append("svg")
       .attr("width", window.innerWidth)
       .attr("height", '100%');
-
+    this.prevContainer = this.svg.append("g");
     this.zoomContainer = this.svg.append("g");
+    this.zoom = d3.zoom().scaleExtent([0.75, 1.5]);
+    let xBefore = 0, yBefore = 0;
     this.svg.call(this.zoom.on("zoom", () => {
       this.zoomContainer.attr("transform", d3.event.transform);
+      let prevLine = this.prevContainer.select("line");
+      if(prevLine.size() > 0) {
+        let x2 = prevLine.attr("x2");
+        let y2 = prevLine.attr("y2");
+
+        let xTransform =  d3.event.transform.x / d3.event.transform.k;
+        let yTransform = d3.event.transform.y / d3.event.transform.k;
+
+        prevLine.attr("x2", (+x2 + xTransform - xBefore)).attr("y2", (+y2 + yTransform - yBefore));
+        xBefore = xTransform;
+        yBefore = yTransform;
+      }
     })).on("dblclick.zoom", null)
       .on("mousedown.zoom", null);
 
@@ -363,7 +375,18 @@ export class GraphComponent implements DoCheck {
   }
 
   drawPrevious(previousNode): void {
-    let prevNode = this.nodesContainer.append("g");
+    this.prevContainer.selectAll("*").remove();
+
+    if(!previousNode.disconnected) {
+      this.prevContainer.append("line")
+        .attr("class", "previous")
+        .attr("x1", this.layout.unitX / 2 + this.layout.padding * 2)
+        .attr("y1", this.layout.unitY / 2 + this.layout.padding * 2)
+        .attr("x2", this.dimensions.width / 2)
+        .attr("y2", this.dimensions.height / 2);
+    }
+
+    let prevNode = this.prevContainer.append("g");
     prevNode.append("use")
       .attr("transform", "translate(" + this.layout.padding * 2 + ", " + this.layout.padding * 2 + ")")
       .attr("filter", previousNode.noIcon() ? "url(#shadow)" : "")
@@ -408,14 +431,6 @@ export class GraphComponent implements DoCheck {
       .attr("dy", this.layout.textSize + 2 * this.layout.padding)
       .attr("class", "icon")
       .text('\uf27d');
-
-    if(!previousNode.disconnected) {
-      this.linksContainer.append("line")
-        .attr("x1", this.layout.unitX / 2 + this.layout.padding * 2)
-        .attr("y1", this.layout.unitY / 2 + this.layout.padding * 2)
-        .attr("x2", this.dimensions.width / 2)
-        .attr("y2", this.dimensions.height / 2);
-    }
 
     prevNode.on("click", () => {
       this.newRoot = previousNode.id;

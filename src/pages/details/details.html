@@ -17,7 +17,10 @@
   </ion-navbar>
   <ion-toolbar class="toolbar_header" *ngIf="explorerService.rootNode" color="lighter">
     <ion-buttons left text-center>
-      <button color="link" *ngIf="explorerService.previousNode()" ion-button (click)="navigateTo(explorerService.previousNode(), false, false)" class="close_toolbar">
+      <button color="lighter" *ngIf="explorerService.previousNode()" ion-button text-center
+              (click)="navigateTo(explorerService.previousNode(), false, false)" [class]="'close_toolbar bg_seed ' + explorerService.previousNodeEntity().category">
+        <ion-icon *ngIf="explorerService.previousNodeEntity().scope == 'private'" name="lock" class="item_lock"></ion-icon>
+        <div class="prev_label">{{explorerService.previousNodeEntity().shortLabel()}}</div>
         <ion-icon name="arrow-back" large></ion-icon>
       </button>
     </ion-buttons>
@@ -110,6 +113,10 @@
     <ion-item *ngIf="explorerService.rootNode.updateDate" class="selectable">
       <ion-label>Dernière mise à jour</ion-label>
       <ion-datetime [(ngModel)]="explorerService.rootNode.updateDate" displayFormat="DD/MM/YYYY" disabled="true"></ion-datetime>
+    </ion-item>
+    <ion-item *ngIf="explorerService.rootNode.author" class="selectable item-datetime-disabled">
+      <ion-label class="details_author" no-margin>Par </ion-label>
+      <button ion-button item-right large clear color="link" (click)="navigateTo(explorerService.rootNode.authorId, false, false)">{{explorerService.rootNode.author}}</button>
     </ion-item>
   </ion-list>
 </ion-content>
