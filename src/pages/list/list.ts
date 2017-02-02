@@ -26,7 +26,7 @@ export class ListPage {
         this.navCtrl.parent.select(0);
       });
     } else {
-      this.explorerService.navigateTo(node, reset);
+      this.explorerService.navigateTo(node, reset, () => {this.content.resize();});
     }
   }
 

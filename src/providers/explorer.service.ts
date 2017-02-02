@@ -6,9 +6,9 @@ import {Seed} from "../components/seed.model";
 @Injectable()
 export class ExplorerService {
 
-  networkData: any;
-  rootNode: Seed;
-  nav: Array<Seed>;
+  public networkData: any;
+  public rootNode: Seed;
+  public nav: Array<Seed>;
 
   constructor(private dataService: DataService) {
     this.nav = [];
@@ -29,7 +29,8 @@ export class ExplorerService {
     this.dataService.getNodeData(newNode).subscribe(data => {
       let parsedData: any = {
         nodes: [],
-        edges: []
+        edges: [],
+        count: data.count
       };
       let nodes = data.nodes;
       let currentRoot = this.rootNode;

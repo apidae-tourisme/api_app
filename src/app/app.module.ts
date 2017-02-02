@@ -50,7 +50,8 @@ export const deepLinkConfig: DeepLinkConfig = {
         scrollAssist: false,
         autoFocusAssist: false,
         mode: 'md',
-        tabsPlacement: 'bottom'
+        tabsPlacement: 'bottom',
+        tabsHideOnSubPages: true
       }, deepLinkConfig
     )
   ],

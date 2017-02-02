@@ -6,7 +6,10 @@
       </button>
     </ion-buttons>
     <ion-toolbar no-border>
-      <ion-searchbar (ionFocus)="displaySearch()" placeholder="Rechercher"></ion-searchbar>
+      <div id="total_counter">{{explorerService.networkData.count}}</div>
+      <button id="top_search" ion-button color="lighter" block icon-left text-left (click)="displaySearch()">
+        <ion-icon name="search" color="link"></ion-icon>Rechercher
+      </button>
     </ion-toolbar>
     <ion-buttons right *ngIf="dataService.userSeed">
       <button ion-button (click)="navigateTo(dataService.userSeed.id, false)">

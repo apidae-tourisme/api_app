@@ -158,7 +158,7 @@ export class GraphComponent implements DoCheck {
     };
 
     // Debug log
-    console.log('drawNetwork with ' + nodes.length + ' nodes and ' + edges.length + ' edges');
+    // console.log('drawNetwork with ' + nodes.length + ' nodes and ' + edges.length + ' edges');
 
     // Check that DOM is ready and data is consistent
     if(this.svg && this.nodesContainer && this.linksContainer && (nodes.length == edges.length + 1)) {

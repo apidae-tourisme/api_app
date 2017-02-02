@@ -169,6 +169,55 @@ ion-header .bar-buttons-md > button.bar-button-md {
 
 ion-searchbar.searchbar-md .searchbar-input {
   padding: 6px 45px;
+  font-size: 1.4rem;
+}
+
+ion-searchbar.searchbar-md .searchbar-search-icon,
+#total_counter {
+  background-image: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 67.42 76.07" fill="#ddd4cb"><g><g><path d="M67.42,54.11V21.93a5.84,5.84,0,0,0-2.92-5L36.64.79a5.78,5.78,0,0,0-5.83,0L2.92,16.88a5.84,5.84,0,0,0-2.92,5V54.14a5.84,5.84,0,0,0,2.92,5L30.81,75.28a5.78,5.78,0,0,0,5.83,0L64.53,59.19A5.92,5.92,0,0,0,67.42,54.11Z"/></g></g></svg>');
+  background-size: auto;
+  background-repeat: no-repeat;
+  background-position: center center;
+  top: 6px;
+  width: 30px;
+  height: 30px;
+}
+
+ion-searchbar.searchbar-md .searchbar-search-icon {
+  left: 7px;
+}
+
+#search_counter,
+#total_counter {
+  position: absolute;
+  z-index: 999;
+  top: 22px;
+  font-size: 10px;
+  font-weight: 500;
+  color: map_get($colors, text_alt);
+  width: 30px;
+  text-align: center;
+}
+
+#search_counter {
+  left: 14px;
+}
+
+#total_counter {
+  right: 12px;
+  top: 14px;
+  line-height: 30px;
+}
+
+#top_search {
+  text-transform: none;
+  color: map_get($colors, text_alt);
+  font-weight: normal;
+  height: 4.2rem;
+}
+
+#top_search .button-inner {
+  justify-content: flex-start;
 }
 
 #header_search > span {
@@ -182,7 +231,11 @@ ion-searchbar.searchbar-md .searchbar-input {
   height: 100%;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
+  font-size: 20px;
+}
+
+.loading_spinner > img {
+  width: 120px;
 }
 
 .dowrap {
@@ -457,9 +510,11 @@ ion-toolbar .header_title ion-avatar + div {
 ion-toolbar .header_title p:first-child {
   color: map-get($colors, text_main);
   font-size: $font-size-base;
+  margin-bottom: 4px;
 }
 
 ion-toolbar .header_title p:last-child {
   color: map-get($colors, text_alt);
   font-size: 1.1rem;
+  line-height: 1em;
 }
