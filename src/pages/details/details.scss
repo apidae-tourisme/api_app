@@ -9,12 +9,7 @@
 
 #list_details .button-large-md {
   font-size: 1.7rem;
-  padding: 0;
   line-height: 2.8em;
-}
-
-#list_details ion-label > .button-large-md {
-  padding: 0 1em 0 0;
 }
 
 #list_details .label-md,
@@ -57,3 +52,8 @@
   padding: 0 1em;
 }
 
+#list_details button p.label_sm {
+  font-weight: normal;
+  font-size: 1.2rem;
+  color: map-get($colors, lighter);
+}
