@@ -7,7 +7,7 @@
     </ion-buttons>
     <ion-title text-center>{{node.id ? 'Modifier la ' : 'Créer une '}}graine</ion-title>
     <ion-buttons right>
-      <button ion-button icon-only color="link" (click)="submitForm()" large>
+      <button ion-button icon-only color="link" (click)="submitForm()" large [disabled]="disabled">
         <ion-icon name="checkmark-circle-outline" large></ion-icon>
       </button>
     </ion-buttons>
@@ -15,101 +15,116 @@
 </ion-header>
 
 <ion-content id="seed_form">
-  <div padding *ngIf="!node.id">
-    <button ion-button block large ngClass="bg_{{node.category}}" (click)="seedTypes()">
-      <i class="{{'ion-md-custom-' + node.category}}"></i>&nbsp;{{node.typeLabel()}}
-    </button>
-  </div>
   <ion-list>
+    <ion-item>
+      <ion-label>Type</ion-label>
+      <h4 item-right>{{node.typeLabel()}}</h4>
+      <ion-avatar item-right class="bg_seed {{node.category}}">
+        <div class="bg_seed {{node.category}}" text-center><i class="ion-md-custom-{{node.category}}"></i></div>
+      </ion-avatar>
+      <button ion-button item-right large icon-only clear color="link" (click)="seedTypes()">
+        <ion-icon name="create"></ion-icon>
+      </button>
+    </ion-item>
     <ion-item *ngIf="node.category != 'person'">
-      <ion-label stacked>Nom</ion-label>
+      <ion-label fixed>Nom</ion-label>
       <ion-input type="text" [(ngModel)]="node.label"></ion-input>
     </ion-item>
     <ion-item *ngIf="node.category == 'person'">
-      <ion-label stacked>Prénom</ion-label>
+      <ion-label fixed>Prénom</ion-label>
       <ion-input type="text" [(ngModel)]="node.firstName"></ion-input>
     </ion-item>
     <ion-item *ngIf="node.category == 'person'">
-      <ion-label stacked>Nom</ion-label>
+      <ion-label fixed>Nom</ion-label>
       <ion-input type="text" [(ngModel)]="node.lastName"></ion-input>
     </ion-item>
     <ion-item>
-      <ion-label stacked>Description</ion-label>
+      <ion-label fixed>Description</ion-label>
       <ion-textarea rows="4" [(ngModel)]="node.description"></ion-textarea>
-    </ion-item>
-    <ion-item *ngIf="dataService.userSeed.email == node.contributor || node.scope == 'public'" no-lines class="label_only">
-      <ion-label stacked>Visibilité</ion-label>
     </ion-item>
     <ion-item *ngIf="dataService.userSeed.email == node.contributor || node.scope == 'public'">
       <ion-label>{{scopeLabel()}}</ion-label>
-      <button ion-button item-right large icon-only [color]="scopeColor()" (click)="toggleScope()">
+      <button ion-button item-right large clear icon-only [color]="scopeColor()" (click)="toggleScope()">
         <ion-icon [name]="scopeIcon()"></ion-icon>
       </button>
     </ion-item>
-    <ion-item no-lines class="label_only">
-      <ion-label stacked>Visuel</ion-label>
-    </ion-item>
     <ion-item>
-      <ion-avatar item-left class="bg_seed {{node.category}}">
+      <ion-label fixed>Visuel</ion-label>
+      <ion-avatar item-right class="bg_seed {{node.category}}">
         <img *ngIf="node.picture" src="{{node.picture}}"/>
         <div *ngIf="!node.picture" class="bg_seed {{node.category}}" text-center><i class="ion-md-custom-{{node.category}}"></i></div>
       </ion-avatar>
-      <button ion-button item-right large icon-only color="link" (click)="editAvatar()">
+      <button ion-button item-right large icon-only clear color="link" (click)="editAvatar()">
         <ion-icon name="create"></ion-icon>
       </button>
-      <button ion-button item-right large icon-only color="danger" (click)="clearAvatar()">
+      <button ion-button item-right large icon-only clear color="danger" (click)="clearAvatar()">
         <ion-icon name="close"></ion-icon>
       </button>
     </ion-item>
     <ion-item>
-      <ion-label stacked>Début</ion-label>
-      <ion-datetime displayFormat="DD/MM/YYYY" pickerFormat="DD/MM/YYYY" min="2015" max="2020" cancelText="Supprimer"
-                    doneText="OK" [(ngModel)]="node.startDate" (ionCancel)="clearStartDate()"></ion-datetime>
+      <ion-label>Début</ion-label>
+      <ion-datetime [(ngModel)]="node.startDate" displayFormat="DD/MM/YYYY" disabled="true"></ion-datetime>
+      <ion-datetime #startDate displayFormat="DD/MM/YYYY" pickerFormat="DD/MM/YYYY" min="2000" max="2020" cancelText="Annuler"
+                    doneText="OK" [(ngModel)]="node.startDate" class="hidden"></ion-datetime>
+      <button ion-button item-right large icon-only clear color="link" (click)="editStartDate()">
+        <ion-icon name="create"></ion-icon>
+      </button>
+      <button ion-button item-right large icon-only clear color="danger" (click)="clearStartDate()">
+        <ion-icon name="close"></ion-icon>
+      </button>
     </ion-item>
     <ion-item>
-      <ion-label stacked>Fin</ion-label>
-      <ion-datetime displayFormat="DD/MM/YYYY" pickerFormat="DD/MM/YYYY" min="2015" max="2020" cancelText="Supprimer"
-                    doneText="OK" [(ngModel)]="node.endDate" (ionCancel)="clearEndDate()"></ion-datetime>
+      <ion-label>Fin</ion-label>
+      <ion-datetime [(ngModel)]="node.endDate" displayFormat="DD/MM/YYYY" disabled="true"></ion-datetime>
+      <ion-datetime #endDate displayFormat="DD/MM/YYYY" pickerFormat="DD/MM/YYYY" min="2000" max="2020" cancelText="Annuler"
+                    doneText="OK" [(ngModel)]="node.endDate" class="hidden"></ion-datetime>
+      <button ion-button item-right large icon-only clear color="link" (click)="editEndDate()">
+        <ion-icon name="create"></ion-icon>
+      </button>
+      <button ion-button item-right large icon-only clear color="danger" (click)="clearEndDate()">
+        <ion-icon name="close"></ion-icon>
+      </button>
     </ion-item>
     <ion-item>
-      <ion-label stacked>Téléphone fixe</ion-label>
+      <ion-label fixed>Tél. fixe</ion-label>
       <ion-input type="tel" [(ngModel)]="node.telephone"></ion-input>
     </ion-item>
     <ion-item>
-      <ion-label stacked>Téléphone mobile</ion-label>
+      <ion-label fixed>Tél. mobile</ion-label>
       <ion-input type="tel" [(ngModel)]="node.mobilePhone"></ion-input>
     </ion-item>
-    <ion-item no-lines class="label_only">
-      <ion-label stacked>Liens</ion-label>
-    </ion-item>
-    <ion-item *ngFor="let url of node.urls; let i = index;" no-lines>
-      <ion-label stacked>Lien {{i + 1}}</ion-label>
-      <ion-input type="text" [(ngModel)]="url.value"></ion-input>
-      <button ion-button item-right large icon-only color="danger" (click)="node.urls.splice(i, 1)"><ion-icon name="close"></ion-icon></button>
-    </ion-item>
     <ion-item>
-      <button ion-button block large ngClass="bg_concept" (click)="addUrl()">Ajouter un lien</button>
+      <ion-label fixed>Adresse</ion-label>
+      <ion-input type="text" [(ngModel)]="node.address"></ion-input>
     </ion-item>
-    <ion-item no-lines class="label_only">
-      <ion-label stacked>Graines liées</ion-label>
+    <ion-item class="label_only" no-lines>
+      <ion-label><strong>Liens</strong></ion-label>
+      <button ion-button icon-only item-right large clear color="link" (click)="addUrl()">
+        <ion-icon name="add-circle"></ion-icon>
+      </button>
+    </ion-item>
+    <ion-item *ngFor="let url of node.urls; let i = index" no-lines>
+      <ion-input type="text" [(ngModel)]="url.value" placeholder="Lien web, email, téléphone..."></ion-input>
+      <button ion-button item-right large clear icon-only color="danger" (click)="node.urls.splice(i, 1)"><ion-icon name="close"></ion-icon></button>
+    </ion-item>
+    <ion-item class="label_only" border-top>
+      <ion-label><strong>Graines liées</strong></ion-label>
+      <button ion-button icon-only item-right large clear color="link" (click)="addSeed()">
+        <ion-icon name="add-circle"></ion-icon>
+      </button>
     </ion-item>
     <ion-item *ngFor="let seed of node.seeds; let i = index;" no-lines>
+      <ion-icon *ngIf="seed.scope == 'private'" name="lock" class="item_lock"></ion-icon>
       <ion-avatar item-left class="bg_seed {{seed.category}}">
         <img *ngIf="seed.picture" src="{{seed.picture}}"/>
         <div *ngIf="!seed.picture" text-center><i class="ion-md-custom-{{seed.category}}"></i></div>
       </ion-avatar>
       <h2>{{seed.label}}</h2>
-      <button ion-button item-right large icon-only color="danger" (click)="node.seeds.splice(i, 1)"><ion-icon name="close"></ion-icon></button>
+      <button ion-button item-right large clear icon-only color="danger" (click)="node.seeds.splice(i, 1)"><ion-icon name="close"></ion-icon></button>
     </ion-item>
-    <ion-item>
-      <button ion-button block large ngClass="bg_concept" (click)="addSeed()">Lier une graine</button>
-    </ion-item>
-    <ion-item *ngIf="node.id" no-lines class="label_only">
-      <ion-label stacked>Archivage</ion-label>
-    </ion-item>
-    <ion-item *ngIf="node.id">
+    <ion-item *ngIf="node.id" border-top>
       <ion-label>{{archiveLabel()}}</ion-label>
-      <button ion-button item-right large icon-only [color]="archiveColor()" (click)="toggleArchive()">
+      <button ion-button item-right large clear icon-only [color]="archiveColor()" (click)="toggleArchive()">
         <ion-icon [name]="archiveIcon()"></ion-icon>
       </button>
     </ion-item>

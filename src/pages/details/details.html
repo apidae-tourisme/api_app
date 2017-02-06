@@ -29,7 +29,8 @@
     </ion-buttons>
     <ion-title text-center>
       <div class="inline">
-        <div class="header_title button-inner">
+        <div class="header_title">
+          <span class="button-inner">
           <ion-icon *ngIf="explorerService.rootNode.scope == 'private'" name="lock" class="item_lock"></ion-icon>
           <ion-avatar item-left class="bg_seed {{explorerService.rootNode.category}}">
             <img *ngIf="explorerService.rootNode.picture" src="{{explorerService.rootNode.picture}}"/>
@@ -39,6 +40,7 @@
             <p text-left>{{explorerService.rootNode.label}}</p>
             <p text-left>{{explorerService.rootNode.description}}</p>
           </div>
+          </span>
         </div>
       </div>
     </ion-title>
@@ -76,6 +78,14 @@
         <span class="button_label">{{explorerService.rootNode.mobilePhone}}</span>
       </div>
       <a ion-button large item-right icon-only color="product" (click)="openUrl('sms:' + explorerService.rootNode.mobilePhone, true)" class="button_eol"><ion-icon md="ios-chatbubbles"></ion-icon></a>
+    </ion-item>
+    <ion-item *ngIf="explorerService.rootNode.address" class="selectable">
+      <div class="button-md button-large-md button-md-lighter selectable" large>
+        <a ion-button icon-only item-left class="button-md-event" (click)="openAddress(explorerService.rootNode.address)" large>
+          <ion-icon md="ios-pin"></ion-icon>
+        </a>
+        <span class="button_label">{{explorerService.rootNode.address}}</span>
+      </div>
     </ion-item>
     <ion-item *ngIf="explorerService.rootNode.email" class="selectable" text-wrap>
       <div class="button-md button-large-md button-md-lighter selectable" large>

@@ -1,5 +1,5 @@
-import {Component} from '@angular/core';
-import {NavParams, NavController, ModalController, ToastController} from 'ionic-angular';
+import {Component, ViewChild} from '@angular/core';
+import {NavParams, NavController, ModalController, ToastController, LoadingController} from 'ionic-angular';
 import {Seed} from "../../components/seed.model";
 import {SeedType} from "./seed-type";
 import {DataService} from "../../providers/data.service";
@@ -11,12 +11,15 @@ import {EditAvatar} from "./edit-avatar";
   templateUrl: 'form.html'
 })
 export class FormPage {
+  @ViewChild('startDate') startDatePicker;
+  @ViewChild('endDate') endDatePicker;
 
   public node: Seed;
+  public disabled: boolean;
 
   constructor(private navCtrl: NavController, private params: NavParams, public modalCtrl: ModalController,
               public dataService: DataService, private explorerService: ExplorerService,
-              private toastCtrl: ToastController) {
+              private loadingCtrl: LoadingController, private toastCtrl: ToastController) {
     this.node = params.get('node') || new Seed(
       {scope: 'private', last_contributor: this.dataService.userSeed.email, archived: false}, false, false);
   }
@@ -56,8 +59,21 @@ export class FormPage {
   }
 
   submitForm(): void {
+    this.disabled = true;
+
+    let loading = this.loadingCtrl.create({
+      content: 'Enregistrement en cours...'
+    });
+
+    loading.present();
+
+    setTimeout(() => {
+      loading.dismiss();
+    }, 30000);
+
     this.dataService.saveNode(this.node).subscribe(data => {
       this.node.id = data.node.id;
+      loading.dismiss();
       this.presentToast("La graine a été enregistrée.", () => {
         this.dismissForm(true, this.node.id == this.dataService.userSeed.id);
       });
@@ -65,6 +81,24 @@ export class FormPage {
       this.presentToast("Une erreur est survenue pendant l'enregistrement de la graine.", () => {});
       console.log("submit error : " + JSON.stringify(error))
     });
+  }
+
+  editStartDate(): void {
+    if(!this.node.startDate) {
+      this.node.startDate = new Date().toISOString();
+    }
+    setTimeout(() => {
+      this.startDatePicker.open();
+    }, 150);
+  }
+
+  editEndDate(): void {
+    if(!this.node.endDate) {
+      this.node.endDate = new Date().toISOString();
+    }
+    setTimeout(() => {
+      this.endDatePicker.open();
+    }, 150);
   }
 
   clearStartDate(): void {

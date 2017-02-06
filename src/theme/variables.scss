@@ -34,7 +34,7 @@ $colors: (
   event:          #7e7764,
   action:         #ddd4cb,
   product:        #718c16,
-  creativework:   #a4bd52,
+  creativeWork:   #a4bd52,
   idea:           #d9e8a9,
   concept:        #ffffff
 );
@@ -74,4 +74,4 @@ $searchbar-md-input-clear-icon-color: map-get($colors, text_main);
 // http://ionicframework.com/docs/v2/ionicons/
 
 $ionicons-font-path: "../assets/fonts";
-@import "ionicons";
+@import "ionic.ionicons";

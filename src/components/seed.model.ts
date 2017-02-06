@@ -1,4 +1,5 @@
 import {Seeds} from "../providers/seeds";
+
 export class Seed {
 
   public static readonly DEFAULT_TYPE = Seeds.CONCEPT;
@@ -14,6 +15,7 @@ export class Seed {
   email: string;
   telephone: string;
   mobilePhone: string;
+  address: string;
   url: string;
   creationDate: string;
   updateDate: string;
@@ -32,12 +34,13 @@ export class Seed {
     this.id = nodeData.id;
     this.label = (nodeData.firstname && nodeData.lastname) ? (nodeData.firstname + ' ' + nodeData.lastname) : nodeData.name;
     this.description = nodeData.description;
-    this.category = nodeData.label ? nodeData.label.toLowerCase() : Seed.DEFAULT_TYPE;
+    this.category = nodeData.label ? (nodeData.label.charAt(0).toLowerCase() + nodeData.label.substring(1)) : Seed.DEFAULT_TYPE;
     this.firstName = nodeData.firstname;
     this.lastName = nodeData.lastname;
     this.email = nodeData.email;
     this.telephone = nodeData.telephone;
     this.mobilePhone = nodeData.mobilephone;
+    this.address = nodeData.address;
     this.setCode();
     this.picture = this.normalize(nodeData.thumbnail);
     this.url = this.normalize(nodeData.url);
@@ -120,7 +123,7 @@ export class Seed {
   public submitParams(): any {
     return {
       id: this.id,
-      name: this.label,
+      name: (this.firstName && this.lastName) ? (this.firstName + ' ' + this.lastName) : this.label,
       description: this.description,
       thumbnail: this.picture,
       type: this.category,
@@ -129,6 +132,7 @@ export class Seed {
       email: this.email,
       telephone: this.telephone,
       mobilephone: this.mobilePhone,
+      address: this.address,
       started_at: this.startDate,
       ended_at: this.endDate,
       archived: this.archived,

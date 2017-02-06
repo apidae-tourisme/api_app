@@ -1,6 +1,7 @@
 import {Component, ViewChild} from "@angular/core";
 import {ViewController, Content} from "ionic-angular";
 import {SearchService} from "../../providers/search.service";
+import {ExplorerService} from "../../providers/explorer.service";
 
 @Component({
   templateUrl: 'search-seeds.html'
@@ -10,7 +11,8 @@ export class SearchSeeds {
 
   public searchQuery: string;
 
-  constructor(public viewCtrl: ViewController, public searchService: SearchService) {
+  constructor(public viewCtrl: ViewController, public searchService: SearchService,
+              public explorerService: ExplorerService) {
     this.searchQuery = null;
   }
 

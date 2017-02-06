@@ -44,6 +44,10 @@ export class DetailsPage {
     new InAppBrowser(isEmail ? ('mailto:' + trimmedUrl) : trimmedUrl, (useSystem || isEmail) ? '_system' : '_blank', 'location=yes');
   }
 
+  openAddress(address) {
+    new InAppBrowser('https://maps.google.com?q=' + address, '_blank', 'location=yes');
+  }
+
   navigateTo(node, showGraph, reset): void {
     if(showGraph) {
       this.explorerService.navigateTo(node, reset, () => {
@@ -85,7 +89,7 @@ export class DetailsPage {
   dateFormat(date): string {
     if(date) {
       let dateObj = new Date(date);
-      return [this.lpad(dateObj.getDate()), this.lpad(dateObj.getMonth() + 1), dateObj.getFullYear()].join('/');
+      return [this.lpad(dateObj.getUTCDate()), this.lpad(dateObj.getUTCMonth() + 1), dateObj.getUTCFullYear()].join('/');
     }
     return '';
   }

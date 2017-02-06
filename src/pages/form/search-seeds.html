@@ -6,26 +6,29 @@
       </button>
     </ion-buttons>
     <ion-toolbar no-border>
-      <ion-searchbar (ionInput)="searchNodes($event)" (ionFocus)="loadResults()" [(ngModel)]="searchQuery" placeholder="Rechercher" debounce="500"></ion-searchbar>
+      <div id="search_counter">{{(searchQuery && searchQuery.length >= 3) ? (searchService.searching ? '...'  : searchService.nodes.length) : explorerService.networkData.count}}</div>
+      <ion-searchbar #search (ionInput)="searchNodes($event)" (ionFocus)="loadResults()" [(ngModel)]="searchQuery"
+                     placeholder="Rechercher" debounce="600"></ion-searchbar>
     </ion-toolbar>
     <ion-buttons right></ion-buttons>
   </ion-navbar>
-  <ion-toolbar *ngIf="searchService.nodes" color="lighter" class="toolbar_header">
-    <ion-title text-center>
-      <div>{{searchService.nodes.length == 0 ? 'Aucun' : searchService.nodes.length}} résultat{{searchService.nodes.length > 1 ? 's' : ''}}</div>
-    </ion-title>
-  </ion-toolbar>
 </ion-header>
 
 <ion-content id="search_seeds">
-  <div class="loading_spinner" *ngIf="!searchService.nodes && searchService.showSearch" text-center>
-    <ion-spinner name="dots"></ion-spinner><span light>Chargement en cours</span>
+  <div class="loading_spinner" *ngIf="searchService.searching" text-center>
+    <ion-spinner name="dots"></ion-spinner>
+    <p ion-text color="light">Recherche en cours</p>
   </div>
-  <div class="loading_spinner" *ngIf="searchService.showSearch && !searchService.searching && searchService.nodes.length == 0" text-center>
-    Veuillez saisir le nom de la graine à lier
+  <div class="loading_spinner" *ngIf="!searchQuery || searchQuery.length < 3" text-center>
+    <img src="assets/img/logo-apiapp.svg"/>
+    <p>
+      Veuillez saisir au moins 3 caractères<br/>
+      pour lancer une recherche
+    </p>
   </div>
-  <ion-list *ngIf="searchService.showSearch && searchService.nodes.length > 0" id="search_results">
+  <ion-list *ngIf="searchService.nodes.length > 0" id="search_results">
     <ion-item *ngFor="let node of searchService.nodes" text-wrap (click)="selectSeed(node)">
+      <ion-icon *ngIf="node.scope == 'private'" name="lock" class="item_lock"></ion-icon>
       <ion-avatar item-left class="bg_seed {{node.category}}">
         <img *ngIf="node.picture" src="{{node.picture}}"/>
         <div *ngIf="!node.picture" text-center><i class="ion-md-custom-{{node.category}}"></i></div>

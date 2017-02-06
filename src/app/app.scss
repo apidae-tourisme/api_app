@@ -31,7 +31,7 @@
 .ion-md-custom-competence:before {
   content: "\e90d";
 }
-.ion-md-custom-creativework:before {
+.ion-md-custom-creativeWork:before {
   content: "\e90e";
 }
 .ion-md-custom-event:before {
@@ -111,7 +111,7 @@
   background-image: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 67.42 76.07" fill="#718c16"><g><g><path d="M67.42,54.11V21.93a5.84,5.84,0,0,0-2.92-5L36.64.79a5.78,5.78,0,0,0-5.83,0L2.92,16.88a5.84,5.84,0,0,0-2.92,5V54.14a5.84,5.84,0,0,0,2.92,5L30.81,75.28a5.78,5.78,0,0,0,5.83,0L64.53,59.19A5.92,5.92,0,0,0,67.42,54.11Z"/></g></g></svg>');
 }
 
-.bg_seed.creativework {
+.bg_seed.creativeWork {
   background-image: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 67.42 76.07" fill="#a4bd52"><g><g><path d="M67.42,54.11V21.93a5.84,5.84,0,0,0-2.92-5L36.64.79a5.78,5.78,0,0,0-5.83,0L2.92,16.88a5.84,5.84,0,0,0-2.92,5V54.14a5.84,5.84,0,0,0,2.92,5L30.81,75.28a5.78,5.78,0,0,0,5.83,0L64.53,59.19A5.92,5.92,0,0,0,67.42,54.11Z"/></g></g></svg>');
 }
 
@@ -298,9 +298,9 @@ div.font_avatar {
   stroke: map-get($colors, project);
 }
 
-.creativework {
-  color: map-get($colors, creativework);
-  stroke: map-get($colors, creativework);
+.creativeWork {
+  color: map-get($colors, creativeWork);
+  stroke: map-get($colors, creativeWork);
 }
 
 .schema {
@@ -353,9 +353,9 @@ div.font_avatar {
   fill: map-get($colors, project);
 }
 
-.bg_creativework {
-  background-color: map-get($colors, creativework);
-  fill: map-get($colors, creativework);
+.bg_creativeWork {
+  background-color: map-get($colors, creativeWork);
+  fill: map-get($colors, creativeWork);
 }
 
 .bg_schema {
@@ -452,10 +452,17 @@ ion-header .toolbar_header .button-inner > ion-icon {
 }
 
 ion-header .toolbar_header .button-inner > ion-icon.item_lock {
-  font-size: 18px;
+  font-size: 16px;
+  position: absolute;
   color: black;
-  top: -2px;
-  left: 30px;
+  top: -1px;
+  left: 26px;
+}
+
+ion-header .toolbar_header button.close_toolbar .button-inner > ion-icon.item_lock {
+  font-size: 14px;
+  top: -6px;
+  left: 21px;
 }
 
 [icon-only] i {

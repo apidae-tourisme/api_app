@@ -31,12 +31,15 @@ export class EditAvatar {
     if(!this.isWeb && this.avatar.src) {
       let loading = this.loadingCtrl.create({
         content: "Téléchargement de l'image en cours",
-        duration: 100000
+        duration: 60000
       });
       loading.present();
 
       let fileName = this.avatar.src.substr(this.avatar.src.lastIndexOf('/') + 1);
-      let dataDirectory = cordova.file.tempDirectory;
+      let filePath = this.avatar.src;
+      if(this.platform.is('ios')) {
+        filePath = cordova.file.tempDirectory + fileName
+      }
       let fileTransfer = new Transfer();
       let options: any;
 
@@ -44,7 +47,7 @@ export class EditAvatar {
         fileKey: 'file',
         fileName: fileName
       };
-      fileTransfer.upload(dataDirectory + fileName, ApiAppConfig.API_URL + '/pictures', options)
+      fileTransfer.upload(filePath, ApiAppConfig.API_URL + '/pictures', options)
         .then((data) => {
           loading.dismiss();
           this.viewCtrl.dismiss({imageUrl: JSON.parse(data.response)['picture'].thumbnail});

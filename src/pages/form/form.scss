@@ -1,3 +1,7 @@
+#seed_form ion-list ion-item.item-block {
+  min-height: 70px;
+}
+
 #seed_form .button-inner,
 #edit_avatar .button-inner {
   text-transform: none;
@@ -7,31 +11,36 @@
   font-size: 3rem;
 }
 
-#seed_form .item-md.item-input.ng-valid.input-has-value:not(.input-has-focus) .item-inner,
-#seed_form .list-md .item-input.ng-valid.input-has-value:not(.input-has-focus):last-child {
+#seed_form .item.item-block .item-inner {
   border-bottom-color: map_get($colors, light);
   box-shadow: none;
 }
 
-#seed_form .item-md.item-input.input-has-focus .item-inner,
-#seed_form .list-md .item-input.input-has-focus:last-child {
+#seed_form .item.item-block.item-input.input-has-focus .item-inner,
+#seed_form .item.item-block.item-input.input-has-focus:last-child {
   border-bottom-color: map_get($colors, link);
   box-shadow: none;
 }
 
-#seed_form .input-has-focus .label-md[stacked] {
+#seed_form .input-has-focus .label-md {
   color: map_get($colors, link);
 }
 
+#seed_form .item.item-block[border-top] {
+  margin-top: 10px;
+}
+
+#seed_form .item.item-block[border-top] .item-inner {
+  border-top: 1px solid map_get($colors, light);
+  border-bottom: none;
+}
+
 #seed_form .item-md ion-avatar {
-  margin-top: 0;
-  margin-bottom: 0;
+  margin-top: 5px;
+  margin-bottom: 5px;
 }
 
-#seed_form .item.label_only {
-  min-height: 0;
-}
-
+#seed_form .item ion-label,
 #seed_form .item.label_only ion-label {
   color: $label-md-text-color;
 }
@@ -43,6 +52,41 @@
 
 #seed_types div.bg_seed > p > i:before {
   font-size: 4rem;
+}
+
+#seed_types div.bg_seed.concept > p {
+  margin-top: 32px;
+  margin-bottom: 32px;
+}
+
+#seed_form .button[icon-only] {
+  max-width: 2.4em;
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+#seed_form ion-datetime.hidden {
+  display: none;
+}
+
+#seed_form .datetime-disabled,
+#seed_form .item-datetime-disabled ion-label {
+  opacity: 1;
+}
+
+#seed_form ion-icon.item_lock {
+  position: absolute;
+  left: 39px;
+  top: 0;
+  font-size: 14px;
+}
+
+#seed_form ion-item[no-lines].item-block {
+  min-height: 50px;
+}
+
+#seed_form ion-item[no-lines] ion-input {
+  font-size: 14px;
 }
 
 #seed_form button.bg_concept,

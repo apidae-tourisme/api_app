@@ -6,7 +6,7 @@ export class Seeds {
   public static readonly EVENT = 'event';
   public static readonly PROJECT = 'project';
   public static readonly ACTION = 'action';
-  public static readonly CREATIVE_WORK = 'creativework';
+  public static readonly CREATIVE_WORK = 'creativeWork';
   public static readonly PRODUCT = 'product';
   public static readonly IDEA = 'idea';
   public static readonly CONCEPT = 'concept';
