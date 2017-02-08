@@ -1,5 +1,5 @@
 import {Component, ViewChild, NgZone} from '@angular/core';
-import {App, NavParams, Events, NavController, Content, AlertController} from 'ionic-angular';
+import {App, NavParams, Events, NavController, Content, AlertController, Platform} from 'ionic-angular';
 import {DomSanitizer, SafeUrl} from "@angular/platform-browser";
 import {InAppBrowser} from "ionic-native";
 import {ExplorerService} from "../../providers/explorer.service";
@@ -20,10 +20,11 @@ export class DetailsPage {
   constructor(private app: App, private navCtrl: NavController, public events: Events, private sanitizer: DomSanitizer,
               public explorerService: ExplorerService, public searchService: SearchService, public authService: AuthService,
               public alertCtrl: AlertController, private dataService: DataService, private navParams: NavParams,
-              private zone: NgZone) {
+              private zone: NgZone, private platform: Platform) {
   }
 
   ionViewDidEnter(): void {
+    this.registerBack();
     let seedId = this.navParams.get('seedId');
     if(seedId) {
       this.explorerService.navigateTo(seedId, false);
@@ -34,14 +35,14 @@ export class DetailsPage {
     return this.sanitizer.bypassSecurityTrustUrl(url);
   }
 
-  openUrl(url, useSystem?): void {
+  openUrl(url): void {
     let trimmedUrl = url.replace(/\s/g, '');
     let isEmail = trimmedUrl.indexOf('@') != -1;
     let phoneRegexp = new RegExp(/\d+/);
     if(!isEmail && !trimmedUrl.match(phoneRegexp) && trimmedUrl.indexOf('http') == -1) {
       trimmedUrl = 'http://' + trimmedUrl;
     }
-    new InAppBrowser(isEmail ? ('mailto:' + trimmedUrl) : trimmedUrl, (useSystem || isEmail) ? '_system' : '_blank', 'location=yes');
+    new InAppBrowser(isEmail ? ('mailto:' + trimmedUrl) : trimmedUrl, '_system');
   }
 
   openAddress(address) {
@@ -119,5 +120,20 @@ export class DetailsPage {
       ]
     });
     confirm.present();
+  }
+
+  registerBack() {
+    this.platform.ready().then(() => {
+      this.platform.registerBackButtonAction(() => {
+        if (this.navCtrl.canGoBack()) {
+          this.navCtrl.pop();
+        } else {
+          let prevNode = this.explorerService.previousNode();
+          if(prevNode) {
+            this.explorerService.navigateTo(prevNode, false, () => this.content.resize());
+          }
+        }
+      }, 100);
+    });
   }
 }

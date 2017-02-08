@@ -24,7 +24,7 @@
     "@angular/platform-server": "2.2.1",
     "@ionic/storage": "1.1.7",
     "ionic-angular": "^2.0.0",
-    "ionic-native": "2.2.11",
+    "ionic-native": "2.5.1",
     "ionicons": "3.0.0",
     "rxjs": "5.0.0-beta.12",
     "sw-toolbox": "3.4.0",
@@ -49,12 +49,12 @@
       "id": "cordova-labs-local-webserver"
     },
     "cordova-plugin-camera",
-    "cordova-plugin-file-transfer"
+    "cordova-plugin-file-transfer",
+    "cordova-plugin-network-information"
   ],
   "cordovaPlatforms": [
     "android",
-    "ios",
-    "browser"
+    "ios"
   ],
   "description": "api_app: ApiApp"
 }

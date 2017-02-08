@@ -4,6 +4,7 @@ import {AuthService} from "../../providers/auth.service";
 import {TabsPage} from "../tabs/tabs";
 import {DataService} from "../../providers/data.service";
 import {Seed} from "../../components/seed.model";
+import {Network} from 'ionic-native';
 
 @Component({
   templateUrl: 'login.html'
@@ -12,8 +13,24 @@ export class LoginPage {
 
   public msg: string;
 
+  private connectionType: string;
+
   constructor(public navCtrl: NavController, public authService: AuthService, private platform: Platform,
               private dataService: DataService, private alertCtrl: AlertController, private zone: NgZone) {
+    this.connectionType = 'web';
+
+    // Subscribe to connectivity changes on mobile devices
+    if(platform.is('cordova')) {
+      this.platform.ready().then(() => {
+        this.connectionType = Network.type;
+        Network.onConnect().subscribe(() => {
+          this.connectionType = Network.type;
+        });
+        Network.onDisconnect().subscribe(() => {
+          this.connectionType = Network.type;
+        });
+      });
+    }
   }
 
   ionViewDidEnter() {
@@ -24,8 +41,12 @@ export class LoginPage {
         window.location.href = '/';
       }, (error) => {
         let alert = this.alertCtrl.create({
-          title: "Echec de l'authentification",
-          message: "Nous n'avons pas pu vous identifier. Veuillez vous assurer que votre compte utilisateur ApiApp est actif.",
+          title: "En attente de validation",
+          message: "Nous avons bien pris note de votre souhait d’utiliser ApiApp et vous en remercions. Nous reprendrons " +
+            "contact avec vous au moment de valider votre accès à l’application. Pour toute question complémentaire, " +
+            "vous pouvez nous joindre à l’adresse info@apiapp.apidae-tourisme.com.\n\n" +
+            "L’équipe Apidae Tourisme",
+          cssClass: "custom_alert",
           buttons: [
             {
               text: 'Fermer',
@@ -42,7 +63,13 @@ export class LoginPage {
       this.platform.ready().then(() => {
         this.authService.getLocalAuthData().then(authData => {
           if(authData) {
-            this.loggedInRedirect();
+            if(this.hasConnectivity()) {
+              this.loggedInRedirect();
+            } else {
+              this.displayOfflineAlert();
+            }
+          } else {
+            console.log("Local auth data missing");
           }
         })
       });
@@ -50,7 +77,11 @@ export class LoginPage {
   }
 
   authenticateUser(): void {
-    this.authService.authenticate(() => this.loggedInRedirect(), () => {});
+    if(this.hasConnectivity()) {
+      this.authService.authenticate(() => this.loggedInRedirect(), () => {});
+    } else {
+      this.displayOfflineAlert();
+    }
   }
 
   loggedInRedirect(): void {
@@ -80,5 +111,19 @@ export class LoginPage {
     this.zone.run(() => {
       this.navCtrl.setRoot(TabsPage, {animate: false});
     });
+  }
+
+  hasConnectivity(): boolean {
+    return this.connectionType && this.connectionType != 'none';
+  }
+
+  displayOfflineAlert(): void {
+    let alert = this.alertCtrl.create({
+      title: "Aucune connectivité",
+      message: "Oups, pas de réseau :(\nCette première version d'ApiApp a besoin d'une connexion Internet, via le réseau téléphonique mobile, le Wifi,...",
+      cssClass: "custom_alert",
+      buttons: [{text: 'Fermer'}]
+    });
+    alert.present();
   }
 }

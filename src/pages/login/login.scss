@@ -3,6 +3,10 @@
   position: relative;
 }
 
+ion-alert.custom_alert div.alert-message {
+  white-space: pre-line;
+}
+
 #auth_panel {
   position: absolute;
   top: 30vh;

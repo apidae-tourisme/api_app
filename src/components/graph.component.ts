@@ -26,6 +26,10 @@ export class GraphComponent implements DoCheck {
   private defaultTransform;
   private layout;
 
+  // Improvements :
+  // Use new fx and fy properties for fixed previous nodes
+  // Add transitions and improve use of D3 data binding (enter and exit apis)
+
   constructor(private element: ElementRef) {
     this.htmlElement = this.element.nativeElement;
     this.host = d3.select(this.element.nativeElement);
@@ -34,13 +38,17 @@ export class GraphComponent implements DoCheck {
       unitY: 80,
       unitIcon: 30,
       unitImg: 28,
+      linkDistance: 75,
+      nodeScaleX: 1.15,
+      nodeScaleY: 1.1,
       rootScaleX: 1.5,
       rootScaleY: 1.8,
       titleSize: 12,
       textSize: 10,
       padding: 3,
       seedsLength: 30,
-      descLength: 50
+      descLength: 50,
+      periphNodesCount: 9
     };
   }
 
@@ -50,7 +58,7 @@ export class GraphComponent implements DoCheck {
       .attr("height", '100%');
     this.prevContainer = this.svg.append("g");
     this.zoomContainer = this.svg.append("g");
-    this.zoom = d3.zoom().scaleExtent([0.75, 1.5]);
+    this.zoom = d3.zoom().scaleExtent([0.6, 1.5]);
     let xBefore = 0, yBefore = 0;
     this.svg.call(this.zoom.on("zoom", () => {
       this.zoomContainer.attr("transform", d3.event.transform);
@@ -126,10 +134,8 @@ export class GraphComponent implements DoCheck {
     let productIcon = defs.append("symbol").attr("id", "product").attr("viewBox", "0 0 30 30");
     productIcon.append("path").attr("d", "M24.21,8.91,21.14,6.55a.7.7,0,0,0-.41-.14H17.31a.68.68,0,0,0,0,1.36H20.5l2.2,1.68-2.2,1.68H8.56V7.76H15a.68.68,0,0,0,.68-.68V4.72a.68.68,0,1,0-1.36,0V6.4H7.89a.68.68,0,0,0-.68.68v4.73a.68.68,0,0,0,.68.68h6.42V13.7h-5a.7.7,0,0,0-.41.14L5.78,16.2a.66.66,0,0,0,0,1.06l3.07,2.36a.7.7,0,0,0,.41.14h3.42a.68.68,0,1,0,0-1.36H9.49L7.3,16.72,9.49,15H21.43v3.38H15a.68.68,0,0,0-.68.68v6.19a.68.68,0,1,0,1.36,0V19.77h6.46a.68.68,0,0,0,.68-.68V14.37a.68.68,0,0,0-.68-.68H15.65V12.47h5.08a.7.7,0,0,0,.41-.14L24.22,10a.67.67,0,0,0,.27-.53A.68.68,0,0,0,24.21,8.91Z");
 
-    this.linksContainer = this.zoomContainer.append("g")
-      .attr("class", "links");
-    this.nodesContainer = this.zoomContainer.append("g")
-      .attr("class", "nodes");
+    this.linksContainer = this.zoomContainer.append("g").attr("class", "links");
+    this.nodesContainer = this.zoomContainer.append("g").attr("class", "nodes");
 
     this.defaultTransform = d3.zoomTransform(this.zoomContainer);
   }
@@ -166,15 +172,15 @@ export class GraphComponent implements DoCheck {
       this.nodesContainer.selectAll("*").remove();
 
       let simulation = d3.forceSimulation()
-        .alphaMin(0.1)
+        .alphaMin(0.2)
         .force("link", d3.forceLink().id(function (d) {
           return d.id;
         })
-          .distance(function (link, index) {
-            return index < 10 ? layout.unitX : (layout.unitX * 2);
-          }))
+        .distance(function (link, index) {
+          return (index < layout.periphNodesCount ? layout.linkDistance  : (layout.linkDistance * 2)) * layout.nodeScaleX;
+        }))
         .force("charge", d3.forceManyBody().strength(function (node, index) {
-          return node.isRoot ? -2500 : -800;
+          return node.isRoot ? (nodes.length == 2 ? -20000 : -1200) : -800;
         }))
         .force("center", d3.forceCenter(this.dimensions.width / 2, this.dimensions.height / 2));
 
@@ -193,7 +199,7 @@ export class GraphComponent implements DoCheck {
 
       nodesEnter.append("use")
         .attr("transform", function (d) {
-          return d.isRoot ? "scale(" + layout.rootScaleX + " " + layout.rootScaleY + ")" : "";
+          return d.isRoot ? "scale(" + layout.rootScaleX + " " + layout.rootScaleY + ")" : "scale(" + layout.nodeScaleX + " " + layout.nodeScaleY + ")";
         })
         .attr("filter", function (d) {
           return d.category == 'concept' ? "url(#shadow)" : "";
@@ -205,7 +211,7 @@ export class GraphComponent implements DoCheck {
 
       nodesEnter.append("use")
         .attr("transform", function (d) {
-          return d.isRoot ? "scale(" + layout.rootScaleX + ")" : "";
+          return d.isRoot ? "scale(" + layout.rootScaleX + ")" : "scale(" + layout.nodeScaleX + ")";
         })
         .attr("x", (layout.unitX - layout.unitIcon) / 2)
         .attr("y", (layout.unitIcon / 2) - (layout.padding * 2))
@@ -220,7 +226,7 @@ export class GraphComponent implements DoCheck {
 
       nodesEnter.append("image")
         .attr("transform", function (d) {
-          return d.isRoot ? "scale(" + layout.rootScaleX + ")" : "";
+          return d.isRoot ? "scale(" + layout.rootScaleX + ")" : "scale(" + layout.nodeScaleX + ")";
         })
         .attr("class", "img-node")
         .attr("x", (layout.unitX - layout.unitImg) / 2)
@@ -233,7 +239,7 @@ export class GraphComponent implements DoCheck {
 
       nodesEnter.append("text")
         .attr("transform", function (d) {
-          return d.isRoot ? "scale(" + layout.rootScaleX + ")" : "";
+          return d.isRoot ? "scale(" + layout.rootScaleX + ")" : "scale(" + layout.nodeScaleX + ")";
         })
         .attr("x", (layout.unitX - layout.titleSize) / 2 + layout.padding * 0.5)
         .attr("y", layout.padding)
@@ -246,10 +252,10 @@ export class GraphComponent implements DoCheck {
       let nodesLabel = nodesEnter.append("text")
         .attr("text-anchor", "middle")
         .attr("x", function (d) {
-          return (d.isRoot ? (layout.unitX * layout.rootScaleX) : layout.unitX) / 2;
+          return layout.unitX * (d.isRoot ? layout.rootScaleX : layout.nodeScaleX) / 2;
         })
         .attr("y", function (d) {
-          return (layout.unitIcon * 1.5 - layout.padding * 2) * (d.noIcon() ? 0.75 : (d.isRoot ? layout.rootScaleX : 1)) + 2 * layout.padding;
+          return (layout.unitIcon * 1.5 - layout.padding * 2) * (d.noIcon() ? 0.75 : (d.isRoot ? layout.rootScaleX : layout.nodeScaleX)) + 2 * layout.padding;
         })
         .attr("class", function (d) {
           return d.category + " label";
@@ -300,24 +306,30 @@ export class GraphComponent implements DoCheck {
     function updateNodesAndLinks(links, nodes) {
       links
         .attr("x1", function (d) {
-          let x = d.source.isPrevious ? (layout.unitX / 2 + layout.padding) : d.source.x;
+          let x = d.source.x;
           return parseFloat(x);
         })
         .attr("y1", function (d) {
-          let y = d.source.isPrevious ? (layout.unitY / 2 + layout.padding) : d.source.y;
+          let y = d.source.y;
           return parseFloat(y);
         })
         .attr("x2", function (d) {
-          return parseFloat(d.target.x);
+          return that.dimensions.width / 2;
         })
         .attr("y2", function (d) {
-          return parseFloat(d.target.y);
+          return that.dimensions.height / 2;
         });
 
       nodes
         .attr("transform", function (d) {
-          let tx = d.isPrevious ? layout.padding : (d.x - (layout.unitX * (d.isRoot ? layout.rootScaleX : 1) / 2));
-          let ty = d.isPrevious ? layout.padding : (d.y - (layout.unitY * (d.isRoot ? layout.rootScaleY : 1) / 2));
+          let tx, ty;
+          if(d.isRoot) {
+            tx = that.dimensions.width / 2 - (layout.unitX * layout.rootScaleX / 2);
+            ty = that.dimensions.height / 2 - (layout.unitY * layout.rootScaleY / 2);
+          } else {
+            tx = d.x - (layout.unitX * layout.nodeScaleX / 2);
+            ty = d.y - (layout.unitY * layout.nodeScaleY / 2);
+          }
           return "translate(" + tx + "," + ty + ")";
         });
     }
@@ -353,21 +365,24 @@ export class GraphComponent implements DoCheck {
       x = Number.parseInt(textElt.attr("x")),
       charsCount = 0,
       textLength = ((textElt.datum() && textElt.datum().isRoot) ? layout.descLength : layout.seedsLength),
-      width = (isRoot ? (layout.unitX * layout.rootScaleX) : layout.unitX) - 2 * layout.padding;
+      width = layout.unitX * (isRoot ? layout.rootScaleX : layout.nodeScaleX) - 2 * layout.padding;
     if(reset) {
       textElt.text(null);
     }
     let tspan = textElt.append("tspan").attr("x", x).attr("dy", offset).attr("font-size", fontSize + "px");
     while ((word = words.pop()) && charsCount <= textLength) {
-      line.push(word);
       charsCount += word.length + 1;
-      tspan.text(line.join(" ") + (charsCount > textLength ? '...' : ''));
+      if(charsCount > textLength) {
+        word = word.substr(0, word.length - (charsCount - textLength)) + '…';
+      }
+      line.push(word);
+      tspan.text(line.join(" "));
       if (line.length > 1 && tspan.node().getComputedTextLength() > (width - 2 * layout.padding)) {
         line.pop();
         tspan.text(line.join(" "));
         line = [word];
         tspan = textElt.append("tspan").attr("x", x).attr("dy", fontSize).attr("font-size", fontSize + "px")
-          .text(word + (charsCount > textLength ? '...' : ''));
+          .text(word);
         lines++;
       }
     }
@@ -388,12 +403,13 @@ export class GraphComponent implements DoCheck {
 
     let prevNode = this.prevContainer.append("g");
     prevNode.append("use")
-      .attr("transform", "translate(" + this.layout.padding * 2 + ", " + this.layout.padding * 2 + ")")
+      .attr("transform", "translate(" + this.layout.padding * 2 + ", " + this.layout.padding * 2 + ") scale(" + this.layout.nodeScaleX + " " + this.layout.nodeScaleY + ")")
       .attr("filter", previousNode.noIcon() ? "url(#shadow)" : "")
       .attr("class", previousNode.category + " bg_" + previousNode.category)
       .attr("xlink:href", "#seed");
 
     prevNode.append("use")
+      .attr("transform", "scale(" + this.layout.nodeScaleX + " " + this.layout.nodeScaleY + ")")
       .attr("x", (this.layout.unitX - this.layout.unitIcon) / 2 + this.layout.padding * 2)
       .attr("y", (this.layout.unitIcon / 2) - this.layout.padding)
       .attr("width", this.layout.unitIcon)
@@ -402,6 +418,7 @@ export class GraphComponent implements DoCheck {
       .attr("xlink:href", previousNode.picture ? '' : ('#' + previousNode.category));
 
     prevNode.append("image")
+      .attr("transform", "scale(" + this.layout.nodeScaleX + " " + this.layout.nodeScaleY + ")")
       .attr("class", "img-node")
       .attr("x", (this.layout.unitX - this.layout.unitImg) / 2 + this.layout.padding * 2)
       .attr("y", (this.layout.unitImg / 2) - this.layout.padding)
@@ -410,6 +427,7 @@ export class GraphComponent implements DoCheck {
       .attr("xlink:href", previousNode.picture);
 
     prevNode.append("text")
+      .attr("transform", "scale(" + this.layout.nodeScaleX + " " + this.layout.nodeScaleY + ")")
       .attr("x", (this.layout.unitX - this.layout.titleSize) / 2 + this.layout.padding * 2.5)
       .attr("y", this.layout.padding * 4)
       .attr("font-size", this.layout.titleSize)
@@ -418,6 +436,7 @@ export class GraphComponent implements DoCheck {
 
     let prevText = prevNode.append("text");
     prevText.attr("text-anchor", "middle")
+      .attr("transform", "scale(" + this.layout.nodeScaleX + " " + this.layout.nodeScaleY + ")")
       .attr("x", this.layout.unitX / 2 + this.layout.padding * 2)
       .attr("y", (this.layout.unitIcon * 1.5 - this.layout.padding) * (previousNode.noIcon() ? 0.75 : 1) + 2 * this.layout.padding)
       .attr("class", previousNode.category + " label")

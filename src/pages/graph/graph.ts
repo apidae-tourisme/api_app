@@ -1,5 +1,5 @@
 import {Component, ViewChild} from '@angular/core';
-import {Content, NavController, NavParams} from 'ionic-angular';
+import {Content, NavController, NavParams, Platform} from 'ionic-angular';
 import {ExplorerService} from "../../providers/explorer.service";
 import {SearchService} from "../../providers/search.service";
 import {DataService} from "../../providers/data.service";
@@ -16,7 +16,7 @@ export class GraphPage {
   public loading: boolean;
 
   constructor(public explorerService: ExplorerService, public searchService: SearchService, public dataService: DataService,
-              private navCtrl: NavController, private navParams: NavParams) {
+              private navCtrl: NavController, private navParams: NavParams, private platform: Platform) {
     this.loading = true;
   }
 
@@ -25,6 +25,7 @@ export class GraphPage {
   }
 
   ionViewDidEnter(): void {
+    this.registerBack();
     let seedParam = this.navParams.get('seedId');
     if(seedParam) {
       this.explorerService.navigateTo(seedParam == 'default' ? null : seedParam, true, () => this.drawNetwork());
@@ -51,5 +52,20 @@ export class GraphPage {
 
   displaySearch() {
     this.navCtrl.push(SearchPage);
+  }
+
+  registerBack() {
+    this.platform.ready().then(() => {
+      this.platform.registerBackButtonAction(() => {
+        if (this.navCtrl.canGoBack()) {
+          this.navCtrl.pop();
+        } else {
+          let prevNode = this.explorerService.previousNode();
+          if(prevNode) {
+            this.explorerService.navigateTo(prevNode, false, () => this.drawNetwork());
+          }
+        }
+      }, 100);
+    });
   }
 }

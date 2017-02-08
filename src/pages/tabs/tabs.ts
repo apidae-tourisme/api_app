@@ -9,14 +9,13 @@ import {NavParams, Tabs} from "ionic-angular";
   templateUrl: 'tabs.html'
 })
 export class TabsPage {
-
   @ViewChild('appTabs') tabs: Tabs;
 
   tab1Root: any = GraphPage;
   tab2Root: any = DetailsPage;
   tab3Root: any = ListPage;
 
-  constructor(public navParams: NavParams) {
+  constructor(private navParams: NavParams) {
   }
 
   ionViewDidEnter() {
