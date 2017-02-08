@@ -2,11 +2,6 @@
   overflow-y: hidden;
 }
 
-#graph_wrapper div.scroll-content > * {
-  height: 100%;
-  position: relative;
-}
-
 graph {
   position: absolute;
   top: 0;
