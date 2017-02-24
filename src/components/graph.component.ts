@@ -441,7 +441,7 @@ export class GraphComponent implements DoCheck {
       .attr("y", (this.layout.unitIcon * 1.5 - this.layout.padding) * (previousNode.noIcon() ? 0.75 : 1) + 2 * this.layout.padding)
       .attr("class", previousNode.category + " label")
       .attr("dy", "1em")
-      .html(previousNode.label);
+      .text(previousNode.label);
 
     this.doWrap(prevText, prevText.text(), true, false, this.layout.textSize, 0, this.layout);
 
