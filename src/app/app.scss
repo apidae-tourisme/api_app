@@ -377,6 +377,10 @@ ion-header > ion-toolbar {
   border-top: 1px solid map-get($colors, bg);
 }
 
+ion-header ion-navbar ion-buttons button .button-inner {
+  height: 48px;
+}
+
 ion-header .toolbar_header .toolbar-title {
   white-space: inherit;
   font-size: 1.4rem;

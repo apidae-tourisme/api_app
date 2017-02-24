@@ -6,7 +6,7 @@
       </button>
     </ion-buttons>
     <ion-toolbar no-border>
-      <div id="total_counter">{{explorerService.networkData.count}}</div>
+      <div id="total_counter">{{explorerService.networkData ? explorerService.networkData.count : 0}}</div>
       <button id="top_search" ion-button color="lighter" block icon-left text-left (click)="displaySearch()">
         <ion-icon name="search" color="link"></ion-icon>Rechercher
       </button>

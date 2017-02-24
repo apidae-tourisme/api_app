@@ -29,6 +29,7 @@ export class AuthService {
         if(callBackUrl && callBackUrl.indexOf('auth_token') != -1 && callBackUrl.indexOf('client_id') != -1 &&
           callBackUrl.indexOf('uid') != -1) {
           let callBackParams = callBackUrl.slice(callBackUrl.indexOf('?'));
+          browser.close();
           this.setLocalAuthData(callBackParams).then(() => {
             success();
           }, (error) => {
@@ -36,7 +37,6 @@ export class AuthService {
           }).catch((err) => {
             console.log('Unable to set local auth data : ' + err);
           });
-          browser.close();
         }
       });
       browser.on('loaderror').subscribe(data => {

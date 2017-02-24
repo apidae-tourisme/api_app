@@ -26,7 +26,7 @@ export class SearchPage {
     setTimeout(() => {
       this.searchbar.setFocus();
       Keyboard.show();
-    });
+    }, 200);
   }
 
   navigateTo(node, reset): void {
