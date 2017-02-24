@@ -153,6 +153,9 @@ ion-buttons button.bg_seed.concept {
   border-radius: 24px;
 }
 
+<div class="gdf-WidgetBooking" data-reference="H88G000296"></div>
+<script type="text/javascript" src="https://widget.cloudspire.io/booking/sdk.js"></script>
+
 #avatar_icon {
   font-size: 48px;
   color: map_get($colors, person);
@@ -174,7 +177,7 @@ ion-searchbar.searchbar-md .searchbar-input {
 
 ion-searchbar.searchbar-md .searchbar-search-icon,
 #total_counter {
-  background-image: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 67.42 76.07" fill="%23ddd4cb"><g><g><path d="M67.42,54.11V21.93a5.84,5.84,0,0,0-2.92-5L36.64.79a5.78,5.78,0,0,0-5.83,0L2.92,16.88a5.84,5.84,0,0,0-2.92,5V54.14a5.84,5.84,0,0,0,2.92,5L30.81,75.28a5.78,5.78,0,0,0,5.83,0L64.53,59.19A5.92,5.92,0,0,0,67.42,54.11Z"/></g></g></svg>');
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 67.42 76.07' fill='%23ddd4cb'%3E%3Cg%3E%3Cg%3E%3Cpath d='M67.42,54.11V21.93a5.84,5.84,0,0,0-2.92-5L36.64.79a5.78,5.78,0,0,0-5.83,0L2.92,16.88a5.84,5.84,0,0,0-2.92,5V54.14a5.84,5.84,0,0,0,2.92,5L30.81,75.28a5.78,5.78,0,0,0,5.83,0L64.53,59.19A5.92,5.92,0,0,0,67.42,54.11Z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
   background-size: auto;
   background-repeat: no-repeat;
   background-position: center center;

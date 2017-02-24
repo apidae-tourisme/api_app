@@ -261,7 +261,7 @@ export class GraphComponent implements DoCheck {
           return d.category + " label";
         })
         .attr("dy", "1em")
-        .html(function (d) {
+        .text(function (d) {
           return d.isRoot ? (d.label + "|" + (d.description || '')) : d.label;
         });
 
