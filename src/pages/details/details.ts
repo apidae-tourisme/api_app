@@ -31,18 +31,37 @@ export class DetailsPage {
     }
   }
 
+  seedUrls() {
+    let urls = [];
+    let phoneRegexp = new RegExp(/^0\d{9,13}$/);
+    let emailRegexp = new RegExp(/^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()\.,;\s@\"]+\.{0,1})+[^<>()\.,;:\s@\"]{2,})$/);
+    let urlRegexp = new RegExp(/((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-_]*)?\??(?:[\-\+=&;%@\.\w_]*)#?(?:[\.\!\/\\\w]*))?)/);
+    if(this.explorerService.rootNode) {
+      this.explorerService.rootNode.urls.forEach((url) => {
+        let trimmedUrl = url.value.replace(/\s/g, '');
+        if(trimmedUrl.match(phoneRegexp)) {
+          urls.push({label: trimmedUrl, link: ('tel:' + trimmedUrl), icon: 'call'})
+        } else if(trimmedUrl.match(emailRegexp)) {
+          urls.push({label: trimmedUrl, link: ('mailto:' + trimmedUrl), icon: 'at'})
+        } else {
+          let absUrl = trimmedUrl.indexOf('://') != -1 ? trimmedUrl : ('http://' + trimmedUrl);
+          if(absUrl.match(urlRegexp)) {
+            urls.push({label: trimmedUrl, link: absUrl, icon: this.urlIcon(trimmedUrl)})
+          } else {
+            urls.push({label: trimmedUrl, icon: 'help'})
+          }
+        }
+      });
+    }
+    return urls;
+  }
+
   sanitizeUrl(url): SafeUrl {
     return this.sanitizer.bypassSecurityTrustUrl(url);
   }
 
   openUrl(url): void {
-    let trimmedUrl = url.replace(/\s/g, '');
-    let isEmail = trimmedUrl.indexOf('@') != -1;
-    let phoneRegexp = new RegExp(/\d+/);
-    if(!isEmail && !trimmedUrl.match(phoneRegexp) && trimmedUrl.indexOf('http') == -1) {
-      trimmedUrl = 'http://' + trimmedUrl;
-    }
-    new InAppBrowser(isEmail ? ('mailto:' + trimmedUrl) : trimmedUrl, '_system');
+    new InAppBrowser(url, '_system');
   }
 
   openAddress(address) {
@@ -80,11 +99,9 @@ export class DetailsPage {
     for(let i = 0; i < supportedUrls.length; i++) {
       if(url.indexOf(supportedUrls[i]) != -1) {
         return 'logo-' + supportedUrls[i];
-      } else if(url.indexOf('@') != -1) {
-        return 'md-mail';
       }
     }
-    return 'ios-desktop';
+    return 'link';
   }
 
   dateFormat(date): string {

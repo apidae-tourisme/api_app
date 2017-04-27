@@ -38,7 +38,7 @@
           </ion-avatar>
           <div>
             <p text-left>{{explorerService.rootNode.label}}</p>
-            <p text-left>{{explorerService.rootNode.description}}</p>
+            <p text-left class="pre">{{explorerService.rootNode.description}}</p>
           </div>
           </span>
         </div>
@@ -60,35 +60,16 @@
         Déconnexion
       </button>
     </ion-item>
-    <ion-item *ngIf="explorerService.rootNode.telephone" class="selectable">
-      <button ion-button full large icon-left (click)="openUrl('tel:' + explorerService.rootNode.telephone)" color="event" class="selectable">
-        <ion-icon name="ios-call"></ion-icon>
-        {{explorerService.rootNode.telephone}}
-      </button>
-    </ion-item>
-    <ion-item *ngIf="explorerService.rootNode.mobilePhone" class="selectable">
-      <button ion-button full large icon-left (click)="openUrl('tel:' + explorerService.rootNode.mobilePhone)" color="event" class="selectable">
-        <ion-icon name="ios-call"></ion-icon>
-        {{explorerService.rootNode.mobilePhone}}
-      </button>
-      <a ion-button large item-right icon-only color="product" (click)="openUrl('sms:' + explorerService.rootNode.mobilePhone)" class="button_eol"><ion-icon md="ios-chatbubbles"></ion-icon></a>
-    </ion-item>
     <ion-item *ngIf="explorerService.rootNode.address" class="selectable">
       <button ion-button full large icon-left (click)="openAddress(explorerService.rootNode.address)" color="event">
         <ion-icon name="ios-pin"></ion-icon>
         <p class="label_sm">{{explorerService.rootNode.address}}</p>
       </button>
     </ion-item>
-    <ion-item *ngIf="explorerService.rootNode.email" class="selectable" text-wrap>
-      <button ion-button full large icon-left (click)="openUrl(explorerService.rootNode.email)" color="product">
-        <ion-icon name="mail"></ion-icon>
-        <p class="label_sm">{{explorerService.rootNode.email}}</p>
-      </button>
-    </ion-item>
-    <ion-item *ngFor="let url of explorerService.rootNode.urls" class="selectable" text-wrap>
-      <button ion-button full large icon-left (click)="openUrl(url.value)" color="product">
-        <ion-icon [md]="urlIcon(url.value)"></ion-icon>
-        <p class="label_sm">{{url.value}}</p>
+    <ion-item *ngFor="let url of seedUrls()" class="selectable" text-wrap>
+      <button ion-button full large icon-left (click)="openUrl(url.link)" color="product">
+        <ion-icon [name]="url.icon"></ion-icon>
+        <p class="label_sm">{{url.label}}</p>
       </button>
     </ion-item>
     <ion-item *ngIf="explorerService.rootNode.startDate" class="selectable date_item">

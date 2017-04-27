@@ -139,6 +139,10 @@ ion-buttons button.bg_seed.concept {
   color: map_get($colors, text_alt)
 }
 
+.pre {
+  white-space: pre-line;
+}
+
 #apiapp img {
   min-height: inherit;
 }

@@ -45,7 +45,8 @@ export class EditAvatar {
 
       options = {
         fileKey: 'file',
-        fileName: fileName
+        fileName: fileName,
+        mimeType: this.computeMimeType(fileName)
       };
       fileTransfer.upload(filePath, ApiAppConfig.API_URL + '/pictures', options)
         .then((data) => {
@@ -92,7 +93,9 @@ export class EditAvatar {
   selectImage() {
     let options = {
       sourceType: Camera.PictureSourceType.PHOTOLIBRARY,
-      destinationType: Camera.DestinationType.FILE_URI
+      destinationType: Camera.DestinationType.FILE_URI,
+      quality: 100,
+      mediaType: Camera.MediaType.ALLMEDIA
     };
     Camera.getPicture(options).then((fileUri) => {
       this.avatar.src = fileUri;
@@ -122,5 +125,24 @@ export class EditAvatar {
 
   sanitizeUrl(url): SafeUrl {
     return this.sanitizer.bypassSecurityTrustUrl(url);
+  }
+
+  computeMimeType(fileName) {
+    let fileExt = fileName.split('.').pop().toLowerCase();
+    let mimeType = 'image/jpeg';
+    switch(fileExt) {
+      case 'png':
+        mimeType = 'image/png';
+        break;
+      case 'gif':
+        mimeType = 'image/gif';
+        break;
+      case 'svg':
+        mimeType = 'image/svg+xml';
+        break;
+      case 'jpg':
+      default:
+    }
+    return mimeType;
   }
 }
