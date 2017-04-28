@@ -51,7 +51,7 @@ export class EditAvatar {
       fileTransfer.upload(filePath, ApiAppConfig.API_URL + '/pictures', options)
         .then((data) => {
           loading.dismiss();
-          this.viewCtrl.dismiss({imageUrl: JSON.parse(data.response)['picture'].thumbnail});
+          this.viewCtrl.dismiss({imageUrl: JSON.parse(data['response'])['picture'].thumbnail});
         }, (err) => {
           console.log('upload failed : ' + JSON.stringify(err));
         });

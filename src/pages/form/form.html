@@ -84,13 +84,13 @@
       <ion-input type="text" [(ngModel)]="node.address"></ion-input>
     </ion-item>
     <ion-item class="label_only" no-lines>
-      <ion-label><strong>Téléphone, email, réseaux sociaux, lien web...</strong></ion-label>
+      <ion-label><strong>Tél., email, réseaux sociaux, lien web...</strong></ion-label>
       <button ion-button icon-only item-right large clear color="link" (click)="addUrl()">
         <ion-icon name="add-circle"></ion-icon>
       </button>
     </ion-item>
     <ion-item *ngFor="let url of node.urls; let i = index" no-lines>
-      <ion-input type="text" [(ngModel)]="url.value" placeholder="Lien web, email, téléphone..."></ion-input>
+      <ion-input type="text" [(ngModel)]="url.value" placeholder="Tél., email, liens..."></ion-input>
       <button ion-button item-right large clear icon-only color="danger" (click)="node.urls.splice(i, 1)"><ion-icon name="close"></ion-icon></button>
     </ion-item>
     <ion-item class="label_only" border-top>
