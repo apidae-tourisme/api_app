@@ -11,7 +11,7 @@ import {MapPage} from "../pages/map/map";
 import {AuthService} from "../providers/auth.service";
 import {LoginPage} from "../pages/login/login";
 import {DetailsPage} from "../pages/details/details";
-import {Storage} from '@ionic/storage';
+import {IonicStorageModule} from '@ionic/storage';
 import {SearchService} from "../providers/search.service";
 import {FormPage} from "../pages/form/form";
 import {SeedType} from "../pages/form/seed-type";
@@ -53,7 +53,8 @@ export const deepLinkConfig: DeepLinkConfig = {
         tabsPlacement: 'bottom',
         tabsHideOnSubPages: true
       }, deepLinkConfig
-    )
+    ),
+    IonicStorageModule.forRoot()
   ],
   bootstrap: [IonicApp],
   entryComponents: [
@@ -75,7 +76,6 @@ export const deepLinkConfig: DeepLinkConfig = {
     DataService,
     ExplorerService,
     SearchService,
-    Storage,
     Seeds,
     ApiAppConfig
   ]
