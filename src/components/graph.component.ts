@@ -206,7 +206,7 @@ export class GraphComponent {
           return d.scope == 'private' ? '\uf31d' : ''
         });
 
-      let nodesLabel = nodesEnter.append("text")
+      nodesEnter.append("text")
         .attr("text-anchor", "middle")
         .attr("x", function (d) {
           return layout.unitX / 2;
@@ -217,11 +217,7 @@ export class GraphComponent {
         .attr("class", function (d) {
           return d.category + " label";
         })
-        .attr("dy", "1em")
-        .text(function (d) {
-          return d.isRoot ? (d.label + "|" + (d.description || '')) : d.label;
-        });
-      wrapLabels(nodesLabel, that);
+        .attr("dy", "1em");
 
       that.node = nodesEnter.merge(that.node);
       that.node.attr("class", function(d) { return d.isRoot ? "root" : ""; });
@@ -230,11 +226,17 @@ export class GraphComponent {
       that.simulation.nodes(nodes);
       that.simulation.force("link").links(edges);
 
+      let allLabels = that.node.select("text.label");
+      allLabels.text(function (d) {
+        return d.isRoot ? (d.label + "|" + (d.description || '')) : d.label;
+      });
+      wrapLabels(allLabels, that);
+
       that.nodesContainer.selectAll("g").on("click", changeRootNode);
 
       that.simulation.force("center", d3.forceCenter(that.width / 2, that.height / 2));
       that.simulation.alpha(1).restart();
-    }, 600);
+    }, 400);
 
     function changeRootNode() {
       that.simulation.stop();
@@ -243,10 +245,6 @@ export class GraphComponent {
       if(clickedNode.isRoot) {
         that.showDetails.emit();
       } else {
-        wrapLabels(d3.select(this).select("text.label").text(clickedNode.label + "|" + (clickedNode.description || '')), that);
-        let prevRoot = that.nodesContainer.select("g.root");
-        wrapLabels(prevRoot.select("text.label").text(prevRoot.datum().label), that);
-
         that.rootChange.emit({newRoot: clickedNode.id});
         that.nodesContainer.selectAll("g").filter(function (d) {
           return d.id != clickedNode.id;

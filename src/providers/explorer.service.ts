@@ -8,10 +8,12 @@ export class ExplorerService {
 
   public networkData: any;
   public rootNode: Seed;
-  public nav: Array<Seed>;
+  public navBackward: Array<Seed>;
+  public navForward: Array<Seed>;
 
   constructor(private dataService: DataService) {
-    this.nav = [];
+    this.navBackward = [];
+    this.navForward = [];
     this.networkData = {
       nodes: [],
       edges: []
@@ -56,8 +58,9 @@ export class ExplorerService {
       // Reset - no history
       if(resetData) {
         this.networkData = null;
-        this.nav = [];
-        this.nav.push(this.rootNode);
+        this.navBackward = [];
+        this.navForward = [];
+        this.navBackward.push(this.rootNode);
         parsedData.previousNode = null;
       }
       // Node unchanged (switched tabs or refresh)
@@ -66,11 +69,11 @@ export class ExplorerService {
       }
       // Node changed - Nav backward
       else if(newNode && newNode == this.previousNode()) {
-        this.nav.pop();
-        if(this.nav.length == 1) {
+        this.navBackward.pop();
+        if(this.navBackward.length == 1) {
           parsedData.previousNode = null;
         } else {
-          parsedData.previousNode = this.nav[this.nav.length - 2];
+          parsedData.previousNode = this.navBackward[this.navBackward.length - 2];
         }
       }
       // Node changed - Nav forward / search
@@ -78,7 +81,7 @@ export class ExplorerService {
         if(!parsedData.previousNode) {
           parsedData.previousNode = currentRoot;
         }
-        this.nav.push(this.rootNode);
+        this.navBackward.push(this.rootNode);
       }
 
       if(parsedData.previousNode) {
@@ -99,15 +102,15 @@ export class ExplorerService {
   }
 
   currentNode(): string {
-    return this.nav.length > 0 ? this.nav[this.nav.length - 1].id : null;
+    return this.navBackward.length > 0 ? this.navBackward[this.navBackward.length - 1].id : null;
   }
 
   previousNode(): string {
-    return this.nav.length > 1 ? this.nav[this.nav.length - 2].id : null;
+    return this.navBackward.length > 1 ? this.navBackward[this.navBackward.length - 2].id : null;
   }
 
   previousNodeEntity(): Seed {
-    return this.nav.length > 1 ? this.nav[this.nav.length - 2] : null;
+    return this.navBackward.length > 1 ? this.navBackward[this.navBackward.length - 2] : null;
   }
 
   newPreviousNode(newNode, currentRoot): string {
@@ -119,11 +122,12 @@ export class ExplorerService {
   }
 
   beforePreviousNode(): string {
-    return this.nav.length > 2 ? this.nav[this.nav.length - 3].id : null;
+    return this.navBackward.length > 2 ? this.navBackward[this.navBackward.length - 3].id : null;
   }
 
   clearData(): void {
-    this.nav = [];
+    this.navBackward = [];
+    this.navForward = [];
     this.networkData = null;
     this.rootNode = null;
   }

@@ -21,6 +21,10 @@
 </ion-header>
 
 <ion-content id="graph_wrapper">
+  <button id="prev_node" color="text_alt" *ngIf="explorerService.previousNode()" ion-button text-center icon-only outline round
+          (click)="navigateTo(explorerService.previousNode(), false, false)">
+    <ion-icon name="arrow-back" large></ion-icon>
+  </button>
   <graph (showDetails)="displayDetails()" (rootChange)="rootNodeChange($event);" [width]="graphWidth" [height]="graphHeight"></graph>
   <div id="graph_bg">
     <img src="assets/img/flowers-left.png"/>
