@@ -26,7 +26,6 @@ export class GraphComponent {
   private simulation;
   private node;
   private link;
-  private rootElt;
 
   constructor(private element: ElementRef) {
     this.htmlElement = this.element.nativeElement;
@@ -127,13 +126,11 @@ export class GraphComponent {
     this.node = this.nodesContainer.selectAll("g");
 
     this.simulation = d3.forceSimulation()
-      .force("link", d3.forceLink().id(function (d) {
-        return d.id;
-      }).distance(function (link, index) {
-        return index < layout.periphNodesCount ? layout.linkDistance : (layout.linkDistance * 2);
+      .force("link", d3.forceLink().id(function (d) { return d.id; }).distance(function (link, index) {
+        return index < layout.periphNodesCount ? layout.linkDistance : (layout.linkDistance * 1.6);
       }))
       .force("charge", d3.forceManyBody().strength(function (node, index) {
-        return node.isRoot ? -1200 : -800;
+        return node.isRoot ? (that.simulation.nodes().length == 2 ? -20000 : -1200) : -800;
       }))
       .on("tick", ticked);
 
@@ -227,6 +224,7 @@ export class GraphComponent {
       wrapLabels(nodesLabel, that);
 
       that.node = nodesEnter.merge(that.node);
+      that.node.attr("class", function(d) { return d.isRoot ? "root" : ""; });
 
       that.link = that.link.enter().append("line").attr("id", function(d) { return d.source + "-" + d.target; }).merge(that.link);
       that.simulation.nodes(nodes);
@@ -246,12 +244,9 @@ export class GraphComponent {
         that.showDetails.emit();
       } else {
         wrapLabels(d3.select(this).select("text.label").text(clickedNode.label + "|" + (clickedNode.description || '')), that);
-        if(that.rootElt) {
-          let prevRoot = d3.select(that.rootElt);
-          wrapLabels(prevRoot.select("text.label").text(prevRoot.datum().label), that);
-        }
+        let prevRoot = that.nodesContainer.select("g.root");
+        wrapLabels(prevRoot.select("text.label").text(prevRoot.datum().label), that);
 
-        that.rootElt = this;
         that.rootChange.emit({newRoot: clickedNode.id});
         that.nodesContainer.selectAll("g").filter(function (d) {
           return d.id != clickedNode.id;
