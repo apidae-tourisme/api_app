@@ -1,4 +1,4 @@
-import {Component, ElementRef, EventEmitter, Output, DoCheck} from "@angular/core";
+import {Component, ElementRef, EventEmitter, Input, Output} from "@angular/core";
 
 declare var d3: any;
 
@@ -6,7 +6,10 @@ declare var d3: any;
   selector: 'graph',
   template: `<ng-content></ng-content>`
 })
-export class GraphComponent implements DoCheck {
+export class GraphComponent {
+
+  @Input() width: number;
+  @Input() height: number;
 
   @Output() rootChange = new EventEmitter();
   @Output() showDetails = new EventEmitter();
@@ -14,21 +17,16 @@ export class GraphComponent implements DoCheck {
   private host;
   private htmlElement;
   private svg;
-  private dimensions;
   private nodesContainer;
   private linksContainer;
-  private newRoot: string;
-  private rootHasChanged: boolean;
-  private rootDetails: boolean;
   private zoom;
   private zoomContainer;
-  private prevContainer;
   private defaultTransform;
   private layout;
-
-  // Improvements :
-  // Use new fx and fy properties for fixed previous nodes
-  // Add transitions and improve use of D3 data binding (enter and exit apis)
+  private simulation;
+  private node;
+  private link;
+  private rootElt;
 
   constructor(private element: ElementRef) {
     this.htmlElement = this.element.nativeElement;
@@ -39,12 +37,11 @@ export class GraphComponent implements DoCheck {
       unitIcon: 30,
       unitImg: 28,
       linkDistance: 75,
-      nodeScaleX: 1.15,
-      nodeScaleY: 1.1,
-      rootScaleX: 1.5,
-      rootScaleY: 1.8,
-      titleSize: 12,
-      textSize: 10,
+      rootScaleX: 1.6,
+      rootScaleY: 1.6,
+      textMedium: 10,
+      textSmall: 7,
+      textTiny: 6,
       padding: 3,
       seedsLength: 30,
       descLength: 50,
@@ -56,24 +53,10 @@ export class GraphComponent implements DoCheck {
     this.svg = this.host.append("svg")
       .attr("width", window.innerWidth)
       .attr("height", '100%');
-    this.prevContainer = this.svg.append("g");
     this.zoomContainer = this.svg.append("g");
     this.zoom = d3.zoom().scaleExtent([0.6, 1.5]);
-    let xBefore = 0, yBefore = 0;
     this.svg.call(this.zoom.on("zoom", () => {
       this.zoomContainer.attr("transform", d3.event.transform);
-      let prevLine = this.prevContainer.select("line");
-      if(prevLine.size() > 0) {
-        let x2 = prevLine.attr("x2");
-        let y2 = prevLine.attr("y2");
-
-        let xTransform =  d3.event.transform.x / d3.event.transform.k;
-        let yTransform = d3.event.transform.y / d3.event.transform.k;
-
-        prevLine.attr("x2", (+x2 + xTransform - xBefore)).attr("y2", (+y2 + yTransform - yBefore));
-        xBefore = xTransform;
-        yBefore = yTransform;
-      }
     })).on("dblclick.zoom", null)
       .on("mousedown.zoom", null);
 
@@ -136,83 +119,66 @@ export class GraphComponent implements DoCheck {
 
     this.linksContainer = this.zoomContainer.append("g").attr("class", "links");
     this.nodesContainer = this.zoomContainer.append("g").attr("class", "nodes");
-
     this.defaultTransform = d3.zoomTransform(this.zoomContainer);
-  }
 
-  ngDoCheck(): void {
-    if(this.linksContainer && this.nodesContainer) {
-      if(this.rootHasChanged) {
-        this.rootChange.emit({newRoot: this.newRoot});
-        this.rootHasChanged = false;
-      } else if(this.rootDetails) {
-        this.showDetails.emit();
-        this.rootDetails = false;
-      }
+    let that = this;
+    let layout = this.layout;
+    this.link = this.linksContainer.selectAll("line");
+    this.node = this.nodesContainer.selectAll("g");
+
+    this.simulation = d3.forceSimulation()
+      .force("link", d3.forceLink().id(function (d) {
+        return d.id;
+      }).distance(function (link, index) {
+        return index < layout.periphNodesCount ? layout.linkDistance : (layout.linkDistance * 2);
+      }))
+      .force("charge", d3.forceManyBody().strength(function (node, index) {
+        return node.isRoot ? -1200 : -800;
+      }))
+      .on("tick", ticked);
+
+    function ticked() {
+      that.link
+        .attr("x1", function (d) {
+          return d.source.x;
+        })
+        .attr("y1", function (d) {
+          return d.source.y;
+        })
+        .attr("x2", that.width / 2)
+        .attr("y2", that.height / 2);
+
+      that.node.attr("transform", function (d) {
+          let scale = d.isRoot ? layout.rootScaleX : 1;
+          let tx = (d.isRoot ? that.width / 2 : d.x)  - layout.unitX * scale / 2;
+          let ty = (d.isRoot ? that.height / 2 : d.y)  - layout.unitY * scale / 2;
+          return "translate(" + tx + "," + ty + ") scale(" + scale + ")";
+        });
     }
   }
 
-  drawNetwork(networkData): void {
+  render(nodes, edges) {
     let that = this;
     let layout = this.layout;
-    let nodes = networkNodes(networkData.nodes, networkData.previousNode);
-    let edges = networkEdges(networkData.edges, networkData.previousNode);
 
-    this.dimensions = {
-      width: this.svg.node().getBoundingClientRect().width,
-      height: this.svg.node().getBoundingClientRect().height
-    };
+    d3.timeout(function() {
+      that.node = that.node.data(nodes, function(d) { return d.id; }).style("opacity", 1);
+      that.node.exit().remove();
+      that.link = that.link.data(edges, function(d) { return d.source + "-" + d.target; }).style("opacity", 1);
+      that.link.exit().remove();
 
-    // Debug log
-    // console.log('drawNetwork with ' + nodes.length + ' nodes and ' + edges.length + ' edges');
-
-    // Check that DOM is ready and data is consistent
-    if(this.svg && this.nodesContainer && this.linksContainer && (nodes.length == edges.length + 1)) {
-      this.linksContainer.selectAll("*").remove();
-      this.nodesContainer.selectAll("*").remove();
-
-      let simulation = d3.forceSimulation()
-        .alphaMin(0.2)
-        .force("link", d3.forceLink().id(function (d) {
-          return d.id;
-        })
-        .distance(function (link, index) {
-          return (index < layout.periphNodesCount ? layout.linkDistance  : (layout.linkDistance * 2)) * layout.nodeScaleX;
-        }))
-        .force("charge", d3.forceManyBody().strength(function (node, index) {
-          return node.isRoot ? (nodes.length == 2 ? -20000 : -1200) : -800;
-        }))
-        .force("center", d3.forceCenter(this.dimensions.width / 2, this.dimensions.height / 2));
-
-      let linksData = this.linksContainer
-        .selectAll("line")
-        .data(edges);
-
-      let linkEnter = linksData
-        .enter().append("line");
-
-      let nodesData = this.nodesContainer
-        .selectAll("g")
-        .data(nodes);
-
-      let nodesEnter = nodesData.enter().append("g");
+      let nodesEnter = that.node.enter().append("g");
 
       nodesEnter.append("use")
-        .attr("transform", function (d) {
-          return d.isRoot ? "scale(" + layout.rootScaleX + " " + layout.rootScaleY + ")" : "scale(" + layout.nodeScaleX + " " + layout.nodeScaleY + ")";
-        })
         .attr("filter", function (d) {
           return d.category == 'concept' ? "url(#shadow)" : "";
         })
         .attr("class", function (d) {
-          return d.category + " bg_" + d.category;
+          return d.category + "node_bg bg_" + d.category;
         })
         .attr("xlink:href", "#seed");
 
       nodesEnter.append("use")
-        .attr("transform", function (d) {
-          return d.isRoot ? "scale(" + layout.rootScaleX + ")" : "scale(" + layout.nodeScaleX + ")";
-        })
         .attr("x", (layout.unitX - layout.unitIcon) / 2)
         .attr("y", (layout.unitIcon / 2) - (layout.padding * 2))
         .attr("width", layout.unitIcon)
@@ -225,9 +191,6 @@ export class GraphComponent implements DoCheck {
         });
 
       nodesEnter.append("image")
-        .attr("transform", function (d) {
-          return d.isRoot ? "scale(" + layout.rootScaleX + ")" : "scale(" + layout.nodeScaleX + ")";
-        })
         .attr("class", "img-node")
         .attr("x", (layout.unitX - layout.unitImg) / 2)
         .attr("y", (layout.unitImg / 2) - (layout.padding * 2))
@@ -238,12 +201,9 @@ export class GraphComponent implements DoCheck {
         });
 
       nodesEnter.append("text")
-        .attr("transform", function (d) {
-          return d.isRoot ? "scale(" + layout.rootScaleX + ")" : "scale(" + layout.nodeScaleX + ")";
-        })
-        .attr("x", (layout.unitX - layout.titleSize) / 2 + layout.padding * 0.5)
+        .attr("x", (layout.unitX - layout.textMedium) / 2 + layout.padding * 0.5)
         .attr("y", layout.padding)
-        .attr("font-size", layout.titleSize)
+        .attr("font-size", layout.textMedium)
         .attr("class", "icon")
         .text(function (d) {
           return d.scope == 'private' ? '\uf31d' : ''
@@ -252,10 +212,10 @@ export class GraphComponent implements DoCheck {
       let nodesLabel = nodesEnter.append("text")
         .attr("text-anchor", "middle")
         .attr("x", function (d) {
-          return layout.unitX * (d.isRoot ? layout.rootScaleX : layout.nodeScaleX) / 2;
+          return layout.unitX / 2;
         })
         .attr("y", function (d) {
-          return (layout.unitIcon * 1.5 - layout.padding * 2) * (d.noIcon() ? 0.75 : (d.isRoot ? layout.rootScaleX : layout.nodeScaleX)) + 2 * layout.padding;
+          return (layout.unitIcon * 1.5 - layout.padding * 2) * (d.noIcon() ? 0.75 : 1) + 2 * layout.padding;
         })
         .attr("class", function (d) {
           return d.category + " label";
@@ -264,29 +224,43 @@ export class GraphComponent implements DoCheck {
         .text(function (d) {
           return d.isRoot ? (d.label + "|" + (d.description || '')) : d.label;
         });
-
-      simulation.nodes(nodes).on("tick", () => {
-        updateNodesAndLinks(linkEnter, nodesEnter);
-      });
-      simulation.force("link").links(edges);
-
-      this.nodesContainer.selectAll("g").on("click", changeRootNode);
-      this.zoomContainer.attr("transform", this.defaultTransform);
-
-      if (networkData.previousNode) {
-        this.drawPrevious(networkData.previousNode);
-      }
-
       wrapLabels(nodesLabel, that);
-    }
+
+      that.node = nodesEnter.merge(that.node);
+
+      that.link = that.link.enter().append("line").attr("id", function(d) { return d.source + "-" + d.target; }).merge(that.link);
+      that.simulation.nodes(nodes);
+      that.simulation.force("link").links(edges);
+
+      that.nodesContainer.selectAll("g").on("click", changeRootNode);
+
+      that.simulation.force("center", d3.forceCenter(that.width / 2, that.height / 2));
+      that.simulation.alpha(1).restart();
+    }, 600);
 
     function changeRootNode() {
-      let clickedNode = d3.select(this);
-      if(clickedNode.datum().isRoot) {
-        that.rootDetails = true;
+      that.simulation.stop();
+
+      let clickedNode = d3.select(this).datum();
+      if(clickedNode.isRoot) {
+        that.showDetails.emit();
       } else {
-        that.newRoot = clickedNode.datum().id;
-        that.rootHasChanged = true;
+        wrapLabels(d3.select(this).select("text.label").text(clickedNode.label + "|" + (clickedNode.description || '')), that);
+        if(that.rootElt) {
+          let prevRoot = d3.select(that.rootElt);
+          wrapLabels(prevRoot.select("text.label").text(prevRoot.datum().label), that);
+        }
+
+        that.rootElt = this;
+        that.rootChange.emit({newRoot: clickedNode.id});
+        that.nodesContainer.selectAll("g").filter(function (d) {
+          return d.id != clickedNode.id;
+        }).style("opacity", 0);
+        that.linksContainer.selectAll("line").style("opacity", 0);
+
+        d3.select(this).transition().duration(600)
+          .attr("transform", "translate(" + (that.width / 2 - (layout.unitX * layout.rootScaleX / 2)) + ","
+            + (that.height / 2 - (layout.unitY * layout.rootScaleY / 2)) + ") scale(" + layout.rootScaleX + "," + layout.rootScaleY + ")");
       }
     }
 
@@ -295,65 +269,12 @@ export class GraphComponent implements DoCheck {
         let text = d3.select(this);
         if(text.text().indexOf("|") != -1) {
           let textTokens = text.text().split("|");
-          ref.doWrap(text, textTokens[0], true, true, layout.titleSize, layout.padding * 2, layout);
-          ref.doWrap(text, textTokens[1], false, true, layout.textSize, layout.titleSize + layout.padding, layout);
+          ref.doWrap(text, textTokens[0], true, true, layout.textSmall, 0, layout);
+          ref.doWrap(text, textTokens[1], false, true, layout.textTiny, layout.padding * 3, layout);
         } else {
-          ref.doWrap(text, text.text(), true, false, layout.textSize, 0, layout);
+          ref.doWrap(text, text.text(), true, false, layout.textMedium, 0, layout);
         }
       });
-    }
-
-    function updateNodesAndLinks(links, nodes) {
-      links
-        .attr("x1", function (d) {
-          let x = d.source.x;
-          return parseFloat(x);
-        })
-        .attr("y1", function (d) {
-          let y = d.source.y;
-          return parseFloat(y);
-        })
-        .attr("x2", function (d) {
-          return that.dimensions.width / 2;
-        })
-        .attr("y2", function (d) {
-          return that.dimensions.height / 2;
-        });
-
-      nodes
-        .attr("transform", function (d) {
-          let tx, ty;
-          if(d.isRoot) {
-            tx = that.dimensions.width / 2 - (layout.unitX * layout.rootScaleX / 2);
-            ty = that.dimensions.height / 2 - (layout.unitY * layout.rootScaleY / 2);
-          } else {
-            tx = d.x - (layout.unitX * layout.nodeScaleX / 2);
-            ty = d.y - (layout.unitY * layout.nodeScaleY / 2);
-          }
-          return "translate(" + tx + "," + ty + ")";
-        });
-    }
-
-    function networkEdges(edges, previous) {
-      if(previous) {
-        for(let i = 0; i < edges.length; i++) {
-          if(edges[i].source == previous.id) {
-            edges.splice(i, 1);
-          }
-        }
-      }
-      return edges;
-    }
-
-    function networkNodes(nodes, previous) {
-      if(previous) {
-        for(let i = 0; i < nodes.length; i++) {
-          if(nodes[i].id == previous.id) {
-            nodes.splice(i, 1);
-          }
-        }
-      }
-      return nodes;
     }
   }
 
@@ -364,8 +285,8 @@ export class GraphComponent implements DoCheck {
       lines = 1,
       x = Number.parseInt(textElt.attr("x")),
       charsCount = 0,
-      textLength = ((textElt.datum() && textElt.datum().isRoot) ? layout.descLength : layout.seedsLength),
-      width = layout.unitX * (isRoot ? layout.rootScaleX : layout.nodeScaleX) - 2 * layout.padding;
+      textLength = isRoot ? layout.descLength : layout.seedsLength,
+      width = layout.unitX - 2 * layout.padding;
     if(reset) {
       textElt.text(null);
     }
@@ -387,74 +308,6 @@ export class GraphComponent implements DoCheck {
       }
     }
     return lines;
-  }
-
-  drawPrevious(previousNode): void {
-    this.prevContainer.selectAll("*").remove();
-
-    if(!previousNode.disconnected) {
-      this.prevContainer.append("line")
-        .attr("class", "previous")
-        .attr("x1", this.layout.unitX / 2 + this.layout.padding * 2)
-        .attr("y1", this.layout.unitY / 2 + this.layout.padding * 2)
-        .attr("x2", this.dimensions.width / 2)
-        .attr("y2", this.dimensions.height / 2);
-    }
-
-    let prevNode = this.prevContainer.append("g");
-    prevNode.append("use")
-      .attr("transform", "translate(" + this.layout.padding * 2 + ", " + this.layout.padding * 2 + ") scale(" + this.layout.nodeScaleX + " " + this.layout.nodeScaleY + ")")
-      .attr("filter", previousNode.noIcon() ? "url(#shadow)" : "")
-      .attr("class", previousNode.category + " bg_" + previousNode.category)
-      .attr("xlink:href", "#seed");
-
-    prevNode.append("use")
-      .attr("transform", "scale(" + this.layout.nodeScaleX + " " + this.layout.nodeScaleY + ")")
-      .attr("x", (this.layout.unitX - this.layout.unitIcon) / 2 + this.layout.padding * 2)
-      .attr("y", (this.layout.unitIcon / 2) - this.layout.padding)
-      .attr("width", this.layout.unitIcon)
-      .attr("height", this.layout.unitIcon)
-      .attr("class", previousNode.category + " icon")
-      .attr("xlink:href", previousNode.picture ? '' : ('#' + previousNode.category));
-
-    prevNode.append("image")
-      .attr("transform", "scale(" + this.layout.nodeScaleX + " " + this.layout.nodeScaleY + ")")
-      .attr("class", "img-node")
-      .attr("x", (this.layout.unitX - this.layout.unitImg) / 2 + this.layout.padding * 2)
-      .attr("y", (this.layout.unitImg / 2) - this.layout.padding)
-      .attr("width", this.layout.unitImg)
-      .attr("height", this.layout.unitImg)
-      .attr("xlink:href", previousNode.picture);
-
-    prevNode.append("text")
-      .attr("transform", "scale(" + this.layout.nodeScaleX + " " + this.layout.nodeScaleY + ")")
-      .attr("x", (this.layout.unitX - this.layout.titleSize) / 2 + this.layout.padding * 2.5)
-      .attr("y", this.layout.padding * 4)
-      .attr("font-size", this.layout.titleSize)
-      .attr("class", "icon")
-      .text(previousNode.scope == 'private' ? '\uf31d' : '');
-
-    let prevText = prevNode.append("text");
-    prevText.attr("text-anchor", "middle")
-      .attr("transform", "scale(" + this.layout.nodeScaleX + " " + this.layout.nodeScaleY + ")")
-      .attr("x", this.layout.unitX / 2 + this.layout.padding * 2)
-      .attr("y", (this.layout.unitIcon * 1.5 - this.layout.padding) * (previousNode.noIcon() ? 0.75 : 1) + 2 * this.layout.padding)
-      .attr("class", previousNode.category + " label")
-      .attr("dy", "1em")
-      .text(previousNode.label);
-
-    this.doWrap(prevText, prevText.text(), true, false, this.layout.textSize, 0, this.layout);
-
-    prevText.append("tspan")
-      .attr("x", prevText.attr("x"))
-      .attr("dy", this.layout.textSize + 2 * this.layout.padding)
-      .attr("class", "icon")
-      .text('\uf27d');
-
-    prevNode.on("click", () => {
-      this.newRoot = previousNode.id;
-      this.rootHasChanged = true;
-    });
   }
 }
 

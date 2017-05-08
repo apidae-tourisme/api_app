@@ -21,7 +21,7 @@
 </ion-header>
 
 <ion-content id="graph_wrapper">
-  <graph (showDetails)="displayDetails()" (rootChange)="rootNodeChange($event);"></graph>
+  <graph (showDetails)="displayDetails()" (rootChange)="rootNodeChange($event);" [width]="graphWidth" [height]="graphHeight"></graph>
   <div id="graph_bg">
     <img src="assets/img/flowers-left.png"/>
     <img src="assets/img/flowers-right.png"/>

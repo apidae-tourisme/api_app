@@ -8,9 +8,7 @@
     "watch": "ionic-app-scripts watch",
     "serve:before": "watch",
     "emulate:before": "build",
-    "deploy:before": "build",
-    "build:before": "build",
-    "run:before": "build"
+    "deploy:before": "build"
   },
   "dependencies": {
     "@angular/common": "2.4.8",

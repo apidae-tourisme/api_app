@@ -14,6 +14,8 @@ export class GraphPage {
   @ViewChild(GraphComponent) graph: GraphComponent;
 
   public loading: boolean;
+  public graphWidth: number;
+  public graphHeight: number;
 
   constructor(public explorerService: ExplorerService, public searchService: SearchService, public dataService: DataService,
               private navCtrl: NavController, private navParams: NavParams, private platform: Platform) {
@@ -25,6 +27,8 @@ export class GraphPage {
   }
 
   ionViewDidEnter(): void {
+    this.graphWidth = this.content.contentWidth;
+    this.graphHeight = this.content.contentHeight;
     this.registerBack();
     let seedParam = this.navParams.get('seedId');
     if(seedParam) {
@@ -46,7 +50,7 @@ export class GraphPage {
     if(this.graph) {
       this.loading = false;
       this.content.resize();
-      this.graph.drawNetwork(this.explorerService.networkData);
+      this.graph.render(this.explorerService.networkData.nodes, this.explorerService.networkData.edges);
     }
   }
 
