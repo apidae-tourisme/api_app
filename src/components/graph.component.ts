@@ -158,7 +158,7 @@ export class GraphComponent {
     let that = this;
     let layout = this.layout;
 
-    d3.timeout(function() {
+    setTimeout(function() {
       that.node = that.node.data(nodes, function(d) { return d.id; }).style("opacity", 1);
       that.node.exit().remove();
       that.link = that.link.data(edges, function(d) { return d.source + "-" + d.target; }).style("opacity", 1);

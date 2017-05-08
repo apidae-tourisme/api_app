@@ -16,37 +16,34 @@
 
 <ion-content id="seed_form">
   <ion-list>
-    <ion-item>
-      <ion-label><strong>Type</strong></ion-label>
-      <h4 item-right>{{node.typeLabel()}}</h4>
+    <button ion-item large (click)="seedTypes()">
+      <ion-label>Type</ion-label>
+      <h2 item-right>{{node.typeLabel()}}</h2>
       <ion-avatar item-right class="bg_seed {{node.category}}">
-        <div class="bg_seed {{node.category}}" text-center><i class="ion-md-custom-{{node.category}}"></i></div>
+        <div text-center><i class="ion-md-custom-{{node.category}}"></i></div>
       </ion-avatar>
-      <button ion-button item-right large icon-only clear color="link" (click)="seedTypes()">
-        <ion-icon name="create"></ion-icon>
-      </button>
-    </ion-item>
-    <ion-item *ngIf="node.category != 'person'">
-      <ion-label fixed><strong>Nom</strong></ion-label>
+    </button>
+    <label ion-item *ngIf="node.category != 'person'">
+      <ion-label fixed>Nom</ion-label>
       <ion-input type="text" [(ngModel)]="node.label"></ion-input>
-    </ion-item>
-    <ion-item *ngIf="node.category == 'person'">
-      <ion-label fixed><strong>Prénom</strong></ion-label>
+    </label>
+    <label ion-item *ngIf="node.category == 'person'">
+      <ion-label fixed>Prénom</ion-label>
       <ion-input type="text" [(ngModel)]="node.firstName"></ion-input>
-    </ion-item>
-    <ion-item *ngIf="node.category == 'person'">
-      <ion-label fixed><strong>Nom</strong></ion-label>
+    </label>
+    <label ion-item *ngIf="node.category == 'person'">
+      <ion-label fixed>Nom</ion-label>
       <ion-input type="text" [(ngModel)]="node.lastName"></ion-input>
-    </ion-item>
-    <ion-item>
-      <ion-label fixed><strong>Description</strong></ion-label>
+    </label>
+    <label ion-item>
+      <ion-label fixed>Description</ion-label>
       <ion-textarea rows="4" [(ngModel)]="node.description"></ion-textarea>
-    </ion-item>
+    </label>
     <ion-item>
-      <ion-label fixed><strong>Visuel</strong></ion-label>
+      <ion-label fixed>Visuel</ion-label>
       <ion-avatar item-right class="bg_seed {{node.category}}">
         <img *ngIf="node.picture" src="{{node.picture}}"/>
-        <div *ngIf="!node.picture" class="bg_seed {{node.category}}" text-center><i class="ion-md-custom-{{node.category}}"></i></div>
+        <div *ngIf="!node.picture" text-center><i class="ion-md-custom-{{node.category}}"></i></div>
       </ion-avatar>
       <button ion-button item-right large icon-only clear color="link" (click)="editAvatar()">
         <ion-icon name="create"></ion-icon>
@@ -56,7 +53,7 @@
       </button>
     </ion-item>
     <ion-item>
-      <ion-label><strong>Début</strong></ion-label>
+      <ion-label>Début</ion-label>
       <ion-datetime [(ngModel)]="node.startDate" displayFormat="DD/MM/YYYY" disabled="true"></ion-datetime>
       <ion-datetime #startDate displayFormat="DD/MM/YYYY" pickerFormat="DD/MM/YYYY" min="2000" max="2020" cancelText="Annuler"
                     doneText="OK" [(ngModel)]="node.startDate" class="hidden"></ion-datetime>
@@ -68,7 +65,7 @@
       </button>
     </ion-item>
     <ion-item>
-      <ion-label><strong>Fin</strong></ion-label>
+      <ion-label>Fin</ion-label>
       <ion-datetime [(ngModel)]="node.endDate" displayFormat="DD/MM/YYYY" disabled="true"></ion-datetime>
       <ion-datetime #endDate displayFormat="DD/MM/YYYY" pickerFormat="DD/MM/YYYY" min="2000" max="2020" cancelText="Annuler"
                     doneText="OK" [(ngModel)]="node.endDate" class="hidden"></ion-datetime>
@@ -80,25 +77,25 @@
       </button>
     </ion-item>
     <ion-item>
-      <ion-label fixed><strong>Adresse</strong></ion-label>
+      <ion-label fixed>Adresse</ion-label>
       <ion-input type="text" [(ngModel)]="node.address"></ion-input>
     </ion-item>
-    <ion-item class="label_only" no-lines>
-      <ion-label><strong>Tél., email, réseaux sociaux, lien web...</strong></ion-label>
-      <button ion-button icon-only item-right large clear color="link" (click)="addUrl()">
+    <button ion-item (click)="addUrl()" class="label_only" no-lines>
+      <ion-label>Tél., email, réseaux sociaux, lien web...</ion-label>
+      <button ion-button icon-only item-right large clear color="link">
         <ion-icon name="add-circle"></ion-icon>
       </button>
-    </ion-item>
+    </button>
     <ion-item *ngFor="let url of node.urls; let i = index" no-lines>
       <ion-input type="text" [(ngModel)]="url.value" placeholder="Tél., email, liens..."></ion-input>
       <button ion-button item-right large clear icon-only color="danger" (click)="node.urls.splice(i, 1)"><ion-icon name="close"></ion-icon></button>
     </ion-item>
-    <ion-item class="label_only" border-top>
-      <ion-label><strong>Graines liées</strong></ion-label>
-      <button ion-button icon-only item-right large clear color="link" (click)="addSeed()">
+    <button ion-item class="label_only" border-top (click)="addSeed()">
+      <ion-label>Graines liées</ion-label>
+      <button ion-button icon-only item-right large clear color="link">
         <ion-icon name="add-circle"></ion-icon>
       </button>
-    </ion-item>
+    </button>
     <ion-item *ngFor="let seed of node.seeds; let i = index;" no-lines>
       <ion-icon *ngIf="seed.scope == 'private'" name="lock" class="item_lock"></ion-icon>
       <ion-avatar item-left class="bg_seed {{seed.category}}">
@@ -109,13 +106,13 @@
       <button ion-button item-right large clear icon-only color="danger" (click)="node.seeds.splice(i, 1)"><ion-icon name="close"></ion-icon></button>
     </ion-item>
     <ion-item *ngIf="dataService.userSeed.email == node.contributor || node.scope == 'public'" border-top>
-      <ion-label><strong>{{scopeLabel()}}</strong></ion-label>
+      <ion-label>{{scopeLabel()}}</ion-label>
       <button ion-button item-right large clear icon-only [color]="scopeColor()" (click)="toggleScope()">
         <ion-icon [name]="scopeIcon()"></ion-icon>
       </button>
     </ion-item>
     <ion-item *ngIf="node.id" border-top>
-      <ion-label><strong>{{archiveLabel()}}</strong></ion-label>
+      <ion-label>{{archiveLabel()}}</ion-label>
       <button ion-button item-right large clear icon-only [color]="archiveColor()" (click)="toggleArchive()">
         <ion-icon [name]="archiveIcon()"></ion-icon>
       </button>

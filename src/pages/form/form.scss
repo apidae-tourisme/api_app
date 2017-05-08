@@ -1,5 +1,15 @@
-#seed_form ion-list ion-item.item-block {
+#seed_form ion-list .item.item-block {
   min-height: 70px;
+}
+
+#seed_form ion-list .item.item-block ion-input input {
+  padding: 10px 0;
+}
+
+#seed_form button.item ion-avatar.bg_seed {
+  padding: 6px;
+  width: 56px;
+  height: 56px;
 }
 
 #seed_form .button-inner,
