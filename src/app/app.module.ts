@@ -1,50 +1,50 @@
 import {NgModule} from '@angular/core';
-import {IonicApp, IonicModule, DeepLinkConfig} from 'ionic-angular';
+import {IonicApp, IonicModule} from 'ionic-angular';
 import {ApiApp} from './app.component';
-import {TabsPage} from '../pages/tabs/tabs';
-import {GraphPage} from "../pages/graph/graph";
-import {ListPage} from "../pages/list/list";
-import {GraphComponent} from "../components/graph.component";
 import {DataService} from "../providers/data.service";
 import {ExplorerService} from "../providers/explorer.service";
-import {MapPage} from "../pages/map/map";
 import {AuthService} from "../providers/auth.service";
-import {LoginPage} from "../pages/login/login";
-import {DetailsPage} from "../pages/details/details";
 import {IonicStorageModule} from '@ionic/storage';
 import {SearchService} from "../providers/search.service";
-import {FormPage} from "../pages/form/form";
-import {SeedType} from "../pages/form/seed-type";
 import {Seeds} from "../providers/seeds";
 import {ApiAppConfig} from "../providers/apiapp.config";
-import {SearchSeeds} from "../pages/form/search-seeds";
-import {EditAvatar} from "../pages/form/edit-avatar";
-import {SearchPage} from "../pages/search/search";
+import {BrowserModule} from "@angular/platform-browser";
+import {HttpModule} from "@angular/http";
+import {InAppBrowser} from '@ionic-native/in-app-browser';
+import {Camera} from "@ionic-native/camera";
+import {File} from '@ionic-native/file';
+import {Transfer} from "@ionic-native/transfer";
+import {Network} from "@ionic-native/network";
+import {Keyboard} from "@ionic-native/keyboard";
+import {StatusBar} from "@ionic-native/status-bar";
+import {SplashScreen} from "@ionic-native/splash-screen";
 
-export const deepLinkConfig: DeepLinkConfig = {
-  links: [
-    { component: LoginPage, name: 'Connexion', segment: '' },
-    { component: TabsPage, name: 'Tabs', segment: ':seedId/:mode' }
-  ]
-};
+// export const deepLinkConfig: DeepLinkConfig = {
+//   links: [
+//     { component: LoginPage, name: 'Connexion', segment: '' },
+//     { component: TabsPage, name: 'Tabs', segment: ':seedId/:mode' }
+//   ]
+// };
 
 @NgModule({
   declarations: [
-    ApiApp,
-    TabsPage,
-    LoginPage,
-    GraphPage,
-    MapPage,
-    ListPage,
-    SearchPage,
-    DetailsPage,
-    FormPage,
-    SeedType,
-    SearchSeeds,
-    EditAvatar,
-    GraphComponent
+    ApiApp
+    // TabsPage,
+    // LoginPage,
+    // GraphPage,
+    // MapPage,
+    // ListPage,
+    // SearchPage,
+    // DetailsPage,
+    // FormPage,
+    // SeedType,
+    // SearchSeeds,
+    // EditAvatar
+    // GraphComponent
   ],
   imports: [
+    BrowserModule,
+    HttpModule,
     IonicModule.forRoot(ApiApp,
       {
         scrollAssist: false,
@@ -52,26 +52,34 @@ export const deepLinkConfig: DeepLinkConfig = {
         mode: 'md',
         tabsPlacement: 'bottom',
         tabsHideOnSubPages: true
-      }, deepLinkConfig
+      }
     ),
     IonicStorageModule.forRoot()
   ],
   bootstrap: [IonicApp],
   entryComponents: [
-    ApiApp,
-    TabsPage,
-    LoginPage,
-    GraphPage,
-    MapPage,
-    ListPage,
-    SearchPage,
-    DetailsPage,
-    FormPage,
-    SeedType,
-    SearchSeeds,
-    EditAvatar
+    ApiApp
+    // TabsPage,
+    // LoginPage,
+    // GraphPage,
+    // MapPage,
+    // ListPage,
+    // SearchPage,
+    // DetailsPage,
+    // FormPage,
+    // SeedType,
+    // SearchSeeds,
+    // EditAvatar
   ],
   providers: [
+    Keyboard,
+    StatusBar,
+    SplashScreen,
+    InAppBrowser,
+    Camera,
+    File,
+    Transfer,
+    Network,
     AuthService,
     DataService,
     ExplorerService,

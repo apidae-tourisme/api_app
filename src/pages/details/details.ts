@@ -1,7 +1,6 @@
 import {Component, ViewChild, NgZone} from '@angular/core';
-import {App, NavParams, Events, NavController, Content, AlertController, Platform} from 'ionic-angular';
+import {App, NavParams, Events, NavController, Content, AlertController, Platform, IonicPage} from 'ionic-angular';
 import {DomSanitizer, SafeUrl} from "@angular/platform-browser";
-import {InAppBrowser} from "ionic-native";
 import {ExplorerService} from "../../providers/explorer.service";
 import {SearchService} from "../../providers/search.service";
 import {AuthService} from "../../providers/auth.service";
@@ -10,7 +9,9 @@ import {DataService} from "../../providers/data.service";
 import {FormPage} from "../form/form";
 import {Seed} from "../../components/seed.model";
 import {SearchPage} from "../search/search";
+import {InAppBrowser} from "@ionic-native/in-app-browser";
 
+@IonicPage()
 @Component({
   templateUrl: 'details.html'
 })
@@ -20,7 +21,7 @@ export class DetailsPage {
   constructor(private app: App, private navCtrl: NavController, public events: Events, private sanitizer: DomSanitizer,
               public explorerService: ExplorerService, public searchService: SearchService, public authService: AuthService,
               public alertCtrl: AlertController, private dataService: DataService, private navParams: NavParams,
-              private zone: NgZone, private platform: Platform) {
+              private iab: InAppBrowser, private zone: NgZone, private platform: Platform) {
   }
 
   ionViewDidEnter(): void {
@@ -61,11 +62,11 @@ export class DetailsPage {
   }
 
   openUrl(url): void {
-    new InAppBrowser(url, '_system');
+    this.iab.create(url, '_system');
   }
 
   openAddress(address) {
-    new InAppBrowser('https://maps.google.com?q=' + address, '_blank', 'location=yes');
+    this.iab.create('https://maps.google.com?q=' + address, '_blank', 'location=yes');
   }
 
   navigateTo(node, showGraph, reset): void {

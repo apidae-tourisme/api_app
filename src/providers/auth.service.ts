@@ -3,7 +3,7 @@ import {URLSearchParams} from "@angular/http";
 import 'rxjs/Rx';
 import {Storage} from "@ionic/storage";
 import {ApiAppConfig} from "./apiapp.config";
-import {InAppBrowser, Device} from "ionic-native";
+import {InAppBrowser} from '@ionic-native/in-app-browser';
 import {Platform} from "ionic-angular";
 
 declare var window: any;
@@ -11,7 +11,7 @@ declare var window: any;
 @Injectable()
 export class AuthService {
 
-  constructor(private storage: Storage, private platform: Platform){
+  constructor(private storage: Storage, private platform: Platform, private iab: InAppBrowser){
   }
 
   authUrl(): string {
@@ -23,7 +23,7 @@ export class AuthService {
     if(!this.platform.is('cordova')) {
       window.location.href = authUrl;
     } else {
-      let browser = new InAppBrowser(authUrl, '_blank', 'location=no');
+      let browser = this.iab.create(authUrl, '_blank', 'location=no');
       browser.on('loadstart').subscribe(data => {
         let callBackUrl = data['url'];
         if(callBackUrl && callBackUrl.indexOf('auth_token') != -1 && callBackUrl.indexOf('client_id') != -1 &&

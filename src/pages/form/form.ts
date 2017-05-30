@@ -1,5 +1,5 @@
 import {Component, ViewChild} from '@angular/core';
-import {NavParams, NavController, ModalController, ToastController, LoadingController} from 'ionic-angular';
+import {NavParams, NavController, ModalController, ToastController, LoadingController, IonicPage} from 'ionic-angular';
 import {Seed} from "../../components/seed.model";
 import {SeedType} from "./seed-type";
 import {DataService} from "../../providers/data.service";
@@ -7,6 +7,7 @@ import {ExplorerService} from "../../providers/explorer.service";
 import {SearchSeeds} from "./search-seeds";
 import {EditAvatar} from "./edit-avatar";
 
+@IonicPage()
 @Component({
   templateUrl: 'form.html'
 })

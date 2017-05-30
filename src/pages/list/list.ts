@@ -1,10 +1,11 @@
 import {Component, ViewChild} from '@angular/core';
-import {NavController, Content, NavParams, Platform} from 'ionic-angular';
+import {NavController, Content, NavParams, Platform, IonicPage} from 'ionic-angular';
 import {ExplorerService} from "../../providers/explorer.service";
 import {SearchService} from "../../providers/search.service";
 import {DataService} from "../../providers/data.service";
 import {SearchPage} from "../search/search";
 
+IonicPage()
 @Component({
   templateUrl: 'list.html'
 })

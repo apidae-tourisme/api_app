@@ -1,11 +1,14 @@
 import {Component, ViewChild} from '@angular/core';
-import {Content, NavController, NavParams, Platform} from 'ionic-angular';
+import {Content, IonicPage, NavController, NavParams, Platform} from 'ionic-angular';
 import {ExplorerService} from "../../providers/explorer.service";
 import {SearchService} from "../../providers/search.service";
 import {DataService} from "../../providers/data.service";
 import {GraphComponent} from "../../components/graph.component";
 import {SearchPage} from "../search/search";
 
+@IonicPage({
+  segment: 'graph'
+})
 @Component({
   templateUrl: 'graph.html'
 })

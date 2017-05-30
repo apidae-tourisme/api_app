@@ -1,9 +1,11 @@
 import {Component, ViewChild} from "@angular/core";
 import {ViewController, LoadingController, Platform} from "ionic-angular";
-import {Camera, File, Transfer} from "ionic-native";
 import {ApiAppConfig} from "../../providers/apiapp.config";
 import {DataService} from "../../providers/data.service";
 import {SafeUrl, DomSanitizer} from "@angular/platform-browser";
+import {Transfer} from "@ionic-native/transfer";
+import {Camera} from "@ionic-native/camera";
+import {File} from '@ionic-native/file';
 
 declare var cordova: any;
 
@@ -18,7 +20,8 @@ export class EditAvatar {
   public isWeb: boolean;
 
   constructor(public viewCtrl: ViewController, private loadingCtrl: LoadingController, private dataService: DataService,
-              private sanitizer: DomSanitizer, private platform: Platform) {
+              private sanitizer: DomSanitizer, private platform: Platform, private file: File, private transfer: Transfer,
+              private camera: Camera) {
     this.avatar = {};
     this.isWeb = !platform.is('cordova');
   }
@@ -40,7 +43,7 @@ export class EditAvatar {
       if(this.platform.is('ios')) {
         filePath = cordova.file.tempDirectory + fileName
       }
-      let fileTransfer = new Transfer();
+      let fileTransfer = this.transfer.create();
       let options: any;
 
       options = {
@@ -80,7 +83,7 @@ export class EditAvatar {
     }
     let lastSegment = path.substr(path.lastIndexOf('/') + 1);
     let parentDir = path.replace(lastSegment, '');
-    File.listDir(parentDir, lastSegment).then((entries) => {
+    this.file.listDir(parentDir, lastSegment).then((entries) => {
       console.log('entries in ' + parentDir + lastSegment + ' : ' + entries.length);
       for(let i = 0; i < entries.length; i++) {
         console.log('entry ' + i + ' : ' + JSON.stringify(entries[i]));
@@ -92,12 +95,12 @@ export class EditAvatar {
 
   selectImage() {
     let options = {
-      sourceType: Camera.PictureSourceType.PHOTOLIBRARY,
-      destinationType: Camera.DestinationType.FILE_URI,
+      sourceType: this.camera.PictureSourceType.PHOTOLIBRARY,
+      destinationType: this.camera.DestinationType.FILE_URI,
       quality: 100,
-      mediaType: Camera.MediaType.ALLMEDIA
+      mediaType: this.camera.MediaType.ALLMEDIA
     };
-    Camera.getPicture(options).then((fileUri) => {
+    this.camera.getPicture(options).then((fileUri) => {
       this.avatar.src = fileUri;
     }, (err) => {
       console.log('image selection error : ' + err);
@@ -106,10 +109,10 @@ export class EditAvatar {
 
   captureImage() {
     let options = {
-      sourceType: Camera.PictureSourceType.CAMERA,
-      destinationType: Camera.DestinationType.FILE_URI
+      sourceType: this.camera.PictureSourceType.CAMERA,
+      destinationType: this.camera.DestinationType.FILE_URI
     };
-    Camera.getPicture(options).then((fileUri) => {
+    this.camera.getPicture(options).then((fileUri) => {
       this.avatar.src = fileUri;
     }, (err) => {
       console.log('image capture error : ' + err);

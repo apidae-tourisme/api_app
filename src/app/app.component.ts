@@ -1,22 +1,23 @@
 import {Component} from '@angular/core';
 import {Platform, App} from 'ionic-angular';
-import {StatusBar, Splashscreen} from 'ionic-native';
 import {LoginPage} from "../pages/login/login";
 import {AuthService} from "../providers/auth.service";
 import {ExplorerService} from "../providers/explorer.service";
+import {StatusBar} from "@ionic-native/status-bar";
+import {SplashScreen} from "@ionic-native/splash-screen";
 
 @Component({
   template: `<ion-nav [root]="rootPage"></ion-nav>`
 })
 export class ApiApp {
-  rootPage = LoginPage;
+  rootPage = 'LoginPage';
 
   constructor(private platform: Platform, private authService: AuthService, private explorerService: ExplorerService,
-              private app: App) {
+              private statusBar: StatusBar, private splashScreen: SplashScreen, private app: App) {
     platform.ready().then(() => {
-      StatusBar.styleDefault();
+      this.statusBar.styleDefault();
       if(platform.is('core')) {
-        Splashscreen.hide();
+        this.splashScreen.hide();
       }
 
       // Default back button behavior in Android

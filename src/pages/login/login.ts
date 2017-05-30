@@ -1,11 +1,11 @@
 import {Component, NgZone} from '@angular/core';
-import {NavController, Platform, AlertController} from 'ionic-angular';
+import {NavController, Platform, AlertController, IonicPage} from 'ionic-angular';
 import {AuthService} from "../../providers/auth.service";
-import {TabsPage} from "../tabs/tabs";
 import {DataService} from "../../providers/data.service";
 import {Seed} from "../../components/seed.model";
-import {Network} from 'ionic-native';
+import {Network} from "@ionic-native/network";
 
+@IonicPage()
 @Component({
   templateUrl: 'login.html'
 })
@@ -16,18 +16,19 @@ export class LoginPage {
   private connectionType: string;
 
   constructor(public navCtrl: NavController, public authService: AuthService, private platform: Platform,
-              private dataService: DataService, private alertCtrl: AlertController, private zone: NgZone) {
+              private network: Network, private dataService: DataService, private alertCtrl: AlertController,
+              private zone: NgZone) {
     this.connectionType = 'web';
 
     // Subscribe to connectivity changes on mobile devices
     if(platform.is('cordova')) {
       this.platform.ready().then(() => {
-        this.connectionType = Network.type;
-        Network.onConnect().subscribe(() => {
-          this.connectionType = Network.type;
+        this.connectionType = this.network.type;
+        this.network.onConnect().subscribe(() => {
+          this.connectionType = this.network.type;
         });
-        Network.onDisconnect().subscribe(() => {
-          this.connectionType = Network.type;
+        this.network.onDisconnect().subscribe(() => {
+          this.connectionType = this.network.type;
         });
       });
     }
@@ -109,7 +110,7 @@ export class LoginPage {
   // root change is wrapped in a ng zone call to prevent duplicate controller instances (see https://github.com/driftyco/ionic/issues/5960)
   navigateHome(): void {
     this.zone.run(() => {
-      this.navCtrl.setRoot(TabsPage, {animate: false});
+      this.navCtrl.setRoot('TabsPage', {animate: false});
     });
   }
 

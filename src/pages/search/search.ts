@@ -1,11 +1,12 @@
 import {Component, ViewChild} from '@angular/core';
-import {NavController, Searchbar, NavParams} from 'ionic-angular';
+import {NavController, Searchbar, NavParams, IonicPage} from 'ionic-angular';
 import {ExplorerService} from "../../providers/explorer.service";
 import {SearchService} from "../../providers/search.service";
 import {FormPage} from "../form/form";
 import {DataService} from "../../providers/data.service";
-import {Keyboard} from "ionic-native";
+import {Keyboard} from "@ionic-native/keyboard";
 
+@IonicPage()
 @Component({
   templateUrl: 'search.html'
 })
@@ -17,7 +18,7 @@ export class SearchPage {
   public searchQuery: string;
 
   constructor(public explorerService: ExplorerService, public searchService: SearchService, public dataService: DataService,
-              private navCtrl: NavController, private params: NavParams) {
+              private keyboard: Keyboard, private navCtrl: NavController, private params: NavParams) {
     this.searchQuery = null;
     this.tabIndex = +params.get('tabIndex');
   }
@@ -25,7 +26,7 @@ export class SearchPage {
   ionViewDidEnter() {
     setTimeout(() => {
       this.searchbar.setFocus();
-      Keyboard.show();
+      this.keyboard.show();
     }, 200);
   }
 
