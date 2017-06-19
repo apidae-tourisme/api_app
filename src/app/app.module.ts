@@ -19,28 +19,9 @@ import {Keyboard} from "@ionic-native/keyboard";
 import {StatusBar} from "@ionic-native/status-bar";
 import {SplashScreen} from "@ionic-native/splash-screen";
 
-// export const deepLinkConfig: DeepLinkConfig = {
-//   links: [
-//     { component: LoginPage, name: 'Connexion', segment: '' },
-//     { component: TabsPage, name: 'Tabs', segment: ':seedId/:mode' }
-//   ]
-// };
-
 @NgModule({
   declarations: [
     ApiApp
-    // TabsPage,
-    // LoginPage,
-    // GraphPage,
-    // MapPage,
-    // ListPage,
-    // SearchPage,
-    // DetailsPage,
-    // FormPage,
-    // SeedType,
-    // SearchSeeds,
-    // EditAvatar
-    // GraphComponent
   ],
   imports: [
     BrowserModule,
@@ -50,8 +31,11 @@ import {SplashScreen} from "@ionic-native/splash-screen";
         scrollAssist: false,
         autoFocusAssist: false,
         mode: 'md',
-        tabsPlacement: 'bottom',
-        tabsHideOnSubPages: true
+        tabsPlacement: 'top',
+        tabsLayout: 'title-hide',
+        tabsHighlight: true,
+        tabsHideOnSubPages: true,
+        locationStrategy: 'path'
       }
     ),
     IonicStorageModule.forRoot()
@@ -59,17 +43,6 @@ import {SplashScreen} from "@ionic-native/splash-screen";
   bootstrap: [IonicApp],
   entryComponents: [
     ApiApp
-    // TabsPage,
-    // LoginPage,
-    // GraphPage,
-    // MapPage,
-    // ListPage,
-    // SearchPage,
-    // DetailsPage,
-    // FormPage,
-    // SeedType,
-    // SearchSeeds,
-    // EditAvatar
   ],
   providers: [
     Keyboard,
@@ -80,12 +53,12 @@ import {SplashScreen} from "@ionic-native/splash-screen";
     File,
     Transfer,
     Network,
+    ApiAppConfig,
     AuthService,
     DataService,
     ExplorerService,
     SearchService,
-    Seeds,
-    ApiAppConfig
+    Seeds
   ]
 })
 export class AppModule {

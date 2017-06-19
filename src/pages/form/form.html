@@ -105,10 +105,16 @@
       <h2>{{seed.label}}</h2>
       <button ion-button item-right large clear icon-only color="danger" (click)="node.seeds.splice(i, 1)"><ion-icon name="close"></ion-icon></button>
     </ion-item>
-    <ion-item *ngIf="dataService.userSeed.email == node.contributor || node.scope == 'public'" border-top>
-      <ion-label>{{scopeLabel()}}</ion-label>
-      <button ion-button item-right large clear icon-only [color]="scopeColor()" (click)="toggleScope()">
-        <ion-icon [name]="scopeIcon()"></ion-icon>
+    <ion-item *ngIf="dataService.userSeed.email == node.contributor || node.scope == 'public' || node.scope == 'apidae'" border-top>
+      <ion-label>Visible par {{scopeLabel()}}</ion-label>
+      <button ion-button item-right large [clear]="node.scope != 'private'" icon-only (click)="toggleScope('private')">
+        <ion-icon name="lock"></ion-icon>
+      </button>
+      <button ion-button item-right large [clear]="node.scope != 'apidae'" icon-only (click)="toggleScope('apidae')">
+        <ion-icon name="custom-graph"></ion-icon>
+      </button>
+      <button ion-button item-right large [clear]="node.scope != 'public' || node.scope" icon-only (click)="toggleScope('public')">
+        <ion-icon name="globe"></ion-icon>
       </button>
     </ion-item>
     <ion-item *ngIf="node.id" border-top>

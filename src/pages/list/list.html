@@ -18,33 +18,29 @@
       </button>
     </ion-buttons>
   </ion-navbar>
-  <ion-toolbar color="lighter" class="toolbar_header" no-border-bottom>
-    <ion-buttons left text-center>
-      <button color="lighter" *ngIf="explorerService.previousNode()" ion-button text-center
-              (click)="navigateTo(explorerService.previousNode(), false, false)" [class]="'close_toolbar bg_seed ' + explorerService.previousNodeEntity().category">
-        <ion-icon *ngIf="explorerService.previousNodeEntity().scope == 'private'" name="lock" class="item_lock"></ion-icon>
-        <div class="prev_label">{{explorerService.previousNodeEntity().shortLabel()}}</div>
-        <ion-icon name="arrow-back" large></ion-icon>
-      </button>
-    </ion-buttons>
-    <ion-title text-center *ngIf="explorerService.rootNode">
-      <button ion-button clear (click)="displayDetails()" class="header_title">
-        <ion-icon *ngIf="explorerService.rootNode.scope == 'private'" name="lock" class="item_lock"></ion-icon>
-        <ion-avatar item-left class="bg_seed {{explorerService.rootNode.category}}">
-          <img *ngIf="explorerService.rootNode.picture" src="{{explorerService.rootNode.picture}}"/>
-          <div *ngIf="!explorerService.rootNode.picture" text-center><i class="ion-md-custom-{{explorerService.rootNode.category}}"></i></div>
-        </ion-avatar>
-        <div>
-          <p text-left>{{explorerService.rootNode.label}}</p>
-          <p text-left>{{explorerService.rootNode.description}}</p>
-        </div>
-      </button>
-    </ion-title>
-    <ion-buttons right></ion-buttons>
-  </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content id="list_content">
+  <ion-list ion-fixed>
+    <ion-item id="title_details" text-center text-wrap>
+      <button class="prev_link" color="text_alt" *ngIf="explorerService.previousNode()" ion-button large item-start text-center icon-only outline round
+              (click)="navigateTo(explorerService.previousNode(), false, false)">
+        <ion-icon name="arrow-back" large></ion-icon>
+      </button>
+      <button ion-button large outline item-end icon-only color="link" (click)="displayDetails()" id="display_seed">
+        <ion-icon name="eye" large></ion-icon>
+      </button>
+      <ion-icon *ngIf="explorerService.rootNode.scope == 'private'" name="lock" class="item_lock"></ion-icon>
+      <ion-avatar class="bg_seed {{explorerService.rootNode.category}}">
+        <img *ngIf="explorerService.rootNode.picture" src="{{explorerService.rootNode.picture}}"/>
+        <div *ngIf="!explorerService.rootNode.picture" text-center><i class="ion-md-custom-{{explorerService.rootNode.category}}"></i></div>
+      </ion-avatar>
+      <div>
+        <p text-left>{{explorerService.rootNode.label}}</p>
+        <p text-left>{{explorerService.rootNode.description}}</p>
+      </div>
+    </ion-item>
+  </ion-list>
   <div id="list_wrapper">
     <div id="loading_spinner" *ngIf="!explorerService.networkData" text-center>
       <ion-spinner name="dots"></ion-spinner><span light>Chargement en cours</span>

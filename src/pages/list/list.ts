@@ -3,9 +3,10 @@ import {NavController, Content, NavParams, Platform, IonicPage} from 'ionic-angu
 import {ExplorerService} from "../../providers/explorer.service";
 import {SearchService} from "../../providers/search.service";
 import {DataService} from "../../providers/data.service";
-import {SearchPage} from "../search/search";
 
-IonicPage()
+@IonicPage({
+  segment: 'liste'
+})
 @Component({
   templateUrl: 'list.html'
 })
@@ -16,13 +17,12 @@ export class ListPage {
               public explorerService: ExplorerService, public dataService: DataService, private platform: Platform) {
   }
 
-  ionViewDidLoad(): void {
-    let seedId = this.navParams.get('seedId') || this.explorerService.currentNode();
-    this.explorerService.navigateTo(seedId, false);
-  }
-
   ionViewDidEnter(): void {
     this.registerBack();
+    let seedId = this.navParams.get('id');
+    if(seedId) {
+      this.explorerService.navigateTo(seedId, false);
+    }
   }
 
   navigateTo(node, showGraph, reset): void {
@@ -36,7 +36,7 @@ export class ListPage {
   }
 
   displaySearch() {
-    this.navCtrl.push(SearchPage);
+    this.navCtrl.push('SearchPage');
   }
 
   displayDetails() {

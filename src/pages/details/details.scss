@@ -2,13 +2,41 @@
   min-height: 4rem;
 }
 
+#title_details button.prev_link {
+  margin: 16px 15px 10px -5px;
+}
+
+#title_details #edit_seed,
+#title_details #display_seed {
+  margin: 15px 2px 10px 15px;
+}
+
+#title_details button[item-end] ion-icon,
+#title_details button[item-start] ion-icon {
+  font-size: 1.5em;
+}
+
+#title_details .item-inner ion-label {
+  display: flex;
+  align-items: center;
+  margin-top: 5px;
+}
+
+#title_details ion-label h2,
+#title_details ion-label p {
+  padding-left: 6px;
+}
+
+#title_details ion-label ion-avatar {
+  min-width: 56px;
+}
+
 #list_details .button-inner {
   text-transform: none;
   justify-content: flex-start;
 }
 
 #list_details .button-large-md {
-  font-size: 1.7rem;
   line-height: 2.8em;
 }
 

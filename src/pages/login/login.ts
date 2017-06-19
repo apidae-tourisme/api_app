@@ -36,44 +36,15 @@ export class LoginPage {
 
   ionViewDidEnter() {
     let url = window.location.href;
-    if(url.indexOf('auth_token') != -1 && url.indexOf('client_id') != -1 && url.indexOf('uid') != -1) {
-      let callBackParams = url.slice(url.indexOf('?'));
-      this.authService.setLocalAuthData(callBackParams).then(() => {
-        window.location.href = '/';
-      }, (error) => {
-        let alert = this.alertCtrl.create({
-          title: "En attente de validation",
-          message: "Nous avons bien pris note de votre souhait d’utiliser ApiApp et vous en remercions. Nous reprendrons " +
-            "contact avec vous au moment de valider votre accès à l’application. Pour toute question complémentaire, " +
-            "vous pouvez nous joindre à l’adresse info@apiapp.apidae-tourisme.com.\n\n" +
-            "L’équipe Apidae Tourisme",
-          cssClass: "custom_alert",
-          buttons: [
-            {
-              text: 'Fermer',
-              handler: () => {
-                window.location.href = '/';
-              }
-            }
-          ]
+    // callback in browser - Apidae SSO from browser
+    if(url.indexOf('code') != -1) {
+      this.authService.handleAuthCallback(url, () => {
+        this.loggedInRedirect();
+        }, () => {
+          console.log('handleAuthCallback error');
         });
-        alert.present();
-        console.log('Local auth loading failed');
-      });
     } else {
-      this.platform.ready().then(() => {
-        this.authService.getLocalAuthData().then(authData => {
-          if(authData) {
-            if(this.hasConnectivity()) {
-              this.loggedInRedirect();
-            } else {
-              this.displayOfflineAlert();
-            }
-          } else {
-            console.log("Local auth data missing");
-          }
-        })
-      });
+      this.loggedInRedirect();
     }
   }
 

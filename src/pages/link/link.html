@@ -1,7 +1,7 @@
-<ion-header *ngIf="dataService.userSeed">
+<ion-header>
   <ion-navbar color="lighter" hideBackButton="true">
     <ion-buttons left>
-      <button ion-button (click)="navigateTo(null, false)">
+      <button ion-button (click)="navigateTo(null, true, false)">
         <img id="header_logo" src="assets/img/logo-apiapp-mini.svg"/>
       </button>
     </ion-buttons>
@@ -12,7 +12,7 @@
       </button>
     </ion-toolbar>
     <ion-buttons right *ngIf="dataService.userSeed">
-      <button ion-button (click)="navigateTo(dataService.userSeed.id, false)">
+      <button ion-button (click)="navigateTo(dataService.userSeed.id, true, false)">
         <img id="avatar_logo" *ngIf="dataService.userSeed.picture" src="{{dataService.userSeed.picture}}"/>
         <i id="avatar_icon" *ngIf="!dataService.userSeed.picture" class="ion-md-custom-person"></i>
       </button>
@@ -20,14 +20,5 @@
   </ion-navbar>
 </ion-header>
 
-<ion-content id="graph_wrapper">
-  <button id="prev_node" class="prev_link" color="text_alt" *ngIf="explorerService.previousNode()" ion-button text-center icon-only outline round
-          (click)="navigateTo(explorerService.previousNode(), false, false)">
-    <ion-icon name="arrow-back" large></ion-icon>
-  </button>
-  <graph (showDetails)="displayDetails()" (rootChange)="rootNodeChange($event);" [width]="graphWidth" [height]="graphHeight"></graph>
-  <div id="graph_bg">
-    <img src="assets/img/flowers-left.png"/>
-    <img src="assets/img/flowers-right.png"/>
-  </div>
+<ion-content>
 </ion-content>

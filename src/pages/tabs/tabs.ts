@@ -1,8 +1,10 @@
 import {Component, ViewChild} from '@angular/core';
-import {IonicPage, NavParams, Tabs} from "ionic-angular";
-// import {GraphPage} from "../graph/graph";
+import {IonicPage, Tabs} from "ionic-angular";
 
-@IonicPage()
+
+@IonicPage({
+  segment: 'explorer'
+})
 @Component({
   templateUrl: 'tabs.html'
 })
@@ -13,17 +15,8 @@ export class TabsPage {
   tab2Root: any = 'DetailsPage';
   tab3Root: any = 'ListPage';
 
-  constructor(private navParams: NavParams) {
-  }
+  tabParams: any;
 
-  // ionViewDidEnter() {
-  //   let displayMode = this.navParams.get('mode');
-  //   if(displayMode) {
-  //     if(displayMode == 'detail') {
-  //       this.tabs.select(1);
-  //     } else if(displayMode == 'liste') {
-  //       this.tabs.select(2);
-  //     }
-  //   }
-  // }
+  constructor() {
+  }
 }

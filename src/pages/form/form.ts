@@ -110,17 +110,19 @@ export class FormPage {
     this.node.endDate = null;
   }
 
-  toggleScope(): void {
-    this.node.scope = this.node.scope == 'private' ? 'public' : 'private';
+  toggleScope(scope): void {
+    this.node.scope = scope;
     this.node.contributor = this.dataService.userSeed.email;
   }
 
-  scopeIcon(): string {
-    return this.node.scope == 'public' ? 'unlock' : 'lock';
-  }
-
   scopeLabel(): string {
-    return this.node.scope == 'public' ? 'Graine publique' : 'Graine privée';
+    if(this.node.scope == 'apidae') {
+      return 'tout le réseau';
+    } else if(this.node.scope == 'private') {
+      return 'moi uniquement';
+    } else {
+      return 'tout le monde';
+    }
   }
 
   scopeColor(): string {

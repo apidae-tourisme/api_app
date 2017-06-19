@@ -66,12 +66,6 @@ export class GraphComponent {
       .append("font-face-uri")
       .attr("xlink:href", "assets/fonts/ionicons.svg#Ionicons");
 
-    // seeds drop shadow
-    let shadowFilter = defs.append("filter").attr("id", "shadow");
-    shadowFilter.append("feOffset").attr("result", "offOut").attr("in", "SourceAlpha").attr("dx", "0").attr("dy", "1");
-    shadowFilter.append("feGaussianBlur").attr("result", "blurOut").attr("in", "offOut").attr("stdDeviation", "0.7");
-    shadowFilter.append("feBlend").attr("in", "SourceGraphic").attr("in2", "blurOut").attr("mode", "normal");
-
     // seed hexagonal shape
     defs.append("path").attr("id", "seed").attr("d", "M70,56.19V22.77a6.06,6.06,0,0,0-3-5.24L38,.82A6,6,0,0,0,32,.82L3,17.53a6.06,6.06,0,0,0-3,5.24V56.21a6.06,6.06,0,0,0,3,5.24L32,78.16a6,6,0,0,0,6.06,0L67,61.46A6.14,6.14,0,0,0,70,56.19Z");
 
@@ -167,9 +161,6 @@ export class GraphComponent {
       let nodesEnter = that.node.enter().append("g");
 
       nodesEnter.append("use")
-        .attr("filter", function (d) {
-          return d.category == 'concept' ? "url(#shadow)" : "";
-        })
         .attr("class", function (d) {
           return d.category + "node_bg bg_" + d.category;
         })

@@ -44,12 +44,13 @@ $background-color:  map-get($colors, bg);
 $label-md-text-color: map-get($colors, text_alt);
 
 // Custom tabs
+$tabs-background: map-get($colors, lighter);
 $tabs-md-tab-text-color: map-get($colors, text_main);
 $tabs-md-tab-text-color-active: map-get($colors, link);
 $tabs-md-tab-icon-color: map-get($colors, text_alt);
 $tabs-md-tab-icon-color-active: map-get($colors, link);
-$tabs-md-tab-min-height: 6rem;
-$tabs-md-tab-icon-size: 3rem;
+$tabs-md-tab-min-height: 4.6rem;
+$tabs-md-tab-icon-size: 3.2rem;
 $tabs-md-tab-font-size: 1.4rem;
 $tabs-md-tab-font-size-active: 1.6rem;
 

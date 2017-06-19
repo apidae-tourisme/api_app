@@ -1,5 +1,5 @@
 import {Injectable} from "@angular/core";
-import {URLSearchParams} from "@angular/http";
+import {Http, Headers} from "@angular/http";
 import 'rxjs/Rx';
 import {Storage} from "@ionic/storage";
 import {ApiAppConfig} from "./apiapp.config";
@@ -11,33 +11,18 @@ declare var window: any;
 @Injectable()
 export class AuthService {
 
-  constructor(private storage: Storage, private platform: Platform, private iab: InAppBrowser){
-  }
-
-  authUrl(): string {
-    return ApiAppConfig.API_URL + ApiAppConfig.AUTH_PATH;
+  constructor(private storage: Storage, private platform: Platform, private iab: InAppBrowser, private http: Http){
   }
 
   authenticate(success, error): void {
-    let authUrl = this.authUrl() + '?auth_origin_url=' + encodeURIComponent(window.location.href);
     if(!this.platform.is('cordova')) {
-      window.location.href = authUrl;
+      window.location.href = ApiAppConfig.authUrl(encodeURIComponent(window.location.href));
     } else {
-      let browser = this.iab.create(authUrl, '_blank', 'location=no');
+      let browser = this.iab.create(ApiAppConfig.authUrl(ApiAppConfig.OAUTH_REDIRECT_URL), '_blank',
+        'location=no,closebuttoncaption=Fermer,clearsessioncache=yes,clearcache=yes');
       browser.on('loadstart').subscribe(data => {
         let callBackUrl = data['url'];
-        if(callBackUrl && callBackUrl.indexOf('auth_token') != -1 && callBackUrl.indexOf('client_id') != -1 &&
-          callBackUrl.indexOf('uid') != -1) {
-          let callBackParams = callBackUrl.slice(callBackUrl.indexOf('?'));
-          browser.close();
-          this.setLocalAuthData(callBackParams).then(() => {
-            success();
-          }, (error) => {
-            console.log('Local auth is invalid');
-          }).catch((err) => {
-            console.log('Unable to set local auth data : ' + err);
-          });
-        }
+        this.handleAuthCallback(callBackUrl, success, error);
       });
       browser.on('loaderror').subscribe(data => {
         console.log('OAuth request error : ' + JSON.stringify(data));
@@ -46,32 +31,51 @@ export class AuthService {
     }
   }
 
+  handleAuthCallback(callBackUrl, success, error) {
+    if (callBackUrl.indexOf(ApiAppConfig.OAUTH_REDIRECT_URL) === 0) {
+      let callBackCode = callBackUrl.split("code=")[1];
+      let code = callBackCode.split("&")[0];
+      let tokenHeader = {headers: new Headers({
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Authorization': 'Basic ' + btoa(ApiAppConfig.OAUTH_CLIENT_ID + ":" + ApiAppConfig.OAUTH_SECRET)
+      })};
+      let queryParams = "grant_type=authorization_code&redirect_uri=" + ApiAppConfig.OAUTH_REDIRECT_URL + "&code=" + code;
+      this.http.post(ApiAppConfig.OAUTH_TOKEN_URL, queryParams, tokenHeader).map(resp => {
+        return resp.json();
+      }).subscribe(data => {
+        console.log('token success');
+        let profileHeader = {headers: new Headers({'Authorization': 'Bearer ' + data.access_token})};
+        this.http.get(ApiAppConfig.OAUTH_PROFILE_URL, profileHeader).map(resp => {
+          return resp.json();
+        }).subscribe(profile => {
+          this.setLocalAuthData(profile.id).then(() => {
+            success();
+          }, error => {
+            console.log('Local auth is invalid : ' + error);
+          }).catch((err) => {
+            console.log('Unable to set local auth data : ' + err);
+          });
+        }, error => {
+          console.log("Profile retrieval error : " + error);
+        });
+      }, error => {
+        console.log('Token retrieval error : ' + error);
+      });
+    }
+  }
+
   getLocalAuthData() {
     return this.storage.get('authData');
   }
 
-  setLocalAuthData(authQuery: string) {
-    if(authQuery.length > 0 && authQuery.indexOf('?') == 0) {
-      let params = new URLSearchParams(authQuery.slice(1));
-      let authData = {
-        accessToken:    params.get('auth_token'),
-        client:         params.get('client_id'),
-        expiry:         params.get('expiry'),
-        tokenType:      params.get('tokenType'),
-        uid:            params.get('uid').replace(/\D/g,'')
-      };
-      if(this.isValidAuth(authData)) {
-        return this.storage.set('authData', authData);
-      }
+  setLocalAuthData(userId) {
+    if(userId) {
+      return this.storage.set('authData', {uid: userId});
     }
     return Promise.reject('Could not set local auth data');
   }
 
   logOut() {
     return this.storage.set('authData', null);
-  }
-
-  private isValidAuth(auth): boolean {
-    return auth.uid && auth.uid.length > 0;
   }
 }

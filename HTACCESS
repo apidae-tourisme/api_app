@@ -1,0 +1,11 @@
+# Sample .htaccess content that is currently required when deploying to a web server with locationStrategy = 'path'
+
+<IfModule mod_rewrite.c>
+Options Indexes FollowSymLinks
+RewriteEngine On
+RewriteBase /
+RewriteRule ^index\.html$ - [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /index.html [L]
+</IfModule>

@@ -1,13 +1,12 @@
 import {Component, ViewChild} from '@angular/core';
-import {Content, IonicPage, NavController, NavParams, Platform} from 'ionic-angular';
+import {Content, IonicPage, NavController, Platform} from 'ionic-angular';
 import {ExplorerService} from "../../providers/explorer.service";
 import {SearchService} from "../../providers/search.service";
 import {DataService} from "../../providers/data.service";
 import {GraphComponent} from "../../components/graph.component";
-import {SearchPage} from "../search/search";
 
 @IonicPage({
-  segment: 'graph'
+  segment: 'graphe'
 })
 @Component({
   templateUrl: 'graph.html'
@@ -21,7 +20,7 @@ export class GraphPage {
   public graphHeight: number;
 
   constructor(public explorerService: ExplorerService, public searchService: SearchService, public dataService: DataService,
-              private navCtrl: NavController, private navParams: NavParams, private platform: Platform) {
+              private navCtrl: NavController, private platform: Platform) {
     this.loading = true;
   }
 
@@ -33,11 +32,11 @@ export class GraphPage {
     this.graphWidth = this.content.contentWidth;
     this.graphHeight = this.content.contentHeight;
     this.registerBack();
-    let seedParam = this.navParams.get('seedId');
-    if(seedParam) {
-      this.explorerService.navigateTo(seedParam == 'default' ? null : seedParam, true, () => this.drawNetwork());
+    console.log('rootNode : ' + this.explorerService.rootNode);
+    if(!this.explorerService.rootNode) {
+        this.explorerService.navigateTo(null, true, () => this.drawNetwork());
     } else {
-      this.explorerService.navigateTo(this.explorerService.currentNode(), false, () => this.drawNetwork());
+      this.drawNetwork();
     }
   }
 
@@ -58,7 +57,7 @@ export class GraphPage {
   }
 
   displaySearch() {
-    this.navCtrl.push(SearchPage);
+    this.navCtrl.push('SearchPage');
   }
 
   registerBack() {

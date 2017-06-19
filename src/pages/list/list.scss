@@ -13,3 +13,31 @@ ion-list ion-item.item-md ion-avatar {
   width: 44px;
   height: 44px;
 }
+
+#list_content .scroll-content {
+  top: 84px;
+}
+
+#list_content #title_details {
+  border-bottom: 2px solid #dedede;
+}
+
+#list_content #title_details .item-inner ion-label {
+  margin-top: 15px;
+}
+
+#list_content .fixed-content > ion-list {
+  width: 100%;
+}
+
+#title_details p:first-child {
+  color: map-get($colors, text_main);
+  font-size: $font-size-base;
+  margin-bottom: 4px;
+}
+
+#title_details p:last-child {
+  color: map-get($colors, text_alt);
+  font-size: 1.1rem;
+  line-height: 1em;
+}

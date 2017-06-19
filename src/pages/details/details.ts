@@ -4,14 +4,13 @@ import {DomSanitizer, SafeUrl} from "@angular/platform-browser";
 import {ExplorerService} from "../../providers/explorer.service";
 import {SearchService} from "../../providers/search.service";
 import {AuthService} from "../../providers/auth.service";
-import {LoginPage} from "../login/login";
 import {DataService} from "../../providers/data.service";
-import {FormPage} from "../form/form";
 import {Seed} from "../../components/seed.model";
-import {SearchPage} from "../search/search";
 import {InAppBrowser} from "@ionic-native/in-app-browser";
 
-@IonicPage()
+@IonicPage({
+  segment: 'detail'
+})
 @Component({
   templateUrl: 'details.html'
 })
@@ -26,7 +25,7 @@ export class DetailsPage {
 
   ionViewDidEnter(): void {
     this.registerBack();
-    let seedId = this.navParams.get('seedId');
+    let seedId = this.navParams.get('id');
     if(seedId) {
       this.explorerService.navigateTo(seedId, false);
     }
@@ -82,12 +81,12 @@ export class DetailsPage {
   }
 
   displaySearch() {
-    this.navCtrl.push(SearchPage);
+    this.navCtrl.push('SearchPage');
   }
 
   editSeed(): void {
     this.dataService.editNode(this.explorerService.rootNode.id).subscribe(data => {
-      this.navCtrl.push(FormPage, {node: new Seed(data.node, false, false)});
+      this.navCtrl.push('FormPage', {node: new Seed(data.node, false, false)});
     }, error => {
       console.log("Failed to load node " + this.explorerService.rootNode.id + " for edition");
     });
@@ -130,7 +129,7 @@ export class DetailsPage {
               this.dataService.clearUser();
               this.explorerService.clearData();
               this.zone.run(() => {
-                this.app.getRootNav().setRoot(LoginPage);
+                this.app.getRootNav().setRoot('LoginPage');
               });
             });
           }
