@@ -4,6 +4,7 @@ import {ExplorerService} from "../../providers/explorer.service";
 import {SearchService} from "../../providers/search.service";
 import {DataService} from "../../providers/data.service";
 import {GraphComponent} from "../../components/graph.component";
+import {SeedsService} from "../../providers/seeds.service";
 
 @IonicPage({
   segment: 'graphe'
@@ -19,7 +20,7 @@ export class GraphPage {
   public graphWidth: number;
   public graphHeight: number;
 
-  constructor(public explorerService: ExplorerService, public searchService: SearchService, public dataService: DataService,
+  constructor(public explorerService: ExplorerService, public searchService: SearchService, public dataService: SeedsService,
               private navCtrl: NavController, private platform: Platform) {
     this.loading = true;
   }
@@ -32,7 +33,6 @@ export class GraphPage {
     this.graphWidth = this.content.contentWidth;
     this.graphHeight = this.content.contentHeight;
     this.registerBack();
-    console.log('rootNode : ' + this.explorerService.rootNode);
     if(!this.explorerService.rootNode) {
         this.explorerService.navigateTo(null, true, () => this.drawNetwork());
     } else {

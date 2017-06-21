@@ -4,6 +4,7 @@ import {AuthService} from "../../providers/auth.service";
 import {DataService} from "../../providers/data.service";
 import {Seed} from "../../components/seed.model";
 import {Network} from "@ionic-native/network";
+import {SeedsService} from "../../providers/seeds.service";
 
 @IonicPage()
 @Component({
@@ -16,7 +17,7 @@ export class LoginPage {
   private connectionType: string;
 
   constructor(public navCtrl: NavController, public authService: AuthService, private platform: Platform,
-              private network: Network, private dataService: DataService, private alertCtrl: AlertController,
+              private network: Network, private dataService: SeedsService, private alertCtrl: AlertController,
               private zone: NgZone) {
     this.connectionType = 'web';
 
@@ -61,13 +62,11 @@ export class LoginPage {
       this.navigateHome();
     } else {
       this.authService.getLocalAuthData().then(authData => {
-        if(authData && authData.uid) {
-          this.dataService.userId = authData.uid;
-          this.dataService.getNodeDetails(authData.uid).subscribe(data => {
-            this.dataService.userSeed = new Seed(data.node, false, false);
+        if(authData && authData.email) {
+          this.dataService.userEmail = authData.email;
+          this.dataService.getUserSeed(authData.email, (data) => {
+            this.dataService.userSeed = new Seed(data, false, false);
             this.navigateHome();
-          }, function() {
-            console.log('User seed retrieval failed');
           });
         } else {
           console.log('Invalid auth data');
@@ -81,6 +80,7 @@ export class LoginPage {
   // root change is wrapped in a ng zone call to prevent duplicate controller instances (see https://github.com/driftyco/ionic/issues/5960)
   navigateHome(): void {
     this.zone.run(() => {
+      console.log('setting root');
       this.navCtrl.setRoot('TabsPage', {animate: false});
     });
   }

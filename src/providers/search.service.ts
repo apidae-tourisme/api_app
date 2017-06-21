@@ -3,6 +3,7 @@ import {Injectable} from "@angular/core";
 import {DataService} from "./data.service";
 import {ExplorerService} from "./explorer.service";
 import {Seed} from "../components/seed.model";
+import {SeedsService} from "./seeds.service";
 
 @Injectable()
 export class SearchService {
@@ -11,7 +12,7 @@ export class SearchService {
   public showSearch: boolean;
   public searching: boolean;
 
-  constructor(private dataService: DataService, public explorerService: ExplorerService, protected platform: Platform) {
+  constructor(private dataService: SeedsService, public explorerService: ExplorerService, protected platform: Platform) {
     this.showSearch = false;
     this.searching = false;
     this.nodes = [];
@@ -26,10 +27,11 @@ export class SearchService {
     let val = ev.target.value;
 
     if (val && val.trim() != '' && val.length > 2) {
-      this.dataService.searchNodes(val).subscribe(data => {
+      this.dataService.searchNodes(val).then(nodes => {
+        console.log('seachNodes in service : ' + nodes);
         this.nodes = [];
-        for (let i = 0; i < data.nodes.length; i++) {
-          this.nodes.push(new Seed(data.nodes[i], false, false));
+        for (let i = 0; i < nodes.length; i++) {
+          this.nodes.push(new Seed(nodes[i], false, false));
         }
         this.searching = false;
         onComplete();

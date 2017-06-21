@@ -43,12 +43,11 @@ export class AuthService {
       this.http.post(ApiAppConfig.OAUTH_TOKEN_URL, queryParams, tokenHeader).map(resp => {
         return resp.json();
       }).subscribe(data => {
-        console.log('token success');
         let profileHeader = {headers: new Headers({'Authorization': 'Bearer ' + data.access_token})};
         this.http.get(ApiAppConfig.OAUTH_PROFILE_URL, profileHeader).map(resp => {
           return resp.json();
         }).subscribe(profile => {
-          this.setLocalAuthData(profile.id).then(() => {
+          this.setLocalAuthData(profile.email).then(() => {
             success();
           }, error => {
             console.log('Local auth is invalid : ' + error);
@@ -68,9 +67,9 @@ export class AuthService {
     return this.storage.get('authData');
   }
 
-  setLocalAuthData(userId) {
-    if(userId) {
-      return this.storage.set('authData', {uid: userId});
+  setLocalAuthData(userEmail) {
+    if(userEmail) {
+      return this.storage.set('authData', {email: userEmail});
     }
     return Promise.reject('Could not set local auth data');
   }

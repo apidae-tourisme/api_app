@@ -31,10 +31,10 @@ export class Seed {
   urls: Array<any>;
 
   public constructor(nodeData: any, public isRoot: boolean, public isPrevious: boolean) {
-    this.id = nodeData.id;
+    this.id = nodeData._id;
     this.label = (nodeData.firstname && nodeData.lastname) ? (nodeData.firstname + ' ' + nodeData.lastname) : nodeData.name;
     this.description = nodeData.description;
-    this.category = nodeData.label ? (nodeData.label.charAt(0).toLowerCase() + nodeData.label.substring(1)) : Seed.DEFAULT_TYPE;
+    this.category = nodeData.type ? (nodeData.type.charAt(0).toLowerCase() + nodeData.type.substring(1)) : Seed.DEFAULT_TYPE;
     this.firstName = nodeData.firstname;
     this.lastName = nodeData.lastname;
     this.email = nodeData.email;
@@ -54,9 +54,9 @@ export class Seed {
     this.author = nodeData.author;
     this.authorId = nodeData.author_id;
     this.seeds = [];
-    if(nodeData.seeds) {
-      for(let i = 0; i < nodeData.seeds.length; i++) {
-        this.seeds.push(new Seed(nodeData.seeds[i], false, false));
+    if(nodeData.connections) {
+      for(let i = 0; i < nodeData.connections.length; i++) {
+        this.seeds.push(new Seed(nodeData.connections[i], false, false));
       }
     }
     this.urls = [];

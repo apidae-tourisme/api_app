@@ -18,6 +18,7 @@ import {Network} from "@ionic-native/network";
 import {Keyboard} from "@ionic-native/keyboard";
 import {StatusBar} from "@ionic-native/status-bar";
 import {SplashScreen} from "@ionic-native/splash-screen";
+import {SeedsService} from "../providers/seeds.service";
 
 @NgModule({
   declarations: [
@@ -56,6 +57,7 @@ import {SplashScreen} from "@ionic-native/splash-screen";
     ApiAppConfig,
     AuthService,
     DataService,
+    SeedsService,
     ExplorerService,
     SearchService,
     Seeds

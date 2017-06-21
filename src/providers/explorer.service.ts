@@ -2,6 +2,7 @@ import {Injectable} from "@angular/core";
 import {DataService} from "./data.service";
 import 'rxjs/Rx';
 import {Seed} from "../components/seed.model";
+import {SeedsService} from "./seeds.service";
 
 @Injectable()
 export class ExplorerService {
@@ -11,7 +12,7 @@ export class ExplorerService {
   public navBackward: Array<Seed>;
   public navForward: Array<Seed>;
 
-  constructor(private dataService: DataService) {
+  constructor(private dataService: SeedsService) {
     this.navBackward = [];
     this.navForward = [];
     this.networkData = {
@@ -28,7 +29,7 @@ export class ExplorerService {
 
   private exploreGraph(resetData: boolean, newNode, onComplete?): void {
 
-    this.dataService.getNodeData(newNode).subscribe(data => {
+    this.dataService.getNodeData(newNode).then(data => {
       let parsedData: any = {
         nodes: [],
         edges: [],
@@ -41,8 +42,8 @@ export class ExplorerService {
 
       for (let i = 0; i < nodes.length; i++) {
         let node = nodes[i];
-        if (node.id) {
-          let networkNode = new Seed(node, node.is_root, node.id == newPrevious);
+        if (node._id) {
+          let networkNode = new Seed(node, i == 0, node._id == newPrevious);
           if(networkNode.isRoot) {
             this.rootNode = networkNode;
           }
