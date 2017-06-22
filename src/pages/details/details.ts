@@ -85,11 +85,6 @@ export class DetailsPage {
   }
 
   editSeed(): void {
-    // this.dataService.editNode(this.explorerService.rootNode.id).subscribe(data => {
-    //   this.navCtrl.push('FormPage', {node: new Seed(data.node, false, false)});
-    // }, error => {
-    //   console.log("Failed to load node " + this.explorerService.rootNode.id + " for edition");
-    // });
     this.dataService.getNodeData(this.explorerService.rootNode.id).then((data) => {
       console.log('node data retrieved');
       let node = new Seed(data.nodes[0], false, false);
