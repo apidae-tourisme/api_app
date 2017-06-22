@@ -3,7 +3,7 @@ import {Component, NgZone} from "@angular/core";
 import {AuthService} from "../../providers/auth.service";
 import {ExplorerService} from "../../providers/explorer.service";
 import {Seed} from "../../components/seed.model";
-import {DataService} from "../../providers/data.service";
+import {SeedsService} from "../../providers/seeds.service";
 
 @IonicPage({
   segment: 'acceder/:id'
@@ -14,9 +14,8 @@ import {DataService} from "../../providers/data.service";
 export class LinkPage {
 
   constructor(public navCtrl: NavController, public authService: AuthService, private explorerService: ExplorerService,
-              private dataService: DataService, private navParams: NavParams, private zone: NgZone) {
+              private dataService: SeedsService, private navParams: NavParams, private zone: NgZone) {
     let seedId = this.navParams.get('id');
-    console.log('seedId : ' + seedId);
     if(seedId) {
       this.explorerService.navigateTo(seedId, false, () => this.loggedInRedirect());
     }
@@ -27,13 +26,11 @@ export class LinkPage {
       this.navigateHome();
     } else {
       this.authService.getLocalAuthData().then(authData => {
-        if(authData && authData.uid) {
-          this.dataService.userId = authData.uid;
-          this.dataService.getNodeDetails(authData.uid).subscribe(data => {
-            this.dataService.userSeed = new Seed(data.node, false, false);
+        if(authData && authData.email) {
+          this.dataService.userEmail = authData.email;
+          this.dataService.getCurrentUserSeed((data) => {
+            this.dataService.userSeed = new Seed(data, false, false);
             this.navigateHome();
-          }, function() {
-            console.log('User seed retrieval failed');
           });
         } else {
           console.log('Invalid auth data');

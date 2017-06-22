@@ -37,7 +37,7 @@ export class LoginPage {
 
     this.evts.subscribe('sync:paused', () => {
       if(!this.dataService.userSeed) {
-        this.dataService.getUserSeed((data) => {
+        this.dataService.getCurrentUserSeed((data) => {
           this.dataService.userSeed = new Seed(data, false, false);
           this.navigateHome();
         });

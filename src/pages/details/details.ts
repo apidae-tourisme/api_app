@@ -80,6 +80,12 @@ export class DetailsPage {
     }
   }
 
+  navigateToAuthor(author) {
+    this.dataService.getUserSeed(author, (data) => {
+      this.navigateTo(data._id, false, false);
+    })
+  }
+
   displaySearch() {
     this.navCtrl.push('SearchPage');
   }

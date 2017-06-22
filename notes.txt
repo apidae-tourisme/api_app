@@ -1,0 +1,4 @@
+# Notes
+
+# Frequent issues
+- Uncaught syntax error with "<" token and main.js chunk not loaded : check path strategy and base href in index.html

@@ -8,6 +8,8 @@ declare var d3: any;
 })
 export class GraphComponent {
 
+  private static readonly GRAPH_PATH = 'explorer/vue/graphe';
+
   @Input() width: number;
   @Input() height: number;
 
@@ -228,6 +230,9 @@ export class GraphComponent {
 
       that.simulation.force("center", d3.forceCenter(that.width / 2, that.height / 2));
       that.simulation.alpha(1).restart();
+
+      // Fix svg display issue on FF when using <base> tag (see https://gist.github.com/leonderijke/c5cf7c5b2e424c0061d2)
+      prependBaseUrl();
     }, 400);
 
     function changeRootNode() {
@@ -260,6 +265,16 @@ export class GraphComponent {
           ref.doWrap(text, text.text(), true, false, layout.textMedium, 0, layout);
         }
       });
+    }
+
+    function prependBaseUrl() {
+      [].slice.call(document.querySelectorAll("use[*|href]"))
+        .filter(function (element) {
+          return (element.getAttribute("href").indexOf("#") === 0);
+        })
+        .forEach(function (element) {
+          element.setAttribute("href", GraphComponent.GRAPH_PATH + element.getAttribute("href"));
+        });
     }
   }
 

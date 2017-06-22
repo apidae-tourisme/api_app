@@ -112,12 +112,16 @@ export class SeedsService {
     });
   }
 
-  getUserSeed(success) {
-    this.localDatabase.find({selector: {email: this.userEmail}}).then(function (res) {
+  getCurrentUserSeed(success) {
+    this.getUserSeed(this.userEmail, success);
+  }
+
+  getUserSeed(userEmail, success) {
+    this.localDatabase.find({selector: {email: userEmail}}).then(function (res) {
       if (res.docs && res.docs.length > 0) {
         success(res.docs[0]);
       } else {
-        console.log('Unknown user : ' + this.userEmail);
+        console.log('Unknown user : ' + userEmail);
       }
     }).catch(function (err) {
       console.log('User seed retrieval error : ' + JSON.stringify(err));
@@ -132,21 +136,14 @@ export class SeedsService {
     })
   }
 
-  editNode(nodeId) {
-    // let url = ApiAppConfig.API_URL + "/seeds/" + nodeId + "/edit.json";
-    // return this.http.get(url, this.userHeader()).map(resp => {
-    //   return resp.json();
-    // });
-  }
-
   saveNode(seed) {
     let nodeId = seed.id;
     let seedParams = seed.submitParams();
     console.log('submitParams : ' + JSON.stringify(seedParams));
     if(nodeId) {
-      return this.localDatabase.post(seedParams);
-    } else {
       return this.localDatabase.put(seedParams);
+    } else {
+      return this.localDatabase.post(seedParams);
     }
   }
 

@@ -84,7 +84,7 @@
     </ion-item>
     <ion-item *ngIf="explorerService.rootNode.author" class="selectable item-datetime-disabled details_author">
       <ion-label no-margin>Par </ion-label>
-      <button ion-button item-right large clear color="link" (click)="navigateTo(explorerService.rootNode.authorId, false, false)">{{explorerService.rootNode.author}}</button>
+      <button ion-button item-right large clear color="link" (click)="navigateToAuthor(explorerService.rootNode.author)">{{explorerService.rootNode.author}}</button>
     </ion-item>
   </ion-list>
 </ion-content>

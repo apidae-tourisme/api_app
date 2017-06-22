@@ -23,7 +23,7 @@ export class AuthService {
           'location=no,closebuttoncaption=Fermer,clearsessioncache=yes,clearcache=yes');
         browser.on('loadstart').subscribe(data => {
           let callBackUrl = data['url'];
-          this.handleAuthCallback(callBackUrl, success, error);
+          this.handleAuthCallback(callBackUrl, success, error, browser);
         });
         browser.on('loaderror').subscribe(data => {
           console.log('OAuth request error : ' + JSON.stringify(data));
@@ -33,7 +33,7 @@ export class AuthService {
     });
   }
 
-  handleAuthCallback(callBackUrl, success, error) {
+  handleAuthCallback(callBackUrl, success, error, browser?) {
     if (callBackUrl.indexOf(ApiAppConfig.OAUTH_REDIRECT_URL) === 0) {
       let callBackCode = callBackUrl.split("code=")[1];
       let code = callBackCode.split("&")[0];
@@ -50,6 +50,9 @@ export class AuthService {
           return resp.json();
         }).subscribe(profile => {
           this.setLocalAuthData(profile.email).then(() => {
+            if(browser) {
+              browser.close();
+            }
             success();
           }, error => {
             console.log('Local auth is invalid : ' + error);

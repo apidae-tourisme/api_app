@@ -22,7 +22,7 @@ export class FormPage {
               public dataService: SeedsService, private explorerService: ExplorerService,
               private loadingCtrl: LoadingController, private toastCtrl: ToastController) {
     this.node = params.get('node') || new Seed(
-      {scope: 'private', last_contributor: this.dataService.userEmail, archived: false}, false, false);
+      {scope: 'private', author: this.dataService.userEmail, archived: false}, false, false);
   }
 
   dismissForm(showGraph, refreshUser): void {
