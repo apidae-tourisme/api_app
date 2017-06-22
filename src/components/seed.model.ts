@@ -5,6 +5,7 @@ export class Seed {
   public static readonly DEFAULT_TYPE = Seeds.CONCEPT;
 
   id: string;
+  rev: string;
   label: string;
   description: string;
   category: string;
@@ -32,6 +33,7 @@ export class Seed {
 
   public constructor(nodeData: any, public isRoot: boolean, public isPrevious: boolean) {
     this.id = nodeData._id;
+    this.rev = nodeData._rev;
     this.label = (nodeData.firstname && nodeData.lastname) ? (nodeData.firstname + ' ' + nodeData.lastname) : nodeData.name;
     this.description = nodeData.description;
     this.category = nodeData.type ? (nodeData.type.charAt(0).toLowerCase() + nodeData.type.substring(1)) : Seed.DEFAULT_TYPE;
@@ -50,8 +52,8 @@ export class Seed {
     this.endDate = this.formatDate(nodeData.end_date);
     this.archived = nodeData.archived;
     this.scope = nodeData.scope || 'public';
-    this.contributor = nodeData.last_contributor;
     this.author = nodeData.author;
+    // Todo
     this.authorId = nodeData.author_id;
     this.seeds = [];
     if(nodeData.connections) {
@@ -122,7 +124,8 @@ export class Seed {
 
   public submitParams(): any {
     return {
-      id: this.id,
+      _id: this.id,
+      _rev: this.rev,
       name: (this.firstName && this.lastName) ? (this.firstName + ' ' + this.lastName) : this.label,
       description: this.description,
       thumbnail: this.picture,
@@ -137,7 +140,8 @@ export class Seed {
       ended_at: this.endDate,
       archived: this.archived,
       scope: this.scope,
-      seeds: this.seeds.map(function(s) { return s.id; }) || [],
+      author: this.author,
+      connections: this.seeds.map(function(s) { return s.id; }) || [],
       urls: this.urls.map(function(u) { return u.value; }) || []
     };
   }

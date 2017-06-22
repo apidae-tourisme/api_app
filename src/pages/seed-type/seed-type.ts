@@ -1,7 +1,8 @@
 import {Component} from "@angular/core";
-import {ViewController, NavParams} from "ionic-angular";
+import {ViewController, NavParams, IonicPage} from "ionic-angular";
 import {Seeds} from "../../providers/seeds";
 
+@IonicPage()
 @Component({
   templateUrl: 'seed-type.html'
 })

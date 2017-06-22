@@ -4,6 +4,12 @@
   <div id="auth_panel" text-center>
     <img src="assets/img/logo-apiapp.svg"/><br/>
     <button ion-button large color="link" (click)="authenticateUser()">Se connecter</button><br/>
+    <div class="loading_spinner" *ngIf="loggingIn" text-center margin-top>
+      <ion-spinner name="dots"></ion-spinner>
+      <p *ngIf="dataService.syncProgress" ion-text color="text_alt">
+        Mise à jour des données de l'application en cours ({{dataService.syncProgress}}%)
+      </p>
+    </div>
   </div>
   <div id="login_bg">
     <img src="assets/img/flowers-left.png"/>

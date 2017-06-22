@@ -4,9 +4,9 @@ import {DomSanitizer, SafeUrl} from "@angular/platform-browser";
 import {ExplorerService} from "../../providers/explorer.service";
 import {SearchService} from "../../providers/search.service";
 import {AuthService} from "../../providers/auth.service";
-import {DataService} from "../../providers/data.service";
 import {Seed} from "../../components/seed.model";
 import {InAppBrowser} from "@ionic-native/in-app-browser";
+import {SeedsService} from "../../providers/seeds.service";
 
 @IonicPage({
   segment: 'detail'
@@ -19,7 +19,7 @@ export class DetailsPage {
 
   constructor(private app: App, private navCtrl: NavController, public events: Events, private sanitizer: DomSanitizer,
               public explorerService: ExplorerService, public searchService: SearchService, public authService: AuthService,
-              public alertCtrl: AlertController, private dataService: DataService, private navParams: NavParams,
+              public alertCtrl: AlertController, public dataService: SeedsService, private navParams: NavParams,
               private iab: InAppBrowser, private zone: NgZone, private platform: Platform) {
   }
 
@@ -85,10 +85,18 @@ export class DetailsPage {
   }
 
   editSeed(): void {
-    this.dataService.editNode(this.explorerService.rootNode.id).subscribe(data => {
-      this.navCtrl.push('FormPage', {node: new Seed(data.node, false, false)});
-    }, error => {
-      console.log("Failed to load node " + this.explorerService.rootNode.id + " for edition");
+    // this.dataService.editNode(this.explorerService.rootNode.id).subscribe(data => {
+    //   this.navCtrl.push('FormPage', {node: new Seed(data.node, false, false)});
+    // }, error => {
+    //   console.log("Failed to load node " + this.explorerService.rootNode.id + " for edition");
+    // });
+    this.dataService.getNodeData(this.explorerService.rootNode.id).then((data) => {
+      console.log('node data retrieved');
+      let node = new Seed(data.nodes[0], false, false);
+      if(data.nodes.length > 1) {
+        node.seeds = data.nodes.splice(1).map((n) => {return new Seed(n, false, false)});
+      }
+      this.navCtrl.push('FormPage', {node: node});
     });
   }
 

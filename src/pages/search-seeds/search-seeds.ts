@@ -1,8 +1,9 @@
 import {Component, ViewChild} from "@angular/core";
-import {ViewController, Content} from "ionic-angular";
+import {ViewController, Content, IonicPage} from "ionic-angular";
 import {SearchService} from "../../providers/search.service";
 import {ExplorerService} from "../../providers/explorer.service";
 
+@IonicPage()
 @Component({
   templateUrl: 'search-seeds.html'
 })

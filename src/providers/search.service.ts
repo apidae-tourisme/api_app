@@ -28,13 +28,14 @@ export class SearchService {
 
     if (val && val.trim() != '' && val.length > 2) {
       this.dataService.searchNodes(val).then(nodes => {
-        console.log('seachNodes in service : ' + nodes);
         this.nodes = [];
-        for (let i = 0; i < nodes.length; i++) {
-          this.nodes.push(new Seed(nodes[i], false, false));
+        if(nodes) {
+          for (let i = 0; i < nodes.length; i++) {
+            this.nodes.push(new Seed(nodes[i], false, false));
+          }
+          this.searching = false;
+          onComplete();
         }
-        this.searching = false;
-        onComplete();
       });
     } else {
       this.nodes = [];

@@ -162,8 +162,9 @@ export class GraphComponent {
 
       nodesEnter.append("use")
         .attr("class", function (d) {
-          return d.category + "node_bg bg_" + d.category;
+          return d.category + " node_bg bg_" + d.category;
         })
+        .attr("filter", "")
         .attr("xlink:href", "#seed");
 
       nodesEnter.append("use")

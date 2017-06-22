@@ -1,11 +1,11 @@
 import {Component, ViewChild} from '@angular/core';
 import {NavParams, NavController, ModalController, ToastController, LoadingController, IonicPage} from 'ionic-angular';
 import {Seed} from "../../components/seed.model";
-import {SeedType} from "./seed-type";
-import {DataService} from "../../providers/data.service";
 import {ExplorerService} from "../../providers/explorer.service";
-import {SearchSeeds} from "./search-seeds";
-import {EditAvatar} from "./edit-avatar";
+import {SeedsService} from "../../providers/seeds.service";
+import {SeedType} from "../seed-type/seed-type";
+import {SearchSeeds} from "../search-seeds/search-seeds";
+import {EditAvatar} from "../edit-avatar/edit-avatar";
 
 @IonicPage()
 @Component({
@@ -19,10 +19,10 @@ export class FormPage {
   public disabled: boolean;
 
   constructor(private navCtrl: NavController, private params: NavParams, public modalCtrl: ModalController,
-              public dataService: DataService, private explorerService: ExplorerService,
+              public dataService: SeedsService, private explorerService: ExplorerService,
               private loadingCtrl: LoadingController, private toastCtrl: ToastController) {
     this.node = params.get('node') || new Seed(
-      {scope: 'private', last_contributor: this.dataService.userSeed.email, archived: false}, false, false);
+      {scope: 'private', last_contributor: this.dataService.userEmail, archived: false}, false, false);
   }
 
   dismissForm(showGraph, refreshUser): void {
@@ -53,8 +53,9 @@ export class FormPage {
   }
 
   updateUserSeed(onComplete): void {
-    this.dataService.getNodeDetails(this.dataService.userId).subscribe(data => {
-      this.dataService.userSeed = new Seed(data.node, false, false);
+    this.dataService.getNodeDetails(this.dataService.userSeed.id, data => {
+      this.dataService.userSeed = new Seed(data, false, false);
+      console.log('updated user seed');
       onComplete();
     });
   }
@@ -63,7 +64,8 @@ export class FormPage {
     this.disabled = true;
 
     let loading = this.loadingCtrl.create({
-      content: 'Enregistrement en cours...'
+      content: 'Enregistrement en cours...',
+      spinner: 'dots'
     });
 
     loading.present();
@@ -72,13 +74,18 @@ export class FormPage {
       loading.dismiss();
     }, 30000);
 
-    this.dataService.saveNode(this.node).subscribe(data => {
-      this.node.id = data.node.id;
-      loading.dismiss();
-      this.presentToast("La graine a été enregistrée.", () => {
-        this.dismissForm(true, this.node.id == this.dataService.userSeed.id);
-      });
-    }, error => {
+    this.dataService.saveNode(this.node).then(data => {
+      if(data.ok) {
+        this.node.id = data.id;
+        loading.dismiss();
+        this.presentToast("La graine a été enregistrée.", () => {
+          this.dismissForm(true, this.node.id == this.dataService.userSeed.id);
+        });
+      } else {
+        this.presentToast("Une erreur est survenue pendant l'enregistrement de la graine.", () => {});
+        console.log("saveNode error : " + JSON.stringify(data));
+      }
+    }).catch(error => {
       this.presentToast("Une erreur est survenue pendant l'enregistrement de la graine.", () => {});
       console.log("submit error : " + JSON.stringify(error))
     });
@@ -112,7 +119,7 @@ export class FormPage {
 
   toggleScope(scope): void {
     this.node.scope = scope;
-    this.node.contributor = this.dataService.userSeed.email;
+    this.node.author = this.dataService.userEmail;
   }
 
   scopeLabel(): string {
@@ -146,7 +153,7 @@ export class FormPage {
   }
 
   seedTypes(): void {
-    let typesModal = this.modalCtrl.create(SeedType, {type: this.node.category});
+    let typesModal = this.modalCtrl.create('SeedType', {type: this.node.category});
     typesModal.onDidDismiss(data => {
       this.node.category = data.type;
     });
@@ -154,7 +161,7 @@ export class FormPage {
   }
 
   addSeed(): void {
-    let seedsModal = this.modalCtrl.create(SearchSeeds, {type: this.node.category});
+    let seedsModal = this.modalCtrl.create('SearchSeeds', {type: this.node.category});
     seedsModal.onDidDismiss(data => {
       if(data && data.seed) {
         this.node.seeds.push(data.seed);
@@ -168,7 +175,7 @@ export class FormPage {
   }
 
   editAvatar(): void {
-    let avatarModal = this.modalCtrl.create(EditAvatar);
+    let avatarModal = this.modalCtrl.create('EditAvatar');
     avatarModal.onDidDismiss(data => {
       if(data) {
         this.node.picture = data.imageUrl;

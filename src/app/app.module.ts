@@ -36,6 +36,7 @@ import {SeedsService} from "../providers/seeds.service";
         tabsLayout: 'title-hide',
         tabsHighlight: true,
         tabsHideOnSubPages: true,
+        // Web only
         locationStrategy: 'path'
       }
     ),

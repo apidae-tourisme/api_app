@@ -1,5 +1,5 @@
 import {Component, NgZone} from '@angular/core';
-import {NavController, Platform, AlertController, IonicPage} from 'ionic-angular';
+import {NavController, Platform, AlertController, IonicPage, Events} from 'ionic-angular';
 import {AuthService} from "../../providers/auth.service";
 import {DataService} from "../../providers/data.service";
 import {Seed} from "../../components/seed.model";
@@ -13,12 +13,13 @@ import {SeedsService} from "../../providers/seeds.service";
 export class LoginPage {
 
   public msg: string;
+  public loggingIn: boolean;
 
   private connectionType: string;
 
   constructor(public navCtrl: NavController, public authService: AuthService, private platform: Platform,
               private network: Network, private dataService: SeedsService, private alertCtrl: AlertController,
-              private zone: NgZone) {
+              private zone: NgZone, private evts: Events) {
     this.connectionType = 'web';
 
     // Subscribe to connectivity changes on mobile devices
@@ -33,6 +34,15 @@ export class LoginPage {
         });
       });
     }
+
+    this.evts.subscribe('sync:paused', () => {
+      if(!this.dataService.userSeed) {
+        this.dataService.getUserSeed((data) => {
+          this.dataService.userSeed = new Seed(data, false, false);
+          this.navigateHome();
+        });
+      }
+    });
   }
 
   ionViewDidEnter() {
@@ -58,20 +68,24 @@ export class LoginPage {
   }
 
   loggedInRedirect(): void {
+    this.loggingIn = true;
     if(this.dataService.userSeed) {
       this.navigateHome();
     } else {
       this.authService.getLocalAuthData().then(authData => {
         if(authData && authData.email) {
           this.dataService.userEmail = authData.email;
-          this.dataService.getUserSeed(authData.email, (data) => {
-            this.dataService.userSeed = new Seed(data, false, false);
-            this.navigateHome();
+          this.dataService.initReplication().then(() => {
+            console.log('replication started');
+          }).catch((err) => {
+            console.log('failed to init replication : ' + JSON.stringify(err));
           });
         } else {
+          this.loggingIn = false;
           console.log('Invalid auth data');
         }
       }, function() {
+        this.loggingIn = false;
         console.log('Local auth data is invalid');
       });
     }
@@ -80,7 +94,6 @@ export class LoginPage {
   // root change is wrapped in a ng zone call to prevent duplicate controller instances (see https://github.com/driftyco/ionic/issues/5960)
   navigateHome(): void {
     this.zone.run(() => {
-      console.log('setting root');
       this.navCtrl.setRoot('TabsPage', {animate: false});
     });
   }

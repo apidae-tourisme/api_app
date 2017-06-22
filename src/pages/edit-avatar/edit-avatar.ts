@@ -1,5 +1,5 @@
 import {Component, ViewChild} from "@angular/core";
-import {ViewController, LoadingController, Platform} from "ionic-angular";
+import {ViewController, LoadingController, Platform, IonicPage} from "ionic-angular";
 import {ApiAppConfig} from "../../providers/apiapp.config";
 import {DataService} from "../../providers/data.service";
 import {SafeUrl, DomSanitizer} from "@angular/platform-browser";
@@ -9,6 +9,7 @@ import {File} from '@ionic-native/file';
 
 declare var cordova: any;
 
+@IonicPage()
 @Component({
   templateUrl: 'edit-avatar.html'
 })

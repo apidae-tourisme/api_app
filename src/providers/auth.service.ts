@@ -15,20 +15,22 @@ export class AuthService {
   }
 
   authenticate(success, error): void {
-    if(!this.platform.is('cordova')) {
-      window.location.href = ApiAppConfig.authUrl(encodeURIComponent(window.location.href));
-    } else {
-      let browser = this.iab.create(ApiAppConfig.authUrl(ApiAppConfig.OAUTH_REDIRECT_URL), '_blank',
-        'location=no,closebuttoncaption=Fermer,clearsessioncache=yes,clearcache=yes');
-      browser.on('loadstart').subscribe(data => {
-        let callBackUrl = data['url'];
-        this.handleAuthCallback(callBackUrl, success, error);
-      });
-      browser.on('loaderror').subscribe(data => {
-        console.log('OAuth request error : ' + JSON.stringify(data));
-        error();
-      });
-    }
+    this.platform.ready().then(() => {
+      if(!this.platform.is('cordova')) {
+        window.location.href = ApiAppConfig.authUrl(encodeURIComponent(window.location.href));
+      } else {
+        let browser = this.iab.create(ApiAppConfig.authUrl(ApiAppConfig.OAUTH_REDIRECT_URL), '_blank',
+          'location=no,closebuttoncaption=Fermer,clearsessioncache=yes,clearcache=yes');
+        browser.on('loadstart').subscribe(data => {
+          let callBackUrl = data['url'];
+          this.handleAuthCallback(callBackUrl, success, error);
+        });
+        browser.on('loaderror').subscribe(data => {
+          console.log('OAuth request error : ' + JSON.stringify(data));
+          error();
+        });
+      }
+    });
   }
 
   handleAuthCallback(callBackUrl, success, error) {
