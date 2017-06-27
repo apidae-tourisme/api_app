@@ -21,7 +21,7 @@
 </ion-header>
 
 <ion-content id="graph_wrapper">
-  <button id="prev_node" class="prev_link" color="text_alt" *ngIf="explorerService.previousNode()" ion-button text-center icon-only outline round
+  <button id="prev_node" class="prev_link" color="link" *ngIf="explorerService.previousNode()" ion-button text-center icon-only outline round
           (click)="navigateTo(explorerService.previousNode(), false, false)">
     <ion-icon name="arrow-back" large></ion-icon>
   </button>

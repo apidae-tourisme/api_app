@@ -30,7 +30,6 @@ export class ExplorerService {
   private exploreGraph(resetData: boolean, newNode, onComplete?): void {
 
     this.dataService.getNodeData(newNode).then(data => {
-      console.log('exploreGraph for node : ' + newNode);
       let parsedData: any = {
         nodes: [],
         edges: [],

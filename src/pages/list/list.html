@@ -22,13 +22,10 @@
 
 <ion-content id="list_content">
   <ion-list ion-fixed>
-    <ion-item id="title_details" text-center text-wrap>
-      <button class="prev_link" color="text_alt" *ngIf="explorerService.previousNode()" ion-button large item-start text-center icon-only outline round
+    <ion-item id="title_details" text-center>
+      <button class="prev_link" color="link" *ngIf="explorerService.previousNode()" ion-button large item-start text-center icon-only outline round
               (click)="navigateTo(explorerService.previousNode(), false, false)">
         <ion-icon name="arrow-back" large></ion-icon>
-      </button>
-      <button ion-button large outline item-end icon-only color="link" (click)="displayDetails()" id="display_seed">
-        <ion-icon name="eye" large></ion-icon>
       </button>
       <ion-icon *ngIf="explorerService.rootNode.scope == 'private'" name="lock" class="item_lock"></ion-icon>
       <ion-avatar class="bg_seed {{explorerService.rootNode.category}}">

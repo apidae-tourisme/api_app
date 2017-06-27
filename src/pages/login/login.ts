@@ -35,7 +35,7 @@ export class LoginPage {
       });
     }
 
-    this.evts.subscribe('sync:paused', () => {
+    this.evts.subscribe('index:built', () => {
       if(!this.dataService.userSeed) {
         this.dataService.getCurrentUserSeed((data) => {
           this.dataService.userSeed = new Seed(data, false, false);

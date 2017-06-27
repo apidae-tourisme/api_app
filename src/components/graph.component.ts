@@ -232,6 +232,7 @@ export class GraphComponent {
       that.simulation.alpha(1).restart();
 
       // Fix svg display issue on FF when using <base> tag (see https://gist.github.com/leonderijke/c5cf7c5b2e424c0061d2)
+      // Web only
       prependBaseUrl();
     }, 400);
 

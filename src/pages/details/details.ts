@@ -17,6 +17,9 @@ import {SeedsService} from "../../providers/seeds.service";
 export class DetailsPage {
   @ViewChild(Content) content: Content;
 
+  public authorName;
+  public authorId;
+
   constructor(private app: App, private navCtrl: NavController, public events: Events, private sanitizer: DomSanitizer,
               public explorerService: ExplorerService, public searchService: SearchService, public authService: AuthService,
               public alertCtrl: AlertController, public dataService: SeedsService, private navParams: NavParams,
@@ -27,7 +30,11 @@ export class DetailsPage {
     this.registerBack();
     let seedId = this.navParams.get('id');
     if(seedId) {
-      this.explorerService.navigateTo(seedId, false);
+      this.explorerService.navigateTo(seedId, false, () => {
+        this.loadAuthor();
+      });
+    } else {
+      this.loadAuthor();
     }
   }
 
@@ -56,6 +63,13 @@ export class DetailsPage {
     return urls;
   }
 
+  loadAuthor() {
+    this.dataService.getUserSeed(this.explorerService.rootNode.author, (data) => {
+      this.authorName = data.name;
+      this.authorId = data._id;
+    });
+  }
+
   sanitizeUrl(url): SafeUrl {
     return this.sanitizer.bypassSecurityTrustUrl(url);
   }
@@ -78,12 +92,6 @@ export class DetailsPage {
         this.content.resize()
       });
     }
-  }
-
-  navigateToAuthor(author) {
-    this.dataService.getUserSeed(author, (data) => {
-      this.navigateTo(data._id, false, false);
-    })
   }
 
   displaySearch() {

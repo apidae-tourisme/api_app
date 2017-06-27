@@ -9,6 +9,9 @@
       <p *ngIf="dataService.syncProgress" ion-text color="text_alt">
         Mise à jour des données de l'application en cours ({{dataService.syncProgress}}%)
       </p>
+      <p *ngIf="dataService.indexProgress" ion-text color="text_alt">
+        Préparation de l'application
+      </p>
     </div>
   </div>
   <div id="login_bg">

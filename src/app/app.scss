@@ -242,6 +242,10 @@ ion-searchbar.searchbar-md .searchbar-search-icon {
   width: 120px;
 }
 
+.loading_spinner > p {
+  font-size: 14px;
+}
+
 .dowrap {
   white-space: pre-line;
 }
@@ -534,7 +538,16 @@ ion-toolbar .header_title p:last-child {
   line-height: 1em;
 }
 
-.prev_link {
+#prev_node {
+  position: absolute;
+  top: 14px;
+  left: 11px;
+  margin: 0;
+  z-index: 100;
   width: 56px;
   height: 56px;
+}
+
+button.prev_link ion-icon {
+  font-size: 30px;
 }

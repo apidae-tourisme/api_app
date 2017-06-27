@@ -4,6 +4,8 @@
 
 #title_details button.prev_link {
   margin: 16px 15px 10px -5px;
+  width: 56px;
+  height: 56px;
 }
 
 #title_details #edit_seed,
@@ -29,6 +31,10 @@
 
 #title_details ion-label ion-avatar {
   min-width: 56px;
+}
+
+#list_details #title_details .button-inner {
+  justify-content: center;
 }
 
 #list_details .button-inner {

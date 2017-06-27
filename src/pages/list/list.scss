@@ -14,6 +14,15 @@ ion-list ion-item.item-md ion-avatar {
   height: 44px;
 }
 
+ion-list ion-item#title_details ion-icon.item_lock {
+  top: 8px;
+  left: 24px;
+}
+
+ion-list ion-item#title_details > .item-inner {
+  position: relative;
+}
+
 #list_content .scroll-content {
   top: 84px;
 }

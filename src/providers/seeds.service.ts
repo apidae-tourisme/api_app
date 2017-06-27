@@ -15,6 +15,7 @@ export class SeedsService {
   public userSeed: Seed;
   public userEmail: string;
   public syncProgress: number;
+  public indexProgress: boolean;
 
   constructor(private evts: Events) {
     PouchDB.plugin(PouchFind);
@@ -25,9 +26,7 @@ export class SeedsService {
 
     this.localDatabase = isSafari ? new PouchDB(ApiAppConfig.DB_NAME, {size: 50, adapter: 'websql'}) : new PouchDB(ApiAppConfig.DB_NAME);
     this.remoteDatabase = new PouchDB(ApiAppConfig.DB_URL + '/' + ApiAppConfig.DB_NAME);
-    this.localDatabase.createIndex({
-      index: {fields: ['email']}
-    });
+    this.localDatabase.createIndex({index: {fields: ['email']}});
     this.isVisible = (n) => {return (n.scope === 'public' || n.scope === 'apidae' || n.author === this.userEmail) && !n.archived};
   }
 
@@ -40,9 +39,7 @@ export class SeedsService {
         return doc._id.indexOf('_design') !== 0;
       },
       pull: {
-        filter: (doc) => {
-          return doc.doc.scope === 'public' || doc.doc.scope === 'apidae' || doc.doc.author === this.userEmail;
-        }
+        filter: this.isVisible
       }
     };
     return Promise.all([this.localDatabase.allDocs(), this.remoteDatabase.allDocs()]).then((values) => {
@@ -50,13 +47,23 @@ export class SeedsService {
     }).then((count) => {
       return PouchDB.sync(this.localDatabase, this.remoteDatabase, options).on('change', (info) => {
         if(count > 0) {
-          this.syncProgress = Math.min(Math.floor((info.change.docs_written / count) * 100), 100);
+          this.syncProgress = Math.min(Math.floor((info.change.last_seq / count) * 100), 100);
         } else {
           this.syncProgress = 100;
         }
       }).on('paused', (err) => {
-        console.log('sync paused : ' + JSON.stringify(err));
-        this.evts.publish('sync:paused');
+        this.syncProgress = null;
+        this.indexProgress = true;
+        this.localDatabase.search({
+          fields: ['name', 'description', 'address'],
+          build: true
+          // language: 'fr'
+        }).then((res) => {
+          this.indexProgress = false;
+          this.evts.publish('index:built');
+        }).catch((err) => {
+          console.log('index building error : ' + JSON.stringify(err));
+        });
       }).on('active', function () {
         console.log('sync active');
       }).on('denied', function (err) {
@@ -74,19 +81,17 @@ export class SeedsService {
     let nodeId = rootNodeId || "eb9e3271f9694e37b2da5955a003fa96";
     let nodeData = {count: 0, nodes: [], links: []};
     return this.localDatabase.allDocs().then((docs) => {
-      console.log('total count');
       nodeData.count = docs.total_rows;
     }).then(() => {
-      return this.localDatabase.get(nodeId);
+      let node = this.localDatabase.get(nodeId);
+      return node;
     }).then((rootNode) => {
-      console.log('got root node ' + rootNode._id + ' and connections : ' + rootNode.connections);
+      // console.log('got root node ' + rootNode._id + ' and connections : ' + rootNode.connections);
       return this.localDatabase.allDocs({
         keys:  [rootNode._id].concat(rootNode.connections || []),
         include_docs: true
       }).then(nodes => {
-        console.log('got node data');
-        let visibleNodes = nodes.rows.map((row) => {return row.doc;})
-          .filter(this.isVisible);
+        let visibleNodes = nodes.rows.filter((row) => {return row.id;}).map((row) => {return row.doc;});
         nodeData.nodes = visibleNodes;
         nodeData.links = visibleNodes.slice(1).map((n) => {return {source: n._id, target: visibleNodes[0]._id};});
         return nodeData;
@@ -100,11 +105,9 @@ export class SeedsService {
     return this.localDatabase.search({
       query: query,
       fields: ['name', 'description', 'address'],
+      stale: 'ok',
       include_docs: true,
-      // index pre-building seems to break the search
-      // build: true,
-      language: 'fr',
-      filter: this.isVisible
+      // language: 'fr'
     }).then(function (res) {
       return (res.rows && res.rows.length > 0) ? res.rows.map((r) => {return r.doc;}) : [];
     }).catch(function (err) {
@@ -128,23 +131,83 @@ export class SeedsService {
     });
   }
 
-  getNodeDetails(nodeId, success) {
-    this.localDatabase.get(nodeId).then(function (res) {
-      success(res);
-    }).catch(function (err) {
-      console.log('getNodeDetails err : ' + err);
-    })
+  getNodeDetails(nodeId) {
+    return this.localDatabase.get(nodeId);
   }
 
   saveNode(seed) {
-    let nodeId = seed.id;
+    // let nodeId = seed.id;
     let seedParams = seed.submitParams();
     console.log('submitParams : ' + JSON.stringify(seedParams));
-    if(nodeId) {
-      return this.localDatabase.put(seedParams);
+    return this.connectionsChange(seedParams).then((changes) => {
+      console.log('connections change : ' + JSON.stringify(changes));
+      return this.localDatabase.put(seedParams).then((doc) => {
+        console.log('put doc result : ' + JSON.stringify(doc));
+        return this.updateConnections(doc.id, changes);
+      });
+    });
+    // } else {
+    //   return this.localDatabase.post(seedParams).then((doc) => {
+    //     console.log('post doc result : ' + JSON.stringify(doc));
+    //     return this.updateConnections(doc.id, seedParams.connections);
+    //   });
+    // }
+  }
+
+  connectionsChange(seedParams) {
+    if(seedParams.isNew) {
+      return Promise.resolve({added: seedParams.connections, removed: []});
     } else {
-      return this.localDatabase.post(seedParams);
+      return this.getNodeDetails(seedParams._id).then((data) => {
+        let newConnections = seedParams.connections || [];
+        let prevConnections = data.connections || [];
+        let addedNodes = newConnections.filter((c) => {
+          return prevConnections.indexOf(c) == -1;
+        });
+        let removedNodes = prevConnections.filter((c) => {
+          return newConnections.indexOf(c) == -1;
+        });
+        return {added: addedNodes, removed: removedNodes};
+      });
     }
+  }
+
+  updateConnections(nodeId, changes) {
+    let updatedSeeds = [];
+    return this.localDatabase.allDocs({
+        keys: changes.added,
+        include_docs: true
+      }).then((nodes) => {
+        let docs = nodes.rows.filter((row) => {return row.id;}).map((row) => {return row.doc;});
+        for (let doc of docs) {
+          console.log('added doc connections before : ' + doc.connections.join(','));
+          doc.connections.push(nodeId);
+          console.log('added doc connections after : ' + doc.connections.join(','));
+          updatedSeeds.push(doc);
+        }
+        return changes;
+      }).then((res) => {
+      return this.localDatabase.allDocs({
+        keys:  res.removed,
+        include_docs: true
+      }).then((nodes) => {
+        let docs = nodes.rows.filter((row) => {return row.id;}).map((row) => {return row.doc;});
+        for (let doc of docs) {
+          console.log('removed doc connections before : ' + doc.connections.join(','));
+          doc.connections.splice(doc.connections.indexOf(nodeId));
+          console.log('removed doc connections after : ' + doc.connections.join(','));
+          updatedSeeds.push(doc);
+        }
+        return res;
+      });
+    }).then((res) => {
+      return this.localDatabase.bulkDocs(updatedSeeds).then((resp) => {
+        console.log('bulk update successful : ' + JSON.stringify(resp));
+        return {ok: true, id: nodeId};
+      }).catch((err) => {
+        console.log('bulk update error : ' + JSON.stringify(err));
+      });
+    });
   }
 
   clearUser(): void {

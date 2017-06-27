@@ -30,7 +30,6 @@ export class GraphPage {
   }
 
   ionViewDidEnter(): void {
-    console.log('graph did enter');
     this.graphWidth = this.content.contentWidth;
     this.graphHeight = this.content.contentHeight;
     this.registerBack();

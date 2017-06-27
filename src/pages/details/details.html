@@ -23,11 +23,11 @@
 <ion-content>
   <ion-list *ngIf="explorerService.rootNode" id="list_details" no-lines>
     <ion-item id="title_details" text-center text-wrap>
-      <button class="prev_link" color="text_alt" *ngIf="explorerService.previousNode()" ion-button large item-start text-center icon-only outline round
+      <button class="prev_link" color="link" *ngIf="explorerService.previousNode()" ion-button large item-start text-center icon-only outline round
               (click)="navigateTo(explorerService.previousNode(), false, false)">
         <ion-icon name="arrow-back" large></ion-icon>
       </button>
-      <button ion-button large outline item-end icon-only color="link" (click)="editSeed()" id="edit_seed">
+      <button ion-button large outline item-end round icon-only color="link" (click)="editSeed()" id="edit_seed">
         <ion-icon name="create" large></ion-icon>
       </button>
       <ion-icon *ngIf="explorerService.rootNode.scope == 'private'" name="lock" class="item_lock"></ion-icon>
@@ -43,7 +43,7 @@
     <ion-item right *ngIf="dataService.userSeed && explorerService.rootNode.id == dataService.userSeed.id">
       <button ion-button full large icon-left (click)="logOut()" color="person">
         <ion-icon name="exit"></ion-icon>
-        Déconnexion
+        <p class="label_sm">Déconnexion</p>
       </button>
     </ion-item>
     <ion-item *ngIf="explorerService.rootNode.address" class="selectable">
@@ -82,9 +82,9 @@
       <ion-label>Dernière mise à jour</ion-label>
       <ion-datetime [(ngModel)]="explorerService.rootNode.updateDate" displayFormat="DD/MM/YYYY" disabled="true"></ion-datetime>
     </ion-item>
-    <ion-item *ngIf="explorerService.rootNode.author" class="selectable item-datetime-disabled details_author">
+    <ion-item *ngIf="authorId" class="selectable item-datetime-disabled details_author">
       <ion-label no-margin>Par </ion-label>
-      <button ion-button item-right large clear color="link" (click)="navigateToAuthor(explorerService.rootNode.author)">{{explorerService.rootNode.author}}</button>
+      <button ion-button item-right clear color="link" (click)="navigateTo(authorId, true, false)">{{authorName}}</button>
     </ion-item>
   </ion-list>
 </ion-content>

@@ -21,7 +21,7 @@
       </ion-col>
     </ion-row>
     <ion-row wrap>
-      <ion-col *ngFor="let seed of orderedSeeds()" width-33>
+      <ion-col *ngFor="let seed of orderedSeeds()" col-4>
         <div class="bg_seed {{seed.type}}" padding text-center (click)="selectType(seed.type)">
           <p>
             <i class="ion-md-custom-{{seed.type}}"></i><br/>

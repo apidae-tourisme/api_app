@@ -1,4 +1,5 @@
 import {Seeds} from "../providers/seeds";
+import {v4 as uuid} from "uuid";
 
 export class Seed {
 
@@ -36,7 +37,7 @@ export class Seed {
     this.rev = nodeData._rev;
     this.label = (nodeData.firstname && nodeData.lastname) ? (nodeData.firstname + ' ' + nodeData.lastname) : nodeData.name;
     this.description = nodeData.description;
-    this.category = nodeData.type ? (nodeData.type.charAt(0).toLowerCase() + nodeData.type.substring(1)) : Seed.DEFAULT_TYPE;
+    this.category = nodeData.type ? this.seedType(nodeData.type) : Seed.DEFAULT_TYPE;
     this.firstName = nodeData.firstname;
     this.lastName = nodeData.lastname;
     this.email = nodeData.email;
@@ -46,15 +47,13 @@ export class Seed {
     this.setCode();
     this.picture = this.normalize(nodeData.thumbnail);
     this.url = this.normalize(nodeData.url);
-    this.creationDate = this.formatDate(nodeData.created_at);
-    this.updateDate = this.formatDate(nodeData.updated_at);
-    this.startDate = this.formatDate(nodeData.start_date);
-    this.endDate = this.formatDate(nodeData.end_date);
+    this.creationDate = nodeData.created_at;
+    this.updateDate = nodeData.updated_at;
+    this.startDate = nodeData.start_date;
+    this.endDate = nodeData.end_date;
     this.archived = nodeData.archived;
     this.scope = nodeData.scope || 'public';
     this.author = nodeData.author;
-    // Todo
-    this.authorId = nodeData.author_id;
     this.seeds = [];
     if(nodeData.connections) {
       for(let i = 0; i < nodeData.connections.length; i++) {
@@ -67,6 +66,11 @@ export class Seed {
         this.urls.push({value: nodeData.urls[i]});
       }
     }
+  }
+
+  public seedType(type) {
+    let realType = type === 'Task' ? 'Action' : type;
+    return realType.charAt(0).toLowerCase() + realType.substring(1);
   }
 
   public categoryColor() {
@@ -124,8 +128,9 @@ export class Seed {
 
   public submitParams(): any {
     return {
-      _id: this.id,
+      _id: this.id || this.newId(),
       _rev: this.rev,
+      isNew: this.id == null,
       name: (this.firstName && this.lastName) ? (this.firstName + ' ' + this.lastName) : this.label,
       description: this.description,
       thumbnail: this.picture,
@@ -146,11 +151,8 @@ export class Seed {
     };
   }
 
-  private formatDate(dateInSecs) {
-    if(dateInSecs && dateInSecs > 0) {
-      return new Date(dateInSecs * 1000).toISOString();
-    }
-    return null;
+  private newId() {
+    return uuid();
   }
 
   private normalize(url) {

@@ -34,7 +34,6 @@ import {SeedsService} from "../providers/seeds.service";
         mode: 'md',
         tabsPlacement: 'top',
         tabsLayout: 'title-hide',
-        tabsHighlight: true,
         tabsHideOnSubPages: true,
         // Web only
         locationStrategy: 'path'

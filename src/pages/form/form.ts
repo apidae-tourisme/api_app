@@ -53,9 +53,8 @@ export class FormPage {
   }
 
   updateUserSeed(onComplete): void {
-    this.dataService.getNodeDetails(this.dataService.userSeed.id, data => {
+    this.dataService.getNodeDetails(this.dataService.userSeed.id).then(data => {
       this.dataService.userSeed = new Seed(data, false, false);
-      console.log('updated user seed');
       onComplete();
     });
   }
