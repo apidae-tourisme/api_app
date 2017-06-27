@@ -5,6 +5,8 @@ import PouchDB from 'pouchdb';
 import PouchFind from 'pouchdb-find';
 import {Events} from "ionic-angular";
 
+declare var global: any;
+
 @Injectable()
 export class SeedsService {
 
@@ -20,6 +22,11 @@ export class SeedsService {
   constructor(private evts: Events) {
     PouchDB.plugin(PouchFind);
     PouchDB.plugin(require('pouchdb-quick-search'));
+
+    // Import fr language indexing rules
+    global.lunr = require('lunr');
+    require('lunr-languages/lunr.stemmer.support')(global.lunr);
+    require('lunr-languages/lunr.fr')(global.lunr);
 
     // Safari requires a special authorization from user to use disk space
     let isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
@@ -56,8 +63,8 @@ export class SeedsService {
         this.indexProgress = true;
         this.localDatabase.search({
           fields: ['name', 'description', 'address'],
-          build: true
-          // language: 'fr'
+          build: true,
+          language: 'fr'
         }).then((res) => {
           this.indexProgress = false;
           this.evts.publish('index:built');
@@ -107,7 +114,7 @@ export class SeedsService {
       fields: ['name', 'description', 'address'],
       stale: 'ok',
       include_docs: true,
-      // language: 'fr'
+      language: 'fr'
     }).then(function (res) {
       return (res.rows && res.rows.length > 0) ? res.rows.map((r) => {return r.doc;}) : [];
     }).catch(function (err) {
@@ -136,22 +143,12 @@ export class SeedsService {
   }
 
   saveNode(seed) {
-    // let nodeId = seed.id;
     let seedParams = seed.submitParams();
-    console.log('submitParams : ' + JSON.stringify(seedParams));
     return this.connectionsChange(seedParams).then((changes) => {
-      console.log('connections change : ' + JSON.stringify(changes));
       return this.localDatabase.put(seedParams).then((doc) => {
-        console.log('put doc result : ' + JSON.stringify(doc));
         return this.updateConnections(doc.id, changes);
       });
     });
-    // } else {
-    //   return this.localDatabase.post(seedParams).then((doc) => {
-    //     console.log('post doc result : ' + JSON.stringify(doc));
-    //     return this.updateConnections(doc.id, seedParams.connections);
-    //   });
-    // }
   }
 
   connectionsChange(seedParams) {
@@ -180,9 +177,7 @@ export class SeedsService {
       }).then((nodes) => {
         let docs = nodes.rows.filter((row) => {return row.id;}).map((row) => {return row.doc;});
         for (let doc of docs) {
-          console.log('added doc connections before : ' + doc.connections.join(','));
           doc.connections.push(nodeId);
-          console.log('added doc connections after : ' + doc.connections.join(','));
           updatedSeeds.push(doc);
         }
         return changes;
@@ -193,16 +188,13 @@ export class SeedsService {
       }).then((nodes) => {
         let docs = nodes.rows.filter((row) => {return row.id;}).map((row) => {return row.doc;});
         for (let doc of docs) {
-          console.log('removed doc connections before : ' + doc.connections.join(','));
           doc.connections.splice(doc.connections.indexOf(nodeId));
-          console.log('removed doc connections after : ' + doc.connections.join(','));
           updatedSeeds.push(doc);
         }
         return res;
       });
     }).then((res) => {
       return this.localDatabase.bulkDocs(updatedSeeds).then((resp) => {
-        console.log('bulk update successful : ' + JSON.stringify(resp));
         return {ok: true, id: nodeId};
       }).catch((err) => {
         console.log('bulk update error : ' + JSON.stringify(err));
