@@ -23,12 +23,12 @@ export class SeedsService {
 
   constructor(private evts: Events) {
     PouchDB.plugin(PouchFind);
-    // PouchDB.plugin(require('pouchdb-quick-search'));
 
     // Import fr language indexing rules
     global.lunr = require('lunr');
     require('lunr-languages/lunr.stemmer.support')(global.lunr);
     require('lunr-languages/lunr.fr')(global.lunr);
+    global.lunr.tokenizer = this.customTokenizer();
 
     this.isVisible = (n) => {return (n.scope === 'public' || n.scope === 'apidae' || n.author === this.userEmail) && !n.archived};
   }
@@ -86,17 +86,6 @@ export class SeedsService {
             that.evts.publish('index:built');
           });
         });
-
-        // this.localDatabase.search({
-        //   fields: ['name', 'description', 'address'],
-        //   build: true
-        //   // language: 'fr'
-        // }).then((res) => {
-        //   this.indexProgress = false;
-        //   this.evts.publish('index:built');
-        // }).catch((err) => {
-        //   console.log('index building error : ' + JSON.stringify(err));
-        // });
       }).on('active', function () {
         console.log('sync active');
       }).on('denied', function (err) {
@@ -136,15 +125,13 @@ export class SeedsService {
 
   searchNodes(query, scope) {
     // Mix lunr querying strategies as recommended in https://github.com/olivernn/lunr.js/issues/273
-    let queryTerms = query.match(/\S+/g);
-
-    let results = this.idx.query(function (q) {
+    let queryTerms = global.lunr.tokenizer(query);
+    let results = this.idx.query((q) => {
       queryTerms.forEach((term) => {
         q.term(term, { usePipeline: true, boost: 100 });
         q.term(term, { usePipeline: true, wildcard: global.lunr.Query.wildcard.TRAILING, boost: 10 });
-        q.term(term, { usePipeline: false, editDistance: 1 });
       });
-    }) || [];
+    });
 
     return this.localDatabase.allDocs({
       keys: results.map((res) => { return res.ref; }),
@@ -238,5 +225,79 @@ export class SeedsService {
   clearUser(): void {
     this.userSeed = null;
     this.userEmail = null;
+  }
+
+  // Unicode normalizer - Extracted from https://github.com/cvan/lunr-unicode-normalizer
+  unicodeNormalizer(str) {
+    let charmap = {
+      // Latin chars
+      'À': 'A', 'Á': 'A', 'Â': 'A', 'Ã': 'A', 'Ä': 'A', 'Å': 'A', 'Æ': 'AE',
+      'Ç': 'C', 'È': 'E', 'É': 'E', 'Ê': 'E', 'Ë': 'E', 'Ì': 'I', 'Í': 'I',
+      'Î': 'I', 'Ï': 'I', 'Ð': 'D', 'Ñ': 'N', 'Ò': 'O', 'Ó': 'O', 'Ô': 'O',
+      'Õ': 'O', 'Ö': 'O', 'Ő': 'O', 'Ø': 'O', 'Ù': 'U', 'Ú': 'U', 'Û': 'U',
+      'Ü': 'U', 'Ű': 'U', 'Ý': 'Y', 'Þ': 'TH', 'ß': 'ss',
+      'à': 'a', 'á': 'a', 'â': 'a', 'ã': 'a', 'ä': 'a', 'å': 'a', 'æ': 'ae',
+      'ç': 'c', 'è': 'e', 'é': 'e', 'ê': 'e', 'ë': 'e', 'ì': 'i', 'í': 'i',
+      'î': 'i', 'ï': 'i', 'ð': 'd', 'ñ': 'n', 'ò': 'o', 'ó': 'o', 'ô': 'o',
+      'õ': 'o', 'ö': 'o', 'ő': 'o', 'ø': 'o', 'ù': 'u', 'ú': 'u', 'û': 'u',
+      'ü': 'u', 'ű': 'u', 'ý': 'y', 'þ': 'th', 'ÿ': 'y', 'ẞ': 'SS',
+
+
+      // Currencies
+      '€': 'euro', "$": 'dollar',
+
+      // Symbols
+      '©': '(c)', 'œ': 'oe', 'Œ': 'OE', '∑': 'sum', '®': '(r)', '†': '+',
+      '“': '"', '”': '"', '‘': "'", '’': "'", '∂': 'd', 'ƒ': 'f', '™': 'tm',
+      '℠': 'sm', '…': '...', '˚': 'o', 'º': 'o', 'ª': 'a', '•': '*',
+      '∆': 'delta', '∞': 'infini', '♥': 'love', '&': 'et', '|': 'ou',
+      '<': 'less', '>': 'greater'
+    };
+
+    let charmapPattern = Object.keys(charmap).map(function(char) {
+      return char.replace(/[\|\$]/g, '\\$&');
+    }).join('|');
+    let charmapRegExp = new RegExp('(' + charmapPattern + ')', 'g');
+
+    return str.replace(charmapRegExp, function(char) {
+      return charmap[char];
+    });
+  };
+
+  // Returns a custom lunr tokenizer which removes accents and splits on spaces & hyphens
+  customTokenizer() {
+    let that = this;
+    let tokenizer = function(obj) {
+      if (!arguments.length || obj === null || obj === undefined) return [];
+      if (Array.isArray(obj)) {
+        return obj.map(function(t) {
+          return that.unicodeNormalizer(t).toLowerCase();
+        });
+      }
+
+      let str = obj.toString().replace(/^\s+/, '');
+
+      for (let i = str.length - 1; i >= 0; i--) {
+        if (/\S/.test(str.charAt(i))) {
+          str = str.substring(0, i + 1);
+          break;
+        }
+      }
+
+      str = that.unicodeNormalizer(str);
+
+      return str
+        .replace('-', ' ')
+        .split(/\s+/)
+        .map(function(token) {
+          return token.toLowerCase();
+        });
+    };
+
+    for(let attr in global.lunr.tokenizer){
+      tokenizer[attr] = global.lunr.tokenizer[attr];
+    }
+
+    return tokenizer;
   }
 }

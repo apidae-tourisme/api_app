@@ -44,7 +44,7 @@ $background-color:  map-get($colors, bg);
 $label-md-text-color: map-get($colors, text_alt);
 
 // Custom tabs
-$tabs-background: map-get($colors, lighter);
+$tabs-background: map-get($colors, action);
 $tabs-md-tab-text-color: map-get($colors, link);
 $tabs-md-tab-text-color-active: map-get($colors, lighter);
 $tabs-md-tab-icon-color: map-get($colors, link);
