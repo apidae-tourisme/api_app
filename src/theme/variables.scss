@@ -45,14 +45,21 @@ $label-md-text-color: map-get($colors, text_alt);
 
 // Custom tabs
 $tabs-background: map-get($colors, lighter);
-$tabs-md-tab-text-color: map-get($colors, text_main);
-$tabs-md-tab-text-color-active: map-get($colors, link);
-$tabs-md-tab-icon-color: map-get($colors, text_alt);
-$tabs-md-tab-icon-color-active: map-get($colors, link);
+$tabs-md-tab-text-color: map-get($colors, link);
+$tabs-md-tab-text-color-active: map-get($colors, lighter);
+$tabs-md-tab-icon-color: map-get($colors, link);
+$tabs-md-tab-icon-color-active: map-get($colors, lighter);
 $tabs-md-tab-min-height: 4.6rem;
 $tabs-md-tab-icon-size: 3.2rem;
 $tabs-md-tab-font-size: 1.4rem;
 $tabs-md-tab-font-size-active: 1.6rem;
+$tabs-md-tab-icon-size-active: 3.6rem;
+
+// Custom segment bars
+$segment-button-md-border-bottom-width: 0;
+$segment-button-md-height: 4.6rem;
+$segment-button-md-line-height: 4.6rem;
+$segment-button-md-icon-size: 3.2rem;
 
 // Custom search bar
 $searchbar-md-input-search-icon-color: map-get($colors, link);

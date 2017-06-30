@@ -2,6 +2,7 @@ import {Component, ViewChild} from "@angular/core";
 import {ViewController, Content, IonicPage} from "ionic-angular";
 import {SearchService} from "../../providers/search.service";
 import {ExplorerService} from "../../providers/explorer.service";
+import {Seeds} from "../../providers/seeds";
 
 @IonicPage()
 @Component({
@@ -38,6 +39,6 @@ export class SearchSeeds {
   }
 
   searchNodes(evt): void {
-    this.searchService.searchNodes(evt, () => {this.content.resize()})
+    this.searchService.searchNodes(evt, Seeds.SCOPE_ALL, () => {this.content.resize()})
   }
 }

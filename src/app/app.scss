@@ -1,3 +1,9 @@
+@media (max-width: 360px) {
+  #top_search span.button-inner {
+    font-size: 1.2rem;
+  }
+}
+
 @font-face {
   font-family: 'apiapp';
   src:  url('../assets/fonts/apiapp.eot?v3pwbp');
@@ -227,6 +233,14 @@ ion-searchbar.searchbar-md .searchbar-search-icon {
 #header_search > span {
   font-size: 16px;
   padding-left: 30px;
+}
+
+#search_filters {
+  min-height: 40px;
+}
+
+#search_filters.toolbar .segment-md .segment-button.segment-activated {
+  color: map-get($colors, lighter);
 }
 
 .loading_spinner {

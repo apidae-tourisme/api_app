@@ -5,6 +5,7 @@ import {SearchService} from "../../providers/search.service";
 import {FormPage} from "../form/form";
 import {DataService} from "../../providers/data.service";
 import {Keyboard} from "@ionic-native/keyboard";
+import {Seeds} from "../../providers/seeds";
 
 @IonicPage({
   segment: 'recherche'
@@ -18,11 +19,13 @@ export class SearchPage {
   private tabIndex: number;
 
   public searchQuery: string;
+  public searchScope: string;
 
   constructor(public explorerService: ExplorerService, public searchService: SearchService, public dataService: DataService,
               private keyboard: Keyboard, private navCtrl: NavController, private params: NavParams) {
     this.searchQuery = null;
     this.tabIndex = +params.get('tabIndex');
+    this.searchScope = Seeds.SCOPE_ALL;
   }
 
   ionViewDidEnter() {
@@ -50,8 +53,12 @@ export class SearchPage {
     this.navCtrl.pop();
   }
 
+  scopeChanged(evt): void {
+    this.searchNodes(evt);
+  }
+
   searchNodes(evt): void {
-    this.searchService.searchNodes(evt, () => {});
+    this.searchService.searchNodes(this.searchQuery, this.searchScope, () => {});
   }
 
   createSeed() {

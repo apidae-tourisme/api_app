@@ -55,18 +55,27 @@
   color: $label-md-text-color;
 }
 
+#seed_types div.bg_seed {
+  min-height: 15vh;
+  padding-top: 12px;
+}
+
 #seed_types div.bg_seed > p {
   color: #ffffff;
   font-size: 2vh;
+  margin: 0;
+}
+
+#seed_types div.bg_seed > p.synonyms {
+  font-size: 1.4vh;
 }
 
 #seed_types div.bg_seed > p > i:before {
-  font-size: 4rem;
+  font-size: 3.5vh;
 }
 
-#seed_types div.bg_seed.concept > p {
-  margin-top: 32px;
-  margin-bottom: 32px;
+#seed_types div.bg_seed.concept > p:first-child {
+  margin-top: 3vh;
 }
 
 #seed_form .button[icon-only] {

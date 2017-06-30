@@ -4,6 +4,7 @@ import {Seed} from "../components/seed.model";
 import PouchDB from 'pouchdb';
 import PouchFind from 'pouchdb-find';
 import {Events} from "ionic-angular";
+import {Seeds} from "./seeds";
 
 declare var global: any;
 
@@ -12,6 +13,7 @@ export class SeedsService {
 
   private localDatabase: any;
   private remoteDatabase: any;
+  private idx: any;
   private isVisible: any;
 
   public userSeed: Seed;
@@ -21,20 +23,25 @@ export class SeedsService {
 
   constructor(private evts: Events) {
     PouchDB.plugin(PouchFind);
-    PouchDB.plugin(require('pouchdb-quick-search'));
+    // PouchDB.plugin(require('pouchdb-quick-search'));
 
     // Import fr language indexing rules
     global.lunr = require('lunr');
     require('lunr-languages/lunr.stemmer.support')(global.lunr);
     require('lunr-languages/lunr.fr')(global.lunr);
 
+    this.isVisible = (n) => {return (n.scope === 'public' || n.scope === 'apidae' || n.author === this.userEmail) && !n.archived};
+  }
+
+  initDb() {
     // Safari requires a special authorization from user to use disk space
     let isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 
-    this.localDatabase = isSafari ? new PouchDB(ApiAppConfig.DB_NAME, {size: 50, adapter: 'websql'}) : new PouchDB(ApiAppConfig.DB_NAME);
+    let localDbName = ApiAppConfig.DB_NAME + '_' + btoa(this.userEmail);
+
+    this.localDatabase = isSafari ? new PouchDB(localDbName, {size: 50, adapter: 'websql'}) : new PouchDB(localDbName);
     this.remoteDatabase = new PouchDB(ApiAppConfig.DB_URL + '/' + ApiAppConfig.DB_NAME);
-    this.localDatabase.createIndex({index: {fields: ['email']}});
-    this.isVisible = (n) => {return (n.scope === 'public' || n.scope === 'apidae' || n.author === this.userEmail) && !n.archived};
+    return this.localDatabase.createIndex({index: {fields: ['email']}});
   }
 
   initReplication() {
@@ -61,16 +68,35 @@ export class SeedsService {
       }).on('paused', (err) => {
         this.syncProgress = null;
         this.indexProgress = true;
-        this.localDatabase.search({
-          fields: ['name', 'description', 'address'],
-          build: true,
-          language: 'fr'
+        return this.localDatabase.allDocs({
+          include_docs: true
         }).then((res) => {
-          this.indexProgress = false;
-          this.evts.publish('index:built');
-        }).catch((err) => {
-          console.log('index building error : ' + JSON.stringify(err));
+          let that = this;
+          console.log('indexing ' + res.rows.length + ' docs');
+          let localDocs = res.rows.map((row) => {return row.doc;});
+          that.idx = global.lunr(function () {
+            this.use(global.lunr.fr);
+            this.field('name');
+            this.field('description');
+            this.field('address');
+            this.ref('_id');
+            localDocs.forEach((doc) => {
+              this.add(doc);
+            });
+            that.evts.publish('index:built');
+          });
         });
+
+        // this.localDatabase.search({
+        //   fields: ['name', 'description', 'address'],
+        //   build: true
+        //   // language: 'fr'
+        // }).then((res) => {
+        //   this.indexProgress = false;
+        //   this.evts.publish('index:built');
+        // }).catch((err) => {
+        //   console.log('index building error : ' + JSON.stringify(err));
+        // });
       }).on('active', function () {
         console.log('sync active');
       }).on('denied', function (err) {
@@ -108,17 +134,24 @@ export class SeedsService {
     });
   }
 
-  searchNodes(query) {
-    return this.localDatabase.search({
-      query: query,
-      fields: ['name', 'description', 'address'],
-      stale: 'ok',
-      include_docs: true,
-      language: 'fr'
-    }).then(function (res) {
-      return (res.rows && res.rows.length > 0) ? res.rows.map((r) => {return r.doc;}) : [];
-    }).catch(function (err) {
-      console.log('Search nodes error : ' + JSON.stringify(err));
+  searchNodes(query, scope) {
+    // Mix lunr querying strategies as recommended in https://github.com/olivernn/lunr.js/issues/273
+    let queryTerms = query.match(/\S+/g);
+
+    let results = this.idx.query(function (q) {
+      queryTerms.forEach((term) => {
+        q.term(term, { usePipeline: true, boost: 100 });
+        q.term(term, { usePipeline: true, wildcard: global.lunr.Query.wildcard.TRAILING, boost: 10 });
+        q.term(term, { usePipeline: false, editDistance: 1 });
+      });
+    }) || [];
+
+    return this.localDatabase.allDocs({
+      keys: results.map((res) => { return res.ref; }),
+      include_docs: true
+    }).then((nodes) => {
+      return nodes.rows.filter((row) => { return row.id && (scope == Seeds.SCOPE_ALL || row.doc.scope == scope); })
+        .map((row) => { return row.doc; });
     });
   }
 

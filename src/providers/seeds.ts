@@ -26,9 +26,24 @@ export class Seeds {
     schema: "Schéma"
   };
 
+  public static readonly CONCEPT_TYPE = {
+    type: Seeds.CONCEPT, label: "Etiquette", synonyms: ["tag"]
+  };
+
   public static readonly ORDERED = [
-    {type: Seeds.ORGANIZATION, label: "Equipe"}, {type: Seeds.PROJECT, label: "Chantier"}, {type: Seeds.PRODUCT, label: "Service"},
-    {type: Seeds.PERSON, label: "Acteur"}, {type: Seeds.EVENT, label: "Rencontre"}, {type: Seeds.CREATIVE_WORK, label: "Ressource"},
-    {type: Seeds.COMPETENCE, label: "Rôle"}, {type: Seeds.ACTION, label: "Action"}, {type: Seeds.IDEA, label: "Idée"},
+    {type: Seeds.ORGANIZATION, label: "Equipe", synonyms: ["structure", "communauté"]},
+    {type: Seeds.PROJECT, label: "Chantier", synonyms: ["projet", "programme"]},
+    {type: Seeds.PRODUCT, label: "Service", synonyms: ["prestation"]},
+    {type: Seeds.PERSON, label: "Acteur", synonyms: ["personne", "utilisateur"]},
+    {type: Seeds.EVENT, label: "Rencontre", synonyms: ["réunion", "événement", "séminaire"]},
+    {type: Seeds.CREATIVE_WORK, label: "Ressource", synonyms: ["documentation", "équipement"]},
+    {type: Seeds.COMPETENCE, label: "Rôle", synonyms: ["fonction", "compétence"]},
+    {type: Seeds.ACTION, label: "Action", synonyms: ["tâche"]},
+    {type: Seeds.IDEA, label: "Idée", synonyms: []}
   ];
+
+  public static readonly SCOPE_PUBLIC = 'public';
+  public static readonly SCOPE_PRIVATE = 'private';
+  public static readonly SCOPE_APIDAE = 'apidae';
+  public static readonly SCOPE_ALL = 'all';
 }

@@ -1,6 +1,5 @@
 import {Platform} from 'ionic-angular';
 import {Injectable} from "@angular/core";
-import {DataService} from "./data.service";
 import {ExplorerService} from "./explorer.service";
 import {Seed} from "../components/seed.model";
 import {SeedsService} from "./seeds.service";
@@ -22,12 +21,11 @@ export class SearchService {
     this.showSearch = true;
   }
 
-  searchNodes(ev: any, onComplete): void {
+  searchNodes(query, scope, onComplete): void {
     this.searching = true;
-    let val = ev.target.value;
 
-    if (val && val.trim() != '' && val.length > 2) {
-      this.dataService.searchNodes(val).then(nodes => {
+    if (query && query.trim() != '' && query.length > 2) {
+      this.dataService.searchNodes(query, scope).then(nodes => {
         this.nodes = [];
         if(nodes) {
           for (let i = 0; i < nodes.length; i++) {

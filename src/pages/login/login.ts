@@ -69,13 +69,20 @@ export class LoginPage {
 
   loggedInRedirect(): void {
     this.loggingIn = true;
+    console.log('loggedInRedirect');
     if(this.dataService.userSeed) {
+      console.log('navigating home');
       this.navigateHome();
     } else {
       this.authService.getLocalAuthData().then(authData => {
+        console.log('authData : ' + authData);
         if(authData && authData.email) {
+          console.log('authData email : ' + authData.email);
           this.dataService.userEmail = authData.email;
-          this.dataService.initReplication().then(() => {
+          this.dataService.initDb().then(() => {
+            console.log('initDb done');
+            return this.dataService.initReplication();
+          }).then(() => {
             console.log('replication started');
           }).catch((err) => {
             console.log('failed to init replication : ' + JSON.stringify(err));

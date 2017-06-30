@@ -14,9 +14,8 @@
     <ion-row>
       <ion-col>
         <div class="bg_seed concept" padding text-center (click)="selectType('concept')">
-          <p>
-            Etiquette
-          </p>
+          <p>{{conceptSeed().label}}</p>
+          <p class="synonyms pre">{{conceptSeed().synonyms.join("\n")}}</p>
         </div>
       </ion-col>
     </ion-row>
@@ -27,6 +26,7 @@
             <i class="ion-md-custom-{{seed.type}}"></i><br/>
             {{seed.label}}
           </p>
+          <p class="synonyms pre">{{seed.synonyms.join("\n")}}</p>
         </div>
       </ion-col>
     </ion-row>

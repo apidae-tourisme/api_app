@@ -24,4 +24,8 @@ export class SeedType {
   orderedSeeds(): any {
     return Seeds.ORDERED;
   }
+
+  conceptSeed(): any {
+    return Seeds.CONCEPT_TYPE;
+  }
 }

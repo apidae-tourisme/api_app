@@ -16,6 +16,22 @@
       </button>
     </ion-buttons>
   </ion-navbar>
+  <ion-toolbar id="search_filters" color="action" no-padding>
+    <ion-segment [(ngModel)]="searchScope" (ionChange)="scopeChanged($event)">
+      <ion-segment-button value="all">
+        <ion-icon name="infinite" [color]="searchScope == 'all' ? 'lighter' : 'link'"></ion-icon>
+      </ion-segment-button>
+      <ion-segment-button value="public">
+        <ion-icon name="globe" [color]="searchScope == 'public' ? 'lighter' : 'link'"></ion-icon>
+      </ion-segment-button>
+      <ion-segment-button value="apidae">
+        <ion-icon name="people" [color]="searchScope == 'apidae' ? 'lighter' : 'link'"></ion-icon>
+      </ion-segment-button>
+      <ion-segment-button value="private">
+        <ion-icon name="lock" [color]="searchScope == 'private' ? 'lighter' : 'link'"></ion-icon>
+      </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
 </ion-header>
 <ion-content>
   <div class="loading_spinner" *ngIf="searchService.searching" text-center>
