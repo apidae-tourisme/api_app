@@ -10,25 +10,19 @@ export class Seed {
   label: string;
   description: string;
   category: string;
-  code: string;
-  picture: string;
-  firstName: string;
-  lastName: string;
+  attachment: any;
   email: string;
-  telephone: string;
-  mobilePhone: string;
   address: string;
-  url: string;
   creationDate: string;
   updateDate: string;
   startDate: string;
   endDate: string;
   disconnected: boolean;
+  termsConditions: boolean;
   archived: boolean;
   scope: string;
-  contributor: string;
   author: string;
-  authorId: string;
+  connections: Array<string>;
   seeds: Array<any>;
   urls: Array<any>;
 
@@ -38,26 +32,22 @@ export class Seed {
     this.label = (nodeData.firstname && nodeData.lastname) ? (nodeData.firstname + ' ' + nodeData.lastname) : nodeData.name;
     this.description = nodeData.description;
     this.category = nodeData.type ? this.seedType(nodeData.type) : Seed.DEFAULT_TYPE;
-    this.firstName = nodeData.firstname;
-    this.lastName = nodeData.lastname;
     this.email = nodeData.email;
-    this.telephone = nodeData.telephone;
-    this.mobilePhone = nodeData.mobilephone;
     this.address = nodeData.address;
-    this.setCode();
-    this.picture = this.normalize(nodeData.thumbnail);
-    this.url = this.normalize(nodeData.url);
+    this.attachment = nodeData._attachments;
     this.creationDate = nodeData.created_at;
     this.updateDate = nodeData.updated_at;
     this.startDate = nodeData.start_date;
     this.endDate = nodeData.end_date;
     this.archived = nodeData.archived;
-    this.scope = nodeData.scope || 'public';
+    this.scope = nodeData.scope || Seeds.SCOPE_APIDAE;
     this.author = nodeData.author;
+    this.termsConditions = nodeData.termsConditions;
+    this.connections = nodeData.connections || [];
     this.seeds = [];
     if(nodeData.connections) {
       for(let i = 0; i < nodeData.connections.length; i++) {
-        this.seeds.push(new Seed(nodeData.connections[i], false, false));
+        this.seeds.push(new Seed({_id: nodeData.connections[i]}, false, false));
       }
     }
     this.urls = [];
@@ -68,142 +58,54 @@ export class Seed {
     }
   }
 
+  public picture() {
+    return this.attachment && Object.keys(this.attachment)[0];
+  }
+
+  // Note : defaults to png when content is text/plain
+  public pictureData() {
+    let attName = Object.keys(this.attachment)[0];
+    let type = this.attachment[attName].content_type.indexOf('text') != -1 ? 'image/png' : this.attachment[attName].content_type;
+    return "data:" + type + ";base64," + this.attachment[attName].data;
+  }
+
   public seedType(type) {
     let realType = type === 'Task' ? 'Action' : type;
     return realType.charAt(0).toLowerCase() + realType.substring(1);
-  }
-
-  public categoryColor() {
-    return this.category;
   }
 
   public noIcon() {
     return !this.picture && this.category == 'concept';
   }
 
-  public shortLabel(): string {
-    return this.label.length > 10 ? (this.label.substr(0, 8) + '...') : this.label;
-  }
-
-  public typeLabel() {
-    let label = '';
-    switch (this.category) {
-      case 'person' :
-        label = "Acteur";
-        break;
-      case 'organization' :
-        label = "Equipe";
-        break;
-      case 'competence' :
-        label = "Rôle";
-        break;
-      case 'event' :
-        label = "Rencontre";
-        break;
-      case 'project' :
-        label = "Chantier";
-        break;
-      case 'action' :
-        label = "Action";
-        break;
-      case 'creativeWork' :
-        label = "Ressource";
-        break;
-      case 'product' :
-        label = "Service";
-        break;
-      case 'idea' :
-        label = "Idée";
-        break;
-      case 'concept' :
-        label = "Etiquette";
-        break;
-      case 'schema' :
-        label = "Schéma";
-        break;
-      default:
-    }
-    return label;
+  public typeInfo() {
+    return Seeds.allSeedsTypes().filter((t) => {return t.type == this.category})[0];
   }
 
   public submitParams(): any {
     return {
       _id: this.id || this.newId(),
       _rev: this.rev,
-      isNew: this.id == null,
-      name: (this.firstName && this.lastName) ? (this.firstName + ' ' + this.lastName) : this.label,
+      name: this.label,
       description: this.description,
-      thumbnail: this.picture,
+      _attachments: this.attachment,
       type: this.category,
-      firstname: this.firstName,
-      lastname: this.lastName,
       email: this.email,
-      telephone: this.telephone,
-      mobilephone: this.mobilePhone,
       address: this.address,
+      created_at: this.creationDate || new Date().toISOString(),
+      updated_at: new Date().toISOString(),
       started_at: this.startDate,
       ended_at: this.endDate,
       archived: this.archived,
       scope: this.scope,
       author: this.author,
-      connections: this.seeds.map(function(s) { return s.id; }) || [],
+      termsConditions: this.termsConditions,
+      connections: this.connections || [],
       urls: this.urls.map(function(u) { return u.value; }) || []
     };
   }
 
   private newId() {
     return uuid();
-  }
-
-  private normalize(url) {
-    if(url && url.length > 0) {
-      if(url.indexOf('http') != -1) {
-        return url;
-      } else {
-        return 'http://' + url;
-      }
-    } else {
-      return null;
-    }
-  }
-
-  private setCode(): void {
-    switch (this.category) {
-      case 'person' :
-        this.code = '\ue90a';
-        break;
-      case 'organization' :
-        this.code = '\ue909';
-        break;
-      case 'competence' :
-        this.code = '\ue90d';
-        break;
-      case 'event' :
-        this.code = '\ue90f';
-        break;
-      case 'project' :
-        this.code = '\ue90c';
-        break;
-      case 'action' :
-        this.code = '\ue900';
-        break;
-      case 'creativeWork' :
-        this.code = '\ue90e';
-        break;
-      case 'product' :
-        this.code = '\ue90b';
-        break;
-      case 'idea' :
-        this.code = '\ue905';
-        break;
-      case 'concept' :
-        this.code = '';
-        break;
-      case 'schema' :
-        this.code = '';
-        break;
-      default:
-        this.code = '';
-    }
   }
 }

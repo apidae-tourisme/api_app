@@ -41,6 +41,7 @@ export class GraphPage {
   }
 
   navigateTo(node, reset): void {
+    console.log('navigateTo : ' + node);
     this.explorerService.navigateTo(node, reset, () => this.drawNetwork());
   }
 

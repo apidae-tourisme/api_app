@@ -6,6 +6,7 @@ import {SeedsService} from "../../providers/seeds.service";
 import {SeedType} from "../seed-type/seed-type";
 import {SearchSeeds} from "../search-seeds/search-seeds";
 import {EditAvatar} from "../edit-avatar/edit-avatar";
+import {Seeds} from "../../providers/seeds";
 
 @IonicPage()
 @Component({
@@ -21,8 +22,9 @@ export class FormPage {
   constructor(private navCtrl: NavController, private params: NavParams, public modalCtrl: ModalController,
               public dataService: SeedsService, private explorerService: ExplorerService,
               private loadingCtrl: LoadingController, private toastCtrl: ToastController) {
-    this.node = params.get('node') || new Seed(
-      {scope: 'private', author: this.dataService.userEmail, archived: false}, false, false);
+    let seedName = params.get('name');
+    this.node = params.get('node') || new Seed({name: seedName, scope: Seeds.SCOPE_PRIVATE, archived: false}, false, false);
+    this.node.author = this.dataService.userEmail;
   }
 
   dismissForm(showGraph, refreshUser): void {
@@ -131,10 +133,6 @@ export class FormPage {
     }
   }
 
-  scopeColor(): string {
-    return this.node.scope == 'public' ? 'link' : 'text_alt';
-  }
-
   toggleArchive(): void {
     this.node.archived = !this.node.archived;
   }
@@ -164,9 +162,15 @@ export class FormPage {
     seedsModal.onDidDismiss(data => {
       if(data && data.seed) {
         this.node.seeds.push(data.seed);
+        this.node.connections.push(data.seed.id);
       }
     });
     seedsModal.present();
+  }
+
+  removeSeed(seed, idx): void {
+    this.node.seeds.splice(idx, 1);
+    this.node.connections.splice(this.node.connections.indexOf(seed.id), 1);
   }
 
   addUrl(): void {
@@ -176,8 +180,9 @@ export class FormPage {
   editAvatar(): void {
     let avatarModal = this.modalCtrl.create('EditAvatar');
     avatarModal.onDidDismiss(data => {
-      if(data) {
-        this.node.picture = data.imageUrl;
+      if(data && data.data) {
+        this.node.attachment = {};
+        this.node.attachment[data.name] = {content_type: data.type, data: data.data};
       }
     });
     avatarModal.present();
@@ -190,7 +195,7 @@ export class FormPage {
   presentToast(msg, onDismiss) {
     let toast = this.toastCtrl.create({
       message: msg,
-      duration: 4000,
+      duration: 2500,
       position: "middle",
       showCloseButton: true,
       closeButtonText: "Fermer"

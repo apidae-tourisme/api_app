@@ -18,7 +18,7 @@
   <ion-list>
     <button ion-item large (click)="seedTypes()">
       <ion-label>Type</ion-label>
-      <h2 item-right>{{node.typeLabel()}}</h2>
+      <h2 item-right text-right>{{node.typeInfo().label}}<br/><span ion-text class="synonyms" color="text_alt">{{node.typeInfo().synonyms.join(', ')}}</span></h2>
       <ion-avatar item-right class="bg_seed {{node.category}}">
         <div text-center><i class="ion-md-custom-{{node.category}}"></i></div>
       </ion-avatar>
@@ -28,12 +28,8 @@
       <ion-input type="text" [(ngModel)]="node.label"></ion-input>
     </label>
     <label ion-item *ngIf="node.category == 'person'">
-      <ion-label fixed>Prénom</ion-label>
-      <ion-input type="text" [(ngModel)]="node.firstName"></ion-input>
-    </label>
-    <label ion-item *ngIf="node.category == 'person'">
-      <ion-label fixed>Nom</ion-label>
-      <ion-input type="text" [(ngModel)]="node.lastName"></ion-input>
+      <ion-label fixed>Prénom nom</ion-label>
+      <ion-input type="text" [(ngModel)]="node.label"></ion-input>
     </label>
     <label ion-item>
       <ion-label fixed>Description</ion-label>
@@ -42,8 +38,8 @@
     <ion-item>
       <ion-label fixed>Visuel</ion-label>
       <ion-avatar item-right class="bg_seed {{node.category}}">
-        <img *ngIf="node.picture" src="{{node.picture}}"/>
-        <div *ngIf="!node.picture" text-center><i class="ion-md-custom-{{node.category}}"></i></div>
+        <img *ngIf="node.picture()" src="{{node.pictureData()}}"/>
+        <div *ngIf="!node.picture()" text-center><i class="ion-md-custom-{{node.category}}"></i></div>
       </ion-avatar>
       <button ion-button item-right large icon-only clear color="link" (click)="editAvatar()">
         <ion-icon name="create"></ion-icon>
@@ -99,21 +95,21 @@
     <ion-item *ngFor="let seed of node.seeds; let i = index;" no-lines>
       <ion-icon *ngIf="seed.scope == 'private'" name="lock" class="item_lock"></ion-icon>
       <ion-avatar item-left class="bg_seed {{seed.category}}">
-        <img *ngIf="seed.picture" src="{{seed.picture}}"/>
-        <div *ngIf="!seed.picture" text-center><i class="ion-md-custom-{{seed.category}}"></i></div>
+        <img *ngIf="seed.picture()" src="{{seed.pictureData()}}"/>
+        <div *ngIf="!seed.picture()" text-center><i class="ion-md-custom-{{seed.category}}"></i></div>
       </ion-avatar>
       <h2>{{seed.label}}</h2>
-      <button ion-button item-right large clear icon-only color="danger" (click)="node.seeds.splice(i, 1)"><ion-icon name="close"></ion-icon></button>
+      <button ion-button item-right large clear icon-only color="danger" (click)="removeSeed(seed, i)"><ion-icon name="close"></ion-icon></button>
     </ion-item>
     <ion-item *ngIf="dataService.userEmail == node.author || node.scope == 'public' || node.scope == 'apidae'" border-top>
       <ion-label>Visible par {{scopeLabel()}}</ion-label>
-      <button ion-button item-right large [clear]="node.scope != 'private'" icon-only (click)="toggleScope('private')">
+      <button ion-button item-right large color="link" [clear]="node.scope != 'private'" icon-only (click)="toggleScope('private')">
         <ion-icon name="lock"></ion-icon>
       </button>
-      <button ion-button item-right large [clear]="node.scope != 'apidae'" icon-only (click)="toggleScope('apidae')">
+      <button ion-button item-right large color="link" [clear]="node.scope != 'apidae'" icon-only (click)="toggleScope('apidae')">
         <ion-icon name="custom-graph"></ion-icon>
       </button>
-      <button ion-button item-right large [clear]="node.scope != 'public' || node.scope" icon-only (click)="toggleScope('public')">
+      <button ion-button item-right large color="link" [clear]="node.scope != 'public' || node.scope" icon-only (click)="toggleScope('public')">
         <ion-icon name="globe"></ion-icon>
       </button>
     </ion-item>

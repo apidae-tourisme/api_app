@@ -62,6 +62,6 @@ export class SearchPage {
   }
 
   createSeed() {
-    this.navCtrl.push('FormPage');
+    this.navCtrl.push('FormPage', {name: this.searchQuery});
   }
 }

@@ -13,8 +13,8 @@
     </ion-toolbar>
     <ion-buttons right *ngIf="dataService.userSeed">
       <button ion-button (click)="navigateTo(dataService.userSeed.id, true, false)">
-        <img id="avatar_logo" *ngIf="dataService.userSeed.picture" src="{{dataService.userSeed.picture}}"/>
-        <i id="avatar_icon" *ngIf="!dataService.userSeed.picture" class="ion-md-custom-person"></i>
+        <img id="avatar_logo" *ngIf="dataService.userSeed.picture()" src="{{dataService.userSeed.pictureData()}}"/>
+        <i id="avatar_icon" *ngIf="!dataService.userSeed.picture()" class="ion-md-custom-person"></i>
       </button>
     </ion-buttons>
   </ion-navbar>
@@ -32,8 +32,8 @@
       </button>
       <ion-icon *ngIf="explorerService.rootNode.scope == 'private'" name="lock" class="item_lock"></ion-icon>
       <ion-avatar class="bg_seed {{explorerService.rootNode.category}}">
-        <img *ngIf="explorerService.rootNode.picture" src="{{explorerService.rootNode.picture}}"/>
-        <div *ngIf="!explorerService.rootNode.picture" text-center><i class="ion-md-custom-{{explorerService.rootNode.category}}"></i></div>
+        <img *ngIf="explorerService.rootNode.picture()" src="{{explorerService.rootNode.pictureData()}}"/>
+        <div *ngIf="!explorerService.rootNode.picture()" text-center><i class="ion-md-custom-{{explorerService.rootNode.category}}"></i></div>
       </ion-avatar>
       <h2 text-left>{{explorerService.rootNode.label}}</h2>
     </ion-item>
@@ -75,15 +75,15 @@
       </span>
     </ion-item>
     <ion-item *ngIf="explorerService.rootNode.creationDate" class="selectable">
-      <ion-label>Date de création</ion-label>
+      <ion-label class="label_sm">Date de création</ion-label>
       <ion-datetime [(ngModel)]="explorerService.rootNode.creationDate" displayFormat="DD/MM/YYYY" disabled="true"></ion-datetime>
     </ion-item>
     <ion-item *ngIf="explorerService.rootNode.updateDate" class="selectable">
-      <ion-label>Dernière mise à jour</ion-label>
+      <ion-label class="label_sm">Dernière mise à jour</ion-label>
       <ion-datetime [(ngModel)]="explorerService.rootNode.updateDate" displayFormat="DD/MM/YYYY" disabled="true"></ion-datetime>
     </ion-item>
     <ion-item *ngIf="authorId" class="selectable item-datetime-disabled details_author">
-      <ion-label no-margin>Par </ion-label>
+      <ion-label no-margin class="label_sm">Par </ion-label>
       <button ion-button item-right clear color="link" (click)="navigateTo(authorId, true, false)">{{authorName}}</button>
     </ion-item>
   </ion-list>

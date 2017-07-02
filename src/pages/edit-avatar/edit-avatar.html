@@ -15,9 +15,11 @@
 </ion-header>
 
 <ion-content id="edit_avatar" padding>
-  <div *ngIf="avatar.src || avatar.file" text-center>
+  <div *ngIf="avatar.src || avatar.data" text-center>
     <h5>Prévisualisation de l'image :</h5>
-    <img id="avatar_preview" [src]="sanitizeUrl(avatar.src)"/>
+    <div id="preview_wrapper">
+      <img id="avatar_preview" src="{{previewData()}}"/>
+    </div>
   </div>
   <p text-center>
     Sélectionnez une image existante ou prenez une nouvelle photo ci-dessous.

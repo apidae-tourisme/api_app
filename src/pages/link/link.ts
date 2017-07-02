@@ -28,9 +28,11 @@ export class LinkPage {
       this.authService.getLocalAuthData().then(authData => {
         if(authData && authData.email) {
           this.dataService.userEmail = authData.email;
-          this.dataService.getCurrentUserSeed((data) => {
-            this.dataService.userSeed = new Seed(data, false, false);
-            this.navigateHome();
+          this.dataService.getCurrentUserSeed().then((data) => {
+            if(data) {
+              this.dataService.userSeed = new Seed(data, false, false);
+              this.navigateHome();
+            }
           });
         } else {
           console.log('Invalid auth data');

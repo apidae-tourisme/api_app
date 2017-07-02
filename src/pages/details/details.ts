@@ -64,10 +64,12 @@ export class DetailsPage {
   }
 
   loadAuthor() {
-    this.dataService.getUserSeed(this.explorerService.rootNode.author, (data) => {
-      this.authorName = data.name;
-      this.authorId = data._id;
-    });
+    if(this.explorerService.rootNode.author) {
+      this.dataService.getUserSeed(this.explorerService.rootNode.author).then((user) => {
+        this.authorName = user.name;
+        this.authorId = user._id;
+      });
+    }
   }
 
   sanitizeUrl(url): SafeUrl {
@@ -100,7 +102,6 @@ export class DetailsPage {
 
   editSeed(): void {
     this.dataService.getNodeData(this.explorerService.rootNode.id).then((data) => {
-      console.log('node data retrieved');
       let node = new Seed(data.nodes[0], false, false);
       if(data.nodes.length > 1) {
         node.seeds = data.nodes.splice(1).map((n) => {return new Seed(n, false, false)});

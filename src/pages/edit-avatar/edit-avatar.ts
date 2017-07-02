@@ -59,19 +59,20 @@ export class EditAvatar {
         }, (err) => {
           console.log('upload failed : ' + JSON.stringify(err));
         });
-    } else if(this.isWeb && this.avatar.file) {
-      let loading = this.loadingCtrl.create({
-        content: "Téléchargement de l'image en cours",
-        duration: 100000
-      });
-      loading.present();
-      this.dataService.savePicture(this.avatar.file).subscribe(data => {
-          loading.dismiss();
-          this.viewCtrl.dismiss({imageUrl: data['picture'].thumbnail});
-        }, error => {
-          console.log('upload failed : ' + JSON.stringify(error));
-        }
-      );
+    } else if(this.isWeb && this.avatar.data) {
+      this.viewCtrl.dismiss(this.avatar);
+
+      // let loading = this.loadingCtrl.create({
+      //   content: "Téléchargement de l'image en cours",
+      //   duration: 100000
+      // });
+      // loading.present();
+      // this.dataService.savePicture(this.avatar.file).subscribe(data => {
+      //     loading.dismiss();
+      //   }, error => {
+      //     console.log('upload failed : ' + JSON.stringify(error));
+      //   }
+      // );
     }
   }
 
@@ -97,12 +98,16 @@ export class EditAvatar {
   selectImage() {
     let options = {
       sourceType: this.camera.PictureSourceType.PHOTOLIBRARY,
-      destinationType: this.camera.DestinationType.FILE_URI,
-      quality: 100,
+      destinationType: this.camera.DestinationType.DATA_URL,
+      quality: 60,
+      targetWidth: 160,
+      targetHeight: 160,
+      encodingType: this.camera.EncodingType.PNG,
       mediaType: this.camera.MediaType.ALLMEDIA
     };
-    this.camera.getPicture(options).then((fileUri) => {
-      this.avatar.src = fileUri;
+    this.camera.getPicture(options).then((data) => {
+      console.log('selected img : ' + JSON.stringify(data));
+      this.avatar.src = data;
     }, (err) => {
       console.log('image selection error : ' + err);
     });
@@ -111,10 +116,15 @@ export class EditAvatar {
   captureImage() {
     let options = {
       sourceType: this.camera.PictureSourceType.CAMERA,
-      destinationType: this.camera.DestinationType.FILE_URI
+      destinationType: this.camera.DestinationType.DATA_URL,
+      quality: 60,
+      targetWidth: 160,
+      targetHeight: 160,
+      encodingType: this.camera.EncodingType.JPEG
     };
-    this.camera.getPicture(options).then((fileUri) => {
-      this.avatar.src = fileUri;
+    this.camera.getPicture(options).then((data) => {
+      console.log('captured img : ' + JSON.stringify(data));
+      this.avatar.src = data;
     }, (err) => {
       console.log('image capture error : ' + err);
     });
@@ -122,13 +132,22 @@ export class EditAvatar {
 
   updateSrc(evt) {
     if (evt.target.files && evt.target.files[0]) {
-      this.avatar.file = evt.target.files[0];
-      this.avatar.src = window.URL.createObjectURL(evt.target.files[0]);
+      let file = evt.target.files[0];
+      this.avatar.name = file.name;
+      this.avatar.type = file.type;
+      let reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        this.avatar.data = reader.result.substr(reader.result.indexOf(',') + 1);
+      };
+      reader.onerror = function (error) {
+        console.log('Base64 encoding error: ', error);
+      };
     }
   }
 
-  sanitizeUrl(url): SafeUrl {
-    return this.sanitizer.bypassSecurityTrustUrl(url);
+  previewData() {
+    return "data:" + this.avatar.type + ";base64," + this.avatar.data;
   }
 
   computeMimeType(fileName) {

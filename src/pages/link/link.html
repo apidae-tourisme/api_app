@@ -13,8 +13,8 @@
     </ion-toolbar>
     <ion-buttons right *ngIf="dataService.userSeed">
       <button ion-button (click)="navigateTo(dataService.userSeed.id, true, false)">
-        <img id="avatar_logo" *ngIf="dataService.userSeed.picture" src="{{dataService.userSeed.picture}}"/>
-        <i id="avatar_icon" *ngIf="!dataService.userSeed.picture" class="ion-md-custom-person"></i>
+        <img id="avatar_logo" *ngIf="dataService.userSeed.picture()" src="{{dataService.userSeed.pictureData()}}"/>
+        <i id="avatar_icon" *ngIf="!dataService.userSeed.picture()" class="ion-md-custom-person"></i>
       </button>
     </ion-buttons>
   </ion-navbar>

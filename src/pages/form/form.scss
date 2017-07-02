@@ -78,6 +78,10 @@
   margin-top: 3vh;
 }
 
+#seed_form span.synonyms {
+  font-size: 1.2rem;
+}
+
 #seed_form .button[icon-only] {
   max-width: 2.4em;
   margin-top: 5px;
@@ -124,7 +128,14 @@ input.cordova-camera-select {
 }
 
 #avatar_preview {
-  max-width: 100px;
-  height: 100px;
-  border-radius: 50%;
+  min-height: 100%;
+  width: 100%;
+  height: auto;
+}
+
+#preview_wrapper {
+  width: 100px;
+  text-align: center;
+  overflow: hidden;
+  margin: 0 auto;
 }

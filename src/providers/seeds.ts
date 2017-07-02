@@ -12,19 +12,6 @@ export class Seeds {
   public static readonly CONCEPT = 'concept';
   public static readonly SCHEMA = 'schema';
 
-  public static LABELS = {
-    person: "Acteur",
-    organization: "Equipe",
-    competence: "Rôle",
-    event: "Rencontre",
-    project: "Chantier",
-    action: "Action",
-    creativeWork: "Ressource",
-    product: "Service",
-    idea: "Idée",
-    concept: "Etiquette",
-    schema: "Schéma"
-  };
 
   public static readonly CONCEPT_TYPE = {
     type: Seeds.CONCEPT, label: "Etiquette", synonyms: ["tag"]
@@ -41,6 +28,10 @@ export class Seeds {
     {type: Seeds.ACTION, label: "Action", synonyms: ["tâche"]},
     {type: Seeds.IDEA, label: "Idée", synonyms: []}
   ];
+
+  public static allSeedsTypes() {
+    return [Seeds.CONCEPT_TYPE].concat(Seeds.ORDERED);
+  }
 
   public static readonly SCOPE_PUBLIC = 'public';
   public static readonly SCOPE_PRIVATE = 'private';

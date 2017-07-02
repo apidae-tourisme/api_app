@@ -37,7 +37,7 @@ export class SeedsService {
     // Safari requires a special authorization from user to use disk space
     let isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 
-    let localDbName = ApiAppConfig.DB_NAME + '_' + btoa(this.userEmail);
+    let localDbName = ApiAppConfig.LOCAL_DB + '_' + btoa(this.userEmail);
 
     this.localDatabase = isSafari ? new PouchDB(localDbName, {size: 50, adapter: 'websql'}) : new PouchDB(localDbName);
     this.remoteDatabase = new PouchDB(ApiAppConfig.DB_URL + '/' + ApiAppConfig.DB_NAME);
@@ -65,15 +65,15 @@ export class SeedsService {
         } else {
           this.syncProgress = 100;
         }
-      }).on('paused', (err) => {
+      }).on('paused', (res) => {
         this.syncProgress = null;
         this.indexProgress = true;
         return this.localDatabase.allDocs({
           include_docs: true
         }).then((res) => {
           let that = this;
-          console.log('indexing ' + res.rows.length + ' docs');
-          let localDocs = res.rows.map((row) => {return row.doc;});
+          let localDocs = res.rows.filter((row) => {return row.doc;}).map((row) => {return row.doc;});
+          console.log('indexing ' + localDocs.length + ' docs');
           that.idx = global.lunr(function () {
             this.use(global.lunr.fr);
             this.field('name');
@@ -100,18 +100,18 @@ export class SeedsService {
 
   getNodeData(rootNodeId) {
     // Default id = Apidae root
-    let nodeId = rootNodeId || "eb9e3271f9694e37b2da5955a003fa96";
+    let nodeId = rootNodeId || "eb9e3271-f969-4e37-b2da-5955a003fa96";
     let nodeData = {count: 0, nodes: [], links: []};
     return this.localDatabase.allDocs().then((docs) => {
       nodeData.count = docs.total_rows;
     }).then(() => {
-      let node = this.localDatabase.get(nodeId);
-      return node;
+      return this.localDatabase.get(nodeId);
     }).then((rootNode) => {
       // console.log('got root node ' + rootNode._id + ' and connections : ' + rootNode.connections);
       return this.localDatabase.allDocs({
-        keys:  [rootNode._id].concat(rootNode.connections || []),
-        include_docs: true
+        keys: [rootNode._id].concat(rootNode.connections || []),
+        include_docs: true,
+        attachments: true
       }).then(nodes => {
         let visibleNodes = nodes.rows.filter((row) => {return row.id;}).map((row) => {return row.doc;});
         nodeData.nodes = visibleNodes;
@@ -135,23 +135,52 @@ export class SeedsService {
 
     return this.localDatabase.allDocs({
       keys: results.map((res) => { return res.ref; }),
-      include_docs: true
+      include_docs: true,
+      attachments: true
     }).then((nodes) => {
       return nodes.rows.filter((row) => { return row.id && (scope == Seeds.SCOPE_ALL || row.doc.scope == scope); })
         .map((row) => { return row.doc; });
     });
   }
 
-  getCurrentUserSeed(success) {
-    this.getUserSeed(this.userEmail, success);
+  getCurrentUserSeed(userProfile?: any) {
+    return this.getUserSeed(this.userEmail).then((user) => {
+      if(user) {
+        return this.getNodeDetails(user._id);
+      } else if(userProfile) {
+        let userFields = {
+          name: (userProfile.firstName || 'Prénom') + ' ' + (userProfile.lastName || 'Nom'),
+          email: userProfile.email,
+          description: userProfile.profession,
+          urls: [],
+          scope: Seeds.SCOPE_APIDAE
+        };
+        ['phoneNumber', 'gsmNumber', 'facebook', 'twitter'].forEach((lnk) => {
+          if(userProfile[lnk]) {
+            userFields.urls.push(userProfile[lnk]);
+          }
+        });
+        let newUser = new Seed(userFields, false, false);
+        return this.saveNode(newUser).then(data => {
+          if (data.ok) {
+            return this.getNodeDetails(data.id);
+          } else {
+            console.log('New user seed creation failed : ' + JSON.stringify(data));
+            return null;
+          }
+        });
+      }
+      return null;
+    });
   }
 
-  getUserSeed(userEmail, success) {
-    this.localDatabase.find({selector: {email: userEmail}}).then(function (res) {
+  getUserSeed(userEmail) {
+    return this.localDatabase.find({selector: {email: userEmail}}).then(function (res) {
       if (res.docs && res.docs.length > 0) {
-        success(res.docs[0]);
+        return res.docs[0];
       } else {
         console.log('Unknown user : ' + userEmail);
+        return null;
       }
     }).catch(function (err) {
       console.log('User seed retrieval error : ' + JSON.stringify(err));
@@ -159,7 +188,7 @@ export class SeedsService {
   }
 
   getNodeDetails(nodeId) {
-    return this.localDatabase.get(nodeId);
+    return this.localDatabase.get(nodeId, {attachments: true});
   }
 
   saveNode(seed) {
@@ -172,9 +201,7 @@ export class SeedsService {
   }
 
   connectionsChange(seedParams) {
-    if(seedParams.isNew) {
-      return Promise.resolve({added: seedParams.connections, removed: []});
-    } else {
+    if(seedParams._rev) {
       return this.getNodeDetails(seedParams._id).then((data) => {
         let newConnections = seedParams.connections || [];
         let prevConnections = data.connections || [];
@@ -186,6 +213,8 @@ export class SeedsService {
         });
         return {added: addedNodes, removed: removedNodes};
       });
+    } else {
+      return Promise.resolve({added: seedParams.connections, removed: []});
     }
   }
 

@@ -21,14 +21,14 @@
       <ion-segment-button value="all">
         <span ion-text [color]="searchScope == 'all' ? 'lighter' : 'link'">Tout</span>
       </ion-segment-button>
-      <ion-segment-button value="public">
-        <span ion-text [color]="searchScope == 'public' ? 'lighter' : 'link'">Public</span>
+      <ion-segment-button value="private">
+        <span ion-text [color]="searchScope == 'private' ? 'lighter' : 'link'">Privé</span>
       </ion-segment-button>
       <ion-segment-button value="apidae">
         <span ion-text [color]="searchScope == 'apidae' ? 'lighter' : 'link'">Réseau</span>
       </ion-segment-button>
-      <ion-segment-button value="private">
-        <span ion-text [color]="searchScope == 'private' ? 'lighter' : 'link'">Privé</span>
+      <ion-segment-button value="public">
+        <span ion-text [color]="searchScope == 'public' ? 'lighter' : 'link'">Public</span>
       </ion-segment-button>
     </ion-segment>
   </ion-toolbar>
@@ -49,8 +49,8 @@
     <ion-item *ngFor="let node of searchService.nodes" text-wrap (click)="navigateTo(node.id, false)">
       <ion-icon *ngIf="node.scope == 'private'" name="lock" class="item_lock"></ion-icon>
       <ion-avatar item-left class="bg_seed {{node.category}}">
-        <img *ngIf="node.picture" src="{{node.picture}}"/>
-        <div *ngIf="!node.picture" text-center><i class="ion-md-custom-{{node.category}}"></i></div>
+        <img *ngIf="node.picture()" src="{{node.pictureData()}}"/>
+        <div *ngIf="!node.picture()" text-center><i class="ion-md-custom-{{node.category}}"></i></div>
       </ion-avatar>
       <h2>{{node.label}}</h2>
       <p text-nowrap>{{node.description}}</p>

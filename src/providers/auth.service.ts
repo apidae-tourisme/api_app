@@ -11,6 +11,8 @@ declare var window: any;
 @Injectable()
 export class AuthService {
 
+  public userProfile: any;
+
   constructor(private storage: Storage, private platform: Platform, private iab: InAppBrowser, private http: Http){
   }
 
@@ -49,6 +51,7 @@ export class AuthService {
         this.http.get(ApiAppConfig.OAUTH_PROFILE_URL, profileHeader).map(resp => {
           return resp.json();
         }).subscribe(profile => {
+          this.userProfile = profile;
           this.setLocalAuthData(profile.email).then(() => {
             if(browser) {
               browser.close();

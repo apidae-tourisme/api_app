@@ -243,6 +243,14 @@ ion-searchbar.searchbar-md .searchbar-search-icon {
   color: map-get($colors, lighter);
 }
 
+#search_filters span {
+  text-transform: initial;
+}
+
+#search_filters.toolbar .segment-md .segment-button:first-child span {
+  text-transform: uppercase;
+}
+
 .loading_spinner {
   display: flex;
   flex-direction: column;

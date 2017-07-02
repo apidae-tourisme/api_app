@@ -178,7 +178,7 @@ export class GraphComponent {
           return d.category + " icon";
         })
         .attr("xlink:href", function (d) {
-          return d.picture ? '' : ('#' + d.category);
+          return d.picture() ? '' : ('#' + d.category);
         });
 
       nodesEnter.append("image")
@@ -188,7 +188,7 @@ export class GraphComponent {
         .attr("width", layout.unitImg)
         .attr("height", layout.unitImg)
         .attr("xlink:href", function (d) {
-          return d.picture;
+          return d.picture() ? d.pictureData() : null;
         });
 
       nodesEnter.append("text")

@@ -1,5 +1,5 @@
 import {Component, NgZone} from '@angular/core';
-import {NavController, Platform, AlertController, IonicPage, Events} from 'ionic-angular';
+import {NavController, Platform, AlertController, IonicPage, Events, ModalController} from 'ionic-angular';
 import {AuthService} from "../../providers/auth.service";
 import {DataService} from "../../providers/data.service";
 import {Seed} from "../../components/seed.model";
@@ -16,10 +16,11 @@ export class LoginPage {
   public loggingIn: boolean;
 
   private connectionType: string;
+  private termsActive: boolean;
 
   constructor(public navCtrl: NavController, public authService: AuthService, private platform: Platform,
               private network: Network, private dataService: SeedsService, private alertCtrl: AlertController,
-              private zone: NgZone, private evts: Events) {
+              private zone: NgZone, private evts: Events, private modalCtrl: ModalController) {
     this.connectionType = 'web';
 
     // Subscribe to connectivity changes on mobile devices
@@ -37,9 +38,15 @@ export class LoginPage {
 
     this.evts.subscribe('index:built', () => {
       if(!this.dataService.userSeed) {
-        this.dataService.getCurrentUserSeed((data) => {
-          this.dataService.userSeed = new Seed(data, false, false);
-          this.navigateHome();
+        this.dataService.getCurrentUserSeed(this.authService.userProfile).then((data) => {
+          if(data) {
+            this.dataService.userSeed = new Seed(data, false, false);
+            if(this.dataService.userSeed.termsConditions) {
+              this.navigateHome();
+            } else if(!this.termsActive) {
+              this.displayTermsConditions();
+            }
+          }
         });
       }
     });
@@ -69,18 +76,13 @@ export class LoginPage {
 
   loggedInRedirect(): void {
     this.loggingIn = true;
-    console.log('loggedInRedirect');
     if(this.dataService.userSeed) {
-      console.log('navigating home');
       this.navigateHome();
     } else {
       this.authService.getLocalAuthData().then(authData => {
-        console.log('authData : ' + authData);
         if(authData && authData.email) {
-          console.log('authData email : ' + authData.email);
           this.dataService.userEmail = authData.email;
           this.dataService.initDb().then(() => {
-            console.log('initDb done');
             return this.dataService.initReplication();
           }).then(() => {
             console.log('replication started');
@@ -112,10 +114,30 @@ export class LoginPage {
   displayOfflineAlert(): void {
     let alert = this.alertCtrl.create({
       title: "Aucune connectivité",
-      message: "Oups, pas de réseau :(\nCette première version d'ApiApp a besoin d'une connexion Internet, via le réseau téléphonique mobile, le Wifi,...",
+      message: "Oups, pas de réseau :(\nPour vous authentifier, ApiApp a besoin d'une connexion Internet, via le réseau téléphonique mobile, le Wifi,...",
       cssClass: "custom_alert",
       buttons: [{text: 'Fermer'}]
     });
     alert.present();
+  }
+
+  displayTermsConditions(): void {
+    this.termsActive = true;
+    let terms = this.modalCtrl.create('Terms');
+    terms.onDidDismiss(data => {
+      this.termsActive = false;
+      if(data.accept) {
+        this.dataService.getNodeDetails(this.dataService.userSeed.id).then((data) => {
+          this.dataService.userSeed = new Seed(data, false, false);
+          this.dataService.userSeed.termsConditions = true;
+          return this.dataService.userSeed;
+        }).then((userSeed) => {
+          return this.dataService.saveNode(userSeed);
+        }).then(this.navigateHome());
+      } else {
+        this.loggingIn = false;
+      }
+    });
+    terms.present();
   }
 }

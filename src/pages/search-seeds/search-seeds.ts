@@ -1,8 +1,9 @@
 import {Component, ViewChild} from "@angular/core";
-import {ViewController, Content, IonicPage} from "ionic-angular";
+import {ViewController, Content, IonicPage, Searchbar} from "ionic-angular";
 import {SearchService} from "../../providers/search.service";
 import {ExplorerService} from "../../providers/explorer.service";
 import {Seeds} from "../../providers/seeds";
+import {Keyboard} from "@ionic-native/keyboard";
 
 @IonicPage()
 @Component({
@@ -10,12 +11,22 @@ import {Seeds} from "../../providers/seeds";
 })
 export class SearchSeeds {
   @ViewChild(Content) content: Content;
+  @ViewChild(Searchbar) searchbar: Searchbar;
 
   public searchQuery: string;
+  public searchScope: string;
 
   constructor(public viewCtrl: ViewController, public searchService: SearchService,
-              public explorerService: ExplorerService) {
+              private keyboard: Keyboard, public explorerService: ExplorerService) {
     this.searchQuery = null;
+    this.searchScope = Seeds.SCOPE_ALL;
+  }
+
+  ionViewDidEnter() {
+    setTimeout(() => {
+      this.searchbar.setFocus();
+      this.keyboard.show();
+    }, 200);
   }
 
   dismiss() {
@@ -38,7 +49,11 @@ export class SearchSeeds {
     this.searchQuery = null;
   }
 
+  scopeChanged(evt): void {
+    this.searchNodes(evt);
+  }
+
   searchNodes(evt): void {
-    this.searchService.searchNodes(evt, Seeds.SCOPE_ALL, () => {this.content.resize()})
+    this.searchService.searchNodes(this.searchQuery, this.searchScope, () => {this.content.resize()})
   }
 }
