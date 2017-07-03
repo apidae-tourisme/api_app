@@ -75,7 +75,7 @@ export class Seed {
   }
 
   public noIcon() {
-    return !this.picture && this.category == 'concept';
+    return !this.picture() && this.category == 'concept';
   }
 
   public typeInfo() {
@@ -96,7 +96,7 @@ export class Seed {
       updated_at: new Date().toISOString(),
       started_at: this.startDate,
       ended_at: this.endDate,
-      archived: this.archived,
+      _deleted: this.archived,
       scope: this.scope,
       author: this.author,
       termsConditions: this.termsConditions,

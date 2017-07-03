@@ -32,34 +32,34 @@ export class EditAvatar {
   }
 
   submitFile() {
-    if(!this.isWeb && this.avatar.src) {
-      let loading = this.loadingCtrl.create({
-        content: "Téléchargement de l'image en cours",
-        duration: 60000
-      });
-      loading.present();
-
-      let fileName = this.avatar.src.substr(this.avatar.src.lastIndexOf('/') + 1);
-      let filePath = this.avatar.src;
-      if(this.platform.is('ios')) {
-        filePath = cordova.file.tempDirectory + fileName
-      }
-      let fileTransfer = this.transfer.create();
-      let options: any;
-
-      options = {
-        fileKey: 'file',
-        fileName: fileName,
-        mimeType: this.computeMimeType(fileName)
-      };
-      fileTransfer.upload(filePath, ApiAppConfig.API_URL + '/pictures', options)
-        .then((data) => {
-          loading.dismiss();
-          this.viewCtrl.dismiss({imageUrl: JSON.parse(data['response'])['picture'].thumbnail});
-        }, (err) => {
-          console.log('upload failed : ' + JSON.stringify(err));
-        });
-    } else if(this.isWeb && this.avatar.data) {
+    // if(!this.isWeb && this.avatar.src) {
+    //   let loading = this.loadingCtrl.create({
+    //     content: "Téléchargement de l'image en cours",
+    //     duration: 60000
+    //   });
+    //   loading.present();
+    //
+    //   let fileName = this.avatar.src.substr(this.avatar.src.lastIndexOf('/') + 1);
+    //   let filePath = this.avatar.src;
+    //   if(this.platform.is('ios')) {
+    //     filePath = cordova.file.tempDirectory + fileName
+    //   }
+    //   let fileTransfer = this.transfer.create();
+    //   let options: any;
+    //
+    //   options = {
+    //     fileKey: 'file',
+    //     fileName: fileName,
+    //     mimeType: this.computeMimeType(fileName)
+    //   };
+    //   fileTransfer.upload(filePath, ApiAppConfig.API_URL + '/pictures', options)
+    //     .then((data) => {
+    //       loading.dismiss();
+    //       this.viewCtrl.dismiss({imageUrl: JSON.parse(data['response'])['picture'].thumbnail});
+    //     }, (err) => {
+    //       console.log('upload failed : ' + JSON.stringify(err));
+    //     });
+    // } else if(this.isWeb && this.avatar.data) {
       this.viewCtrl.dismiss(this.avatar);
 
       // let loading = this.loadingCtrl.create({
@@ -73,7 +73,7 @@ export class EditAvatar {
       //     console.log('upload failed : ' + JSON.stringify(error));
       //   }
       // );
-    }
+    // }
   }
 
   // For debugging purposes
@@ -106,8 +106,9 @@ export class EditAvatar {
       mediaType: this.camera.MediaType.ALLMEDIA
     };
     this.camera.getPicture(options).then((data) => {
-      console.log('selected img : ' + JSON.stringify(data));
-      this.avatar.src = data;
+      this.avatar.name = 'img.png';
+      this.avatar.type = 'image/png';
+      this.avatar.data = data;
     }, (err) => {
       console.log('image selection error : ' + err);
     });
@@ -123,8 +124,9 @@ export class EditAvatar {
       encodingType: this.camera.EncodingType.JPEG
     };
     this.camera.getPicture(options).then((data) => {
-      console.log('captured img : ' + JSON.stringify(data));
-      this.avatar.src = data;
+      this.avatar.name = 'img.jpg';
+      this.avatar.type = 'image/jpeg';
+      this.avatar.data = data;
     }, (err) => {
       console.log('image capture error : ' + err);
     });

@@ -11,15 +11,18 @@ declare var global: any;
 @Injectable()
 export class SeedsService {
 
+  private static readonly MIN_INTERVAL = 30000;
+  private static readonly DEFAULT_SEED = "eb9e3271-f969-4e37-b2da-5955a003fa96";
+
   private localDatabase: any;
   private remoteDatabase: any;
+  private sync: any;
   private idx: any;
+  private lastIdxUpdate: number;
   private isVisible: any;
 
   public userSeed: Seed;
   public userEmail: string;
-  public syncProgress: number;
-  public indexProgress: boolean;
 
   constructor(private evts: Events) {
     PouchDB.plugin(PouchFind);
@@ -33,15 +36,20 @@ export class SeedsService {
     this.isVisible = (n) => {return (n.scope === 'public' || n.scope === 'apidae' || n.author === this.userEmail) && !n.archived};
   }
 
-  initDb() {
-    // Safari requires a special authorization from user to use disk space
+  initLocalDb() {
     let isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-
     let localDbName = ApiAppConfig.LOCAL_DB + '_' + btoa(this.userEmail);
-
     this.localDatabase = isSafari ? new PouchDB(localDbName, {size: 50, adapter: 'websql'}) : new PouchDB(localDbName);
-    this.remoteDatabase = new PouchDB(ApiAppConfig.DB_URL + '/' + ApiAppConfig.DB_NAME);
-    return this.localDatabase.createIndex({index: {fields: ['email']}});
+  }
+
+  initRemoteDb() {
+    this.remoteDatabase = new PouchDB(ApiAppConfig.DB_URL + '/' + ApiAppConfig.REMOTE_DB);
+  }
+
+  initDb() {
+    this.initRemoteDb();
+    this.initLocalDb();
+    return Promise.resolve();
   }
 
   initReplication() {
@@ -56,51 +64,57 @@ export class SeedsService {
         filter: this.isVisible
       }
     };
+    this.sync = PouchDB.sync(this.localDatabase, this.remoteDatabase, options).on('paused', (res) => {
+      let now = new Date().getTime();
+      if(this.idx && (now - this.lastIdxUpdate) > SeedsService.MIN_INTERVAL) {
+        // console.time('search-index-update');
+        this.buildSearchIndex().then(() => {
+          // console.log('updated search index');
+          // console.timeEnd('search-index-update');
+        });
+      }
+    });
+    return this.sync;
+  }
+
+  cancelReplication() {
+    if(this.sync) {
+      this.sync.cancel();
+    }
+  }
+
+  docsDiff() {
     return Promise.all([this.localDatabase.allDocs(), this.remoteDatabase.allDocs()]).then((values) => {
       return values[1].total_rows - values[0].total_rows;
-    }).then((count) => {
-      return PouchDB.sync(this.localDatabase, this.remoteDatabase, options).on('change', (info) => {
-        if(count > 0) {
-          this.syncProgress = Math.min(Math.floor((info.change.last_seq / count) * 100), 100);
-        } else {
-          this.syncProgress = 100;
-        }
-      }).on('paused', (res) => {
-        this.syncProgress = null;
-        this.indexProgress = true;
-        return this.localDatabase.allDocs({
-          include_docs: true
-        }).then((res) => {
-          let that = this;
-          let localDocs = res.rows.filter((row) => {return row.doc;}).map((row) => {return row.doc;});
-          console.log('indexing ' + localDocs.length + ' docs');
-          that.idx = global.lunr(function () {
-            this.use(global.lunr.fr);
-            this.field('name');
-            this.field('description');
-            this.field('address');
-            this.ref('_id');
-            localDocs.forEach((doc) => {
-              this.add(doc);
-            });
-            that.evts.publish('index:built');
-          });
+    });
+  }
+
+  buildEmailIndex() {
+    return this.localDatabase.createIndex({index: {fields: ['email']}});
+  }
+
+  buildSearchIndex() {
+    return this.localDatabase.allDocs({
+      include_docs: true
+    }).then((res) => {
+      let that = this;
+      let localDocs = res.rows.filter((row) => {return row.doc;}).map((row) => {return row.doc;});
+      that.idx = global.lunr(function () {
+        this.use(global.lunr.fr);
+        this.field('name');
+        this.field('description');
+        this.field('address');
+        this.ref('_id');
+        localDocs.forEach((doc) => {
+          this.add(doc);
         });
-      }).on('active', function () {
-        console.log('sync active');
-      }).on('denied', function (err) {
-        console.log('sync denied : ' + JSON.stringify(err));
-      }).on('complete', function (info) {
-        console.log('sync complete : ' + JSON.stringify(info));
-      }).on('error', function (err) {
-        console.log('sync error : ' + JSON.stringify(err));
+        that.lastIdxUpdate = new Date().getTime();
       });
     });
   }
 
   getNodeData(rootNodeId) {
-    // Default id = Apidae root
-    let nodeId = rootNodeId || "eb9e3271-f969-4e37-b2da-5955a003fa96";
+    let nodeId = rootNodeId || SeedsService.DEFAULT_SEED;
     let nodeData = {count: 0, nodes: [], links: []};
     return this.localDatabase.allDocs().then((docs) => {
       nodeData.count = docs.total_rows;
@@ -113,7 +127,7 @@ export class SeedsService {
         include_docs: true,
         attachments: true
       }).then(nodes => {
-        let visibleNodes = nodes.rows.filter((row) => {return row.id;}).map((row) => {return row.doc;});
+        let visibleNodes = nodes.rows.filter((row) => {return row.id && row.doc;}).map((row) => {return row.doc;});
         nodeData.nodes = visibleNodes;
         nodeData.links = visibleNodes.slice(1).map((n) => {return {source: n._id, target: visibleNodes[0]._id};});
         return nodeData;
@@ -138,7 +152,7 @@ export class SeedsService {
       include_docs: true,
       attachments: true
     }).then((nodes) => {
-      return nodes.rows.filter((row) => { return row.id && (scope == Seeds.SCOPE_ALL || row.doc.scope == scope); })
+      return nodes.rows.filter((row) => { return row.id && row.doc && (scope == Seeds.SCOPE_ALL || row.doc.scope == scope); })
         .map((row) => { return row.doc; });
     });
   }
