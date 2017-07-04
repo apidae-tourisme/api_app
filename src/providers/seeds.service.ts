@@ -11,6 +11,8 @@ declare var global: any;
 @Injectable()
 export class SeedsService {
 
+  public  static readonly BATCH_SIZE = 100;
+
   private static readonly MIN_INTERVAL = 30000;
   private static readonly DEFAULT_SEED = "eb9e3271-f969-4e37-b2da-5955a003fa96";
 
@@ -23,6 +25,22 @@ export class SeedsService {
 
   public userSeed: Seed;
   public userEmail: string;
+
+  private static readonly CHARMAP = {
+    'À': 'A', 'Á': 'A', 'Â': 'A', 'Ã': 'A', 'Ä': 'A', 'Å': 'A', 'Æ': 'AE',
+    'Ç': 'C', 'È': 'E', 'É': 'E', 'Ê': 'E', 'Ë': 'E', 'Ì': 'I', 'Í': 'I',
+    'Î': 'I', 'Ï': 'I', 'Ð': 'D', 'Ñ': 'N', 'Ò': 'O', 'Ó': 'O', 'Ô': 'O',
+    'Õ': 'O', 'Ö': 'O', 'Ő': 'O', 'Ø': 'O', 'Ù': 'U', 'Ú': 'U', 'Û': 'U',
+    'Ü': 'U', 'Ű': 'U', 'Ý': 'Y', 'Þ': 'TH', 'ß': 'ss',
+    'à': 'a', 'á': 'a', 'â': 'a', 'ã': 'a', 'ä': 'a', 'å': 'a', 'æ': 'ae',
+    'ç': 'c', 'è': 'e', 'é': 'e', 'ê': 'e', 'ë': 'e', 'ì': 'i', 'í': 'i',
+    'î': 'i', 'ï': 'i', 'ð': 'd', 'ñ': 'n', 'ò': 'o', 'ó': 'o', 'ô': 'o',
+    'õ': 'o', 'ö': 'o', 'ő': 'o', 'ø': 'o', 'ù': 'u', 'ú': 'u', 'û': 'u',
+    'ü': 'u', 'ű': 'u', 'ý': 'y', 'þ': 'th', 'ÿ': 'y', 'ẞ': 'SS',
+  };
+
+  private static readonly CHARMAP_REGEX = new RegExp('(' +
+    Object.keys(SeedsService.CHARMAP).map(function(char) {return char.replace(/[\|\$]/g, '\\$&');}).join('|') + ')', 'g');
 
   constructor(private evts: Events) {
     PouchDB.plugin(PouchFind);
@@ -67,11 +85,7 @@ export class SeedsService {
     this.sync = PouchDB.sync(this.localDatabase, this.remoteDatabase, options).on('paused', (res) => {
       let now = new Date().getTime();
       if(this.idx && (now - this.lastIdxUpdate) > SeedsService.MIN_INTERVAL) {
-        // console.time('search-index-update');
-        this.buildSearchIndex().then(() => {
-          // console.log('updated search index');
-          // console.timeEnd('search-index-update');
-        });
+        this.buildSearchIndex();
       }
     });
     return this.sync;
@@ -83,10 +97,8 @@ export class SeedsService {
     }
   }
 
-  docsDiff() {
-    return Promise.all([this.localDatabase.allDocs(), this.remoteDatabase.allDocs()]).then((values) => {
-      return values[1].total_rows - values[0].total_rows;
-    });
+  dbInfo() {
+    return Promise.all([this.localDatabase.info(), this.remoteDatabase.info()]);
   }
 
   buildEmailIndex() {
@@ -94,26 +106,35 @@ export class SeedsService {
   }
 
   buildSearchIndex() {
+    console.time('search-index-update');
     return this.localDatabase.allDocs({
       include_docs: true
     }).then((res) => {
       let that = this;
-      let localDocs = res.rows.filter((row) => {return row.doc;}).map((row) => {return row.doc;});
+      let localDocs = res.rows.filter((row) => {return row.doc && this.isVisible(row.doc);}).map((row) => {return row.doc;});
+      console.log('indexing ' + localDocs.length + ' docs');
       that.idx = global.lunr(function () {
         this.use(global.lunr.fr);
+        this.b(0);
         this.field('name');
         this.field('description');
         this.field('address');
         this.ref('_id');
         localDocs.forEach((doc) => {
+          // let ref = 'indexing ' + doc._id;
+          // console.time(ref);
           this.add(doc);
+          // console.timeEnd(ref);
         });
         that.lastIdxUpdate = new Date().getTime();
+        console.log('updated search index');
+        console.timeEnd('search-index-update');
       });
     });
   }
 
   getNodeData(rootNodeId) {
+    console.log('getNodeData : ' + rootNodeId);
     let nodeId = rootNodeId || SeedsService.DEFAULT_SEED;
     let nodeData = {count: 0, nodes: [], links: []};
     return this.localDatabase.allDocs().then((docs) => {
@@ -167,6 +188,7 @@ export class SeedsService {
           email: userProfile.email,
           description: userProfile.profession,
           urls: [],
+          type: Seeds.PERSON,
           scope: Seeds.SCOPE_APIDAE
         };
         ['phoneNumber', 'gsmNumber', 'facebook', 'twitter'].forEach((lnk) => {
@@ -272,38 +294,8 @@ export class SeedsService {
 
   // Unicode normalizer - Extracted from https://github.com/cvan/lunr-unicode-normalizer
   unicodeNormalizer(str) {
-    let charmap = {
-      // Latin chars
-      'À': 'A', 'Á': 'A', 'Â': 'A', 'Ã': 'A', 'Ä': 'A', 'Å': 'A', 'Æ': 'AE',
-      'Ç': 'C', 'È': 'E', 'É': 'E', 'Ê': 'E', 'Ë': 'E', 'Ì': 'I', 'Í': 'I',
-      'Î': 'I', 'Ï': 'I', 'Ð': 'D', 'Ñ': 'N', 'Ò': 'O', 'Ó': 'O', 'Ô': 'O',
-      'Õ': 'O', 'Ö': 'O', 'Ő': 'O', 'Ø': 'O', 'Ù': 'U', 'Ú': 'U', 'Û': 'U',
-      'Ü': 'U', 'Ű': 'U', 'Ý': 'Y', 'Þ': 'TH', 'ß': 'ss',
-      'à': 'a', 'á': 'a', 'â': 'a', 'ã': 'a', 'ä': 'a', 'å': 'a', 'æ': 'ae',
-      'ç': 'c', 'è': 'e', 'é': 'e', 'ê': 'e', 'ë': 'e', 'ì': 'i', 'í': 'i',
-      'î': 'i', 'ï': 'i', 'ð': 'd', 'ñ': 'n', 'ò': 'o', 'ó': 'o', 'ô': 'o',
-      'õ': 'o', 'ö': 'o', 'ő': 'o', 'ø': 'o', 'ù': 'u', 'ú': 'u', 'û': 'u',
-      'ü': 'u', 'ű': 'u', 'ý': 'y', 'þ': 'th', 'ÿ': 'y', 'ẞ': 'SS',
-
-
-      // Currencies
-      '€': 'euro', "$": 'dollar',
-
-      // Symbols
-      '©': '(c)', 'œ': 'oe', 'Œ': 'OE', '∑': 'sum', '®': '(r)', '†': '+',
-      '“': '"', '”': '"', '‘': "'", '’': "'", '∂': 'd', 'ƒ': 'f', '™': 'tm',
-      '℠': 'sm', '…': '...', '˚': 'o', 'º': 'o', 'ª': 'a', '•': '*',
-      '∆': 'delta', '∞': 'infini', '♥': 'love', '&': 'et', '|': 'ou',
-      '<': 'less', '>': 'greater'
-    };
-
-    let charmapPattern = Object.keys(charmap).map(function(char) {
-      return char.replace(/[\|\$]/g, '\\$&');
-    }).join('|');
-    let charmapRegExp = new RegExp('(' + charmapPattern + ')', 'g');
-
-    return str.replace(charmapRegExp, function(char) {
-      return charmap[char];
+    return str.replace(SeedsService.CHARMAP_REGEX, function(char) {
+      return SeedsService.CHARMAP[char];
     });
   };
 

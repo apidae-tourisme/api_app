@@ -99,6 +99,7 @@ export class EditAvatar {
     let options = {
       sourceType: this.camera.PictureSourceType.PHOTOLIBRARY,
       destinationType: this.camera.DestinationType.DATA_URL,
+      allowEdit: false,
       quality: 60,
       targetWidth: 160,
       targetHeight: 160,
@@ -106,9 +107,34 @@ export class EditAvatar {
       mediaType: this.camera.MediaType.ALLMEDIA
     };
     this.camera.getPicture(options).then((data) => {
-      this.avatar.name = 'img.png';
-      this.avatar.type = 'image/png';
-      this.avatar.data = data;
+      // on Android, plugin returns a file uri
+      if(this.platform.is('android') && data) {
+        let fileName = data.substr(data.lastIndexOf('/') + 1);
+        let fileDir = 'file://' + data.replace('/' + fileName, '');
+        let fileType = this.computeMimeType(fileName);
+        this.file.readAsDataURL(fileDir, fileName).then((fileData) => {
+          let img = new Image();
+          img.onload = () => {
+            let canvas = <any>document.getElementById("resize_canvas");
+            let ctx = canvas.getContext("2d");
+            canvas.width = 160;
+            canvas.height = 160;
+            ctx.drawImage(img, 0, 0, 160, 160);
+            let base64img = canvas.toDataURL();
+            this.avatar.data = base64img.substr(base64img.indexOf(',') + 1);
+          };
+          img.src = fileData;
+
+          this.avatar.name = fileName;
+          this.avatar.type = fileType;
+        }, (err) => {
+          console.log('read file error : ' + JSON.stringify(err));
+        });
+      } else {
+        this.avatar.name = 'img.png';
+        this.avatar.type = 'image/png';
+        this.avatar.data = data;
+      }
     }, (err) => {
       console.log('image selection error : ' + err);
     });
@@ -118,6 +144,7 @@ export class EditAvatar {
     let options = {
       sourceType: this.camera.PictureSourceType.CAMERA,
       destinationType: this.camera.DestinationType.DATA_URL,
+      allowEdit: false,
       quality: 60,
       targetWidth: 160,
       targetHeight: 160,

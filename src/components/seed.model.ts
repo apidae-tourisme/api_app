@@ -37,8 +37,8 @@ export class Seed {
     this.attachment = nodeData._attachments;
     this.creationDate = nodeData.created_at;
     this.updateDate = nodeData.updated_at;
-    this.startDate = nodeData.start_date;
-    this.endDate = nodeData.end_date;
+    this.startDate = nodeData.started_at;
+    this.endDate = nodeData.ended_at;
     this.archived = nodeData.archived;
     this.scope = nodeData.scope || Seeds.SCOPE_APIDAE;
     this.author = nodeData.author;

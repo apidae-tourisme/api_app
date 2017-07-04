@@ -14,7 +14,6 @@ export class LoadingPage {
   public syncProgress: number;
 
   private sync: any;
-  private syncRequired: boolean;
 
   constructor(public navCtrl: NavController, private dataService: SeedsService, private authService: AuthService,
               private zone: NgZone, private modalCtrl: ModalController, private navParams: NavParams) {
@@ -22,33 +21,31 @@ export class LoadingPage {
 
   ionViewDidEnter() {
     let isOnline = this.navParams.get('isOnline');
-    console.log('isOnline : ' + isOnline);
     this.msg = 'Initialisation de la base de données';
     if(isOnline) {
       this.dataService.initDb().then(() => {
-        return this.dataService.docsDiff();
-      }).then((count) => {
-        this.sync = this.dataService.initReplication().on('active', () => {
-          this.syncRequired = true;
-        }).on('change', (info) => {
-          if(count > 0) {
-            this.syncProgress = Math.min(Math.floor((info.change.last_seq / count) * 100), 100);
-          } else {
-            this.syncProgress = 100;
-          }
-          this.msg = "Mise à jour des données de l'application en cours (" + this.syncProgress + "%)";
-          if(this.syncProgress === 100) {
-            this.syncRequired = false;
-            this.completeSetUp();
-          }
-        });
-
-        // Handle case when no sync is required
-        setTimeout(() => {
-          if(!this.syncRequired) {
-            this.completeSetUp();
-          }
-        }, 2000);
+        return this.dataService.dbInfo();
+      }).then((infos) => {
+        let remoteSeq = infos[1].update_seq;
+        if(infos[0].doc_count === 0) {
+          // First init - Display loading page (pull events only)
+          this.sync = this.dataService.initReplication().on('change', (info) => {
+            if(remoteSeq - info.change.last_seq > SeedsService.BATCH_SIZE) {
+              this.syncProgress = Math.min(Math.floor((info.change.last_seq / remoteSeq) * 100), 100);
+            } else {
+              this.syncProgress = 100;
+            }
+            this.msg = "Mise à jour des données de l'application en cours (" + this.syncProgress + "%)";
+            if(this.syncProgress === 100) {
+              this.sync.removeAllListeners('change');
+              this.completeSetUp();
+            }
+          });
+        } else {
+          // Local db is not empty, start sync and move on
+          this.sync = this.dataService.initReplication();
+          this.completeSetUp();
+        }
       });
     } else {
       this.dataService.initLocalDb();
@@ -56,15 +53,9 @@ export class LoadingPage {
     }
   }
 
-  ionViewWillLeave() {
-    if(this.sync) {
-      this.sync.removeAllListeners('change');
-    }
-  }
-
   completeSetUp() {
     this.buildIndexes().then(() => {
-      this.msg = "Récupération du profil utilisateur";
+      this.msg = "Chargement du profil utilisateur";
       return this.dataService.getCurrentUserSeed(this.authService.userProfile);
     }).then((data) => {
       this.redirectUser(data);
