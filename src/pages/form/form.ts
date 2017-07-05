@@ -189,7 +189,7 @@ export class FormPage {
   }
 
   clearAvatar(): void {
-    this.node.picture = null;
+    this.node.attachment = {};
   }
 
   presentToast(msg, onDismiss) {

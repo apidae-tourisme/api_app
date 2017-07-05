@@ -13,7 +13,7 @@ export class SeedsService {
 
   public  static readonly BATCH_SIZE = 100;
 
-  private static readonly MIN_INTERVAL = 30000;
+  private static readonly MIN_INTERVAL = 60000;
   private static readonly DEFAULT_SEED = "eb9e3271-f969-4e37-b2da-5955a003fa96";
 
   private localDatabase: any;
@@ -21,6 +21,7 @@ export class SeedsService {
   private sync: any;
   private idx: any;
   private lastIdxUpdate: number;
+  private idxBuilding: boolean;
   private isVisible: any;
 
   public userSeed: Seed;
@@ -84,7 +85,7 @@ export class SeedsService {
     };
     this.sync = PouchDB.sync(this.localDatabase, this.remoteDatabase, options).on('paused', (res) => {
       let now = new Date().getTime();
-      if(this.idx && (now - this.lastIdxUpdate) > SeedsService.MIN_INTERVAL) {
+      if(this.idx && !this.idxBuilding && (now - this.lastIdxUpdate) > SeedsService.MIN_INTERVAL) {
         this.buildSearchIndex();
       }
     });
@@ -94,6 +95,12 @@ export class SeedsService {
   cancelReplication() {
     if(this.sync) {
       this.sync.cancel();
+    }
+  }
+
+  clearChangeListeners() {
+    if(this.sync) {
+      this.sync.removeAllListeners('change');
     }
   }
 
@@ -107,6 +114,7 @@ export class SeedsService {
 
   buildSearchIndex() {
     console.time('search-index-update');
+    this.idxBuilding = true;
     return this.localDatabase.allDocs({
       include_docs: true
     }).then((res) => {
@@ -121,20 +129,16 @@ export class SeedsService {
         this.field('address');
         this.ref('_id');
         localDocs.forEach((doc) => {
-          // let ref = 'indexing ' + doc._id;
-          // console.time(ref);
           this.add(doc);
-          // console.timeEnd(ref);
         });
         that.lastIdxUpdate = new Date().getTime();
-        console.log('updated search index');
+        that.idxBuilding = false;
         console.timeEnd('search-index-update');
       });
     });
   }
 
   getNodeData(rootNodeId) {
-    console.log('getNodeData : ' + rootNodeId);
     let nodeId = rootNodeId || SeedsService.DEFAULT_SEED;
     let nodeData = {count: 0, nodes: [], links: []};
     return this.localDatabase.allDocs().then((docs) => {

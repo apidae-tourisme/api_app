@@ -1,9 +1,5 @@
-import {Component, ViewChild} from "@angular/core";
-import {ViewController, LoadingController, Platform, IonicPage} from "ionic-angular";
-import {ApiAppConfig} from "../../providers/apiapp.config";
-import {DataService} from "../../providers/data.service";
-import {SafeUrl, DomSanitizer} from "@angular/platform-browser";
-import {Transfer} from "@ionic-native/transfer";
+import {Component} from "@angular/core";
+import {ViewController, Platform, IonicPage} from "ionic-angular";
 import {Camera} from "@ionic-native/camera";
 import {File} from '@ionic-native/file';
 
@@ -15,14 +11,10 @@ declare var cordova: any;
 })
 export class EditAvatar {
 
-  @ViewChild('apiapp') wrapperElt;
-
   public avatar: any;
   public isWeb: boolean;
 
-  constructor(public viewCtrl: ViewController, private loadingCtrl: LoadingController, private dataService: DataService,
-              private sanitizer: DomSanitizer, private platform: Platform, private file: File, private transfer: Transfer,
-              private camera: Camera) {
+  constructor(public viewCtrl: ViewController, private platform: Platform, private file: File, private camera: Camera) {
     this.avatar = {};
     this.isWeb = !platform.is('cordova');
   }
@@ -32,48 +24,7 @@ export class EditAvatar {
   }
 
   submitFile() {
-    // if(!this.isWeb && this.avatar.src) {
-    //   let loading = this.loadingCtrl.create({
-    //     content: "Téléchargement de l'image en cours",
-    //     duration: 60000
-    //   });
-    //   loading.present();
-    //
-    //   let fileName = this.avatar.src.substr(this.avatar.src.lastIndexOf('/') + 1);
-    //   let filePath = this.avatar.src;
-    //   if(this.platform.is('ios')) {
-    //     filePath = cordova.file.tempDirectory + fileName
-    //   }
-    //   let fileTransfer = this.transfer.create();
-    //   let options: any;
-    //
-    //   options = {
-    //     fileKey: 'file',
-    //     fileName: fileName,
-    //     mimeType: this.computeMimeType(fileName)
-    //   };
-    //   fileTransfer.upload(filePath, ApiAppConfig.API_URL + '/pictures', options)
-    //     .then((data) => {
-    //       loading.dismiss();
-    //       this.viewCtrl.dismiss({imageUrl: JSON.parse(data['response'])['picture'].thumbnail});
-    //     }, (err) => {
-    //       console.log('upload failed : ' + JSON.stringify(err));
-    //     });
-    // } else if(this.isWeb && this.avatar.data) {
-      this.viewCtrl.dismiss(this.avatar);
-
-      // let loading = this.loadingCtrl.create({
-      //   content: "Téléchargement de l'image en cours",
-      //   duration: 100000
-      // });
-      // loading.present();
-      // this.dataService.savePicture(this.avatar.file).subscribe(data => {
-      //     loading.dismiss();
-      //   }, error => {
-      //     console.log('upload failed : ' + JSON.stringify(error));
-      //   }
-      // );
-    // }
+    this.viewCtrl.dismiss(this.avatar);
   }
 
   // For debugging purposes
