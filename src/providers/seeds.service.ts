@@ -58,7 +58,8 @@ export class SeedsService {
   initLocalDb() {
     let isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
     let localDbName = ApiAppConfig.LOCAL_DB + '_' + btoa(this.userEmail);
-    this.localDatabase = isSafari ? new PouchDB(localDbName, {size: 50, adapter: 'websql'}) : new PouchDB(localDbName);
+    // this.localDatabase = isSafari ? new PouchDB(localDbName, {size: 50, adapter: 'websql'}) : new PouchDB(localDbName);
+    this.localDatabase = new PouchDB(localDbName);
   }
 
   initRemoteDb() {
@@ -80,7 +81,8 @@ export class SeedsService {
         return doc._id.indexOf('_design') !== 0;
       },
       pull: {
-        filter: this.isVisible
+          filter: 'seeds/by_user',
+          query_params: {user: this.userEmail}
       }
     };
     this.sync = PouchDB.sync(this.localDatabase, this.remoteDatabase, options).on('paused', (res) => {
@@ -90,6 +92,11 @@ export class SeedsService {
       }
     });
     return this.sync;
+
+    // this.remoteDatabase.replicate.to(this.localDatabase, {
+    //   filter: 'visible/user',
+    //   query_params: {user: this.userEmail}
+    // });
   }
 
   cancelReplication() {
