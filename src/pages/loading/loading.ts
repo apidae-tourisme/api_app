@@ -11,7 +11,6 @@ import {Seed} from "../../components/seed.model";
 export class LoadingPage {
 
   public msg: string;
-  public syncProgress: number;
 
   constructor(public navCtrl: NavController, private dataService: SeedsService, private authService: AuthService,
               private zone: NgZone, private modalCtrl: ModalController, private navParams: NavParams) {
@@ -21,30 +20,7 @@ export class LoadingPage {
     let isOnline = this.navParams.get('isOnline');
     this.msg = 'Initialisation de la base de données';
     if(isOnline) {
-      this.dataService.initDb().then(() => {
-        return this.dataService.dbInfo();
-      }).then((infos) => {
-        let remoteSeq = infos[1].update_seq;
-        if(infos[0].doc_count === 0) {
-          // First init - Display loading page (pull events only)
-          this.dataService.initReplication().on('change', (info) => {
-            if(remoteSeq - info.change.last_seq > SeedsService.BATCH_SIZE) {
-              this.syncProgress = Math.min(Math.floor((info.change.last_seq / remoteSeq) * 100), 100);
-            } else {
-              this.syncProgress = 100;
-            }
-            this.msg = "Mise à jour des données de l'application en cours (" + this.syncProgress + "%)";
-            if(this.syncProgress === 100) {
-              this.dataService.clearChangeListeners();
-              this.completeSetUp();
-            }
-          });
-        } else {
-          // Local db is not empty, start sync and move on
-          this.dataService.initReplication();
-          this.completeSetUp();
-        }
-      });
+      this.dataService.initDb(() => {this.completeSetUp();}, () => {}, (progress) => {this.msg = progress;});
     } else {
       this.dataService.initLocalDb();
       this.completeSetUp();

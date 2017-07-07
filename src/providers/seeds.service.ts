@@ -3,15 +3,15 @@ import {ApiAppConfig} from "./apiapp.config";
 import {Seed} from "../components/seed.model";
 import PouchDB from 'pouchdb';
 import PouchFind from 'pouchdb-find';
-import {Events} from "ionic-angular";
 import {Seeds} from "./seeds";
+import {Http} from "@angular/http";
 
 declare var global: any;
 
 @Injectable()
 export class SeedsService {
 
-  public  static readonly BATCH_SIZE = 100;
+  public  static readonly BATCH_SIZE = 500;
 
   private static readonly MIN_INTERVAL = 60000;
   private static readonly DEFAULT_SEED = "eb9e3271-f969-4e37-b2da-5955a003fa96";
@@ -43,7 +43,7 @@ export class SeedsService {
   private static readonly CHARMAP_REGEX = new RegExp('(' +
     Object.keys(SeedsService.CHARMAP).map(function(char) {return char.replace(/[\|\$]/g, '\\$&');}).join('|') + ')', 'g');
 
-  constructor(private evts: Events) {
+  constructor(private http: Http) {
     PouchDB.plugin(PouchFind);
 
     // Import fr language indexing rules
@@ -58,21 +58,60 @@ export class SeedsService {
   initLocalDb() {
     let isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
     let localDbName = ApiAppConfig.LOCAL_DB + '_' + btoa(this.userEmail);
-    // this.localDatabase = isSafari ? new PouchDB(localDbName, {size: 50, adapter: 'websql'}) : new PouchDB(localDbName);
-    this.localDatabase = new PouchDB(localDbName);
+    this.localDatabase = isSafari ? new PouchDB(localDbName, {size: 50, adapter: 'websql'}) : new PouchDB(localDbName);
   }
 
   initRemoteDb() {
     this.remoteDatabase = new PouchDB(ApiAppConfig.DB_URL + '/' + ApiAppConfig.REMOTE_DB);
   }
 
-  initDb() {
+  initDb(success, failure, onProgress) {
     this.initRemoteDb();
     this.initLocalDb();
-    return Promise.resolve();
+    onProgress("Mise à jour des données de l'application en cours (0%)");
+    this.localDatabase.info().then((localInfo) => {
+      if(localInfo.doc_count === 0) {
+        let remote: any = {};
+        this.http.get("https://dev-db.apiapp.apidae.net/api-app_dev/_design/scopes/_view/scope_user?keys=[%22apidae%22,%22jean-baptiste.vilain@hotentic.com%22]&group=true")
+          .map(res => res.json()).toPromise().then((data) => {
+          return data.rows.reduce((a, b) => {return a.value + b.value;});
+        }).then((totalDocs) => {
+          remote.count = totalDocs;
+          return this.remoteDatabase.info();
+        }).then((remoteInfo) => {
+          remote.lastSeq = remoteInfo.update_seq;
+          console.log('retrieving ' + remote.count + ' docs for user ' + this.userEmail);
+          let sequence = Promise.resolve();
+          let batchesCount = Math.ceil(remote.count / SeedsService.BATCH_SIZE);
+          for(let i = 0; i < batchesCount; i++) {
+            sequence = sequence.then(() => {
+              return this.http.get(ApiAppConfig.DB_URL + '/' + ApiAppConfig.REMOTE_DB + '/_design/scopes/_list/get/seeds?' +
+                'keys=[%22apidae%22,%22public%22,%22jean-baptiste.vilain@hotentic.com%22]&include_docs=true&attachments=true' +
+                '&limit=' + SeedsService.BATCH_SIZE + '&skip=' + i*SeedsService.BATCH_SIZE)
+                .map(res => res.json()).toPromise().then((data) => {
+                  return this.localDatabase.bulkDocs(data.docs, {new_edits: false}).then((res) => {
+                    onProgress("Mise à jour des données de l'application en cours (" + Math.ceil(((i + 1) / batchesCount)*100) + "%)");
+                  }).catch((err) => {
+                    console.log('bulk docs ' + i + 'err : ' + JSON.stringify(err));
+                  });
+                });
+            });
+          }
+          sequence.then(() => {
+            onProgress("Mise à jour des données de l'application en cours (100%)");
+            this.initReplication(remote.lastSeq);
+            success();
+          }, failure);
+        });
+
+      } else {
+        this.initReplication();
+        success();
+      }
+    });
   }
 
-  initReplication() {
+  initReplication(lastSeq?) {
     let options = {
       live: true,
       retry: true,
@@ -85,6 +124,9 @@ export class SeedsService {
           query_params: {user: this.userEmail}
       }
     };
+    if(lastSeq) {
+      options['since'] = lastSeq;
+    }
     this.sync = PouchDB.sync(this.localDatabase, this.remoteDatabase, options).on('paused', (res) => {
       let now = new Date().getTime();
       if(this.idx && !this.idxBuilding && (now - this.lastIdxUpdate) > SeedsService.MIN_INTERVAL) {
@@ -92,11 +134,6 @@ export class SeedsService {
       }
     });
     return this.sync;
-
-    // this.remoteDatabase.replicate.to(this.localDatabase, {
-    //   filter: 'visible/user',
-    //   query_params: {user: this.userEmail}
-    // });
   }
 
   cancelReplication() {
@@ -109,10 +146,6 @@ export class SeedsService {
     if(this.sync) {
       this.sync.removeAllListeners('change');
     }
-  }
-
-  dbInfo() {
-    return Promise.all([this.localDatabase.info(), this.remoteDatabase.info()]);
   }
 
   buildEmailIndex() {
