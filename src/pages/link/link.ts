@@ -25,19 +25,15 @@ export class LinkPage {
     if(this.dataService.userSeed) {
       this.navigateHome();
     } else {
-      this.authService.getLocalAuthData().then(authData => {
-        if(authData && authData.email) {
-          this.dataService.userEmail = authData.email;
-          this.dataService.getCurrentUserSeed().then((data) => {
-            if(data) {
-              this.dataService.userSeed = new Seed(data, false, false);
-              this.navigateHome();
-            }
-          });
-        } else {
-          console.log('Invalid auth data');
-        }
-      }, function() {
+      this.dataService.getAuth().then(authData => {
+        this.dataService.userEmail = authData.user.email;
+        this.dataService.getCurrentUserSeed().then((data) => {
+          if(data) {
+            this.dataService.userSeed = new Seed(data, false, false);
+            this.navigateHome();
+          }
+        });
+      }).catch((err) => {
         console.log('Local auth data is invalid');
       });
     }

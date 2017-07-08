@@ -1,19 +1,17 @@
 import {Injectable} from "@angular/core";
 import {Http, Headers} from "@angular/http";
 import 'rxjs/Rx';
-import {Storage} from "@ionic/storage";
 import {ApiAppConfig} from "./apiapp.config";
 import {InAppBrowser} from '@ionic-native/in-app-browser';
 import {Platform} from "ionic-angular";
+import {SeedsService} from "./seeds.service";
 
 declare var window: any;
 
 @Injectable()
 export class AuthService {
 
-  public userProfile: any;
-
-  constructor(private storage: Storage, private platform: Platform, private iab: InAppBrowser, private http: Http){
+  constructor(private dataService: SeedsService, private platform: Platform, private iab: InAppBrowser, private http: Http){
   }
 
   authenticate(success, error): void {
@@ -51,8 +49,7 @@ export class AuthService {
         this.http.get(ApiAppConfig.OAUTH_PROFILE_URL, profileHeader).map(resp => {
           return resp.json();
         }).subscribe(profile => {
-          this.userProfile = profile;
-          this.setLocalAuthData(profile.email).then(() => {
+          this.dataService.setAuth(profile).then(() => {
             if(browser) {
               browser.close();
             }
@@ -71,18 +68,9 @@ export class AuthService {
     }
   }
 
-  getLocalAuthData() {
-    return this.storage.get('authData');
-  }
-
-  setLocalAuthData(userEmail) {
-    if(userEmail) {
-      return this.storage.set('authData', {email: userEmail});
-    }
-    return Promise.reject('Could not set local auth data');
-  }
-
   logOut() {
-    return this.storage.set('authData', null);
+    this.dataService.clearAuthData();
+    this.dataService.cancelReplication();
+    return Promise.resolve();
   }
 }

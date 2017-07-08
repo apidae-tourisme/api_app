@@ -1,5 +1,5 @@
 import {Component, NgZone} from '@angular/core';
-import {NavController, IonicPage, ModalController, NavParams} from 'ionic-angular';
+import {NavController, IonicPage, ModalController, NavParams, Events} from 'ionic-angular';
 import {SeedsService} from "../../providers/seeds.service";
 import {AuthService} from "../../providers/auth.service";
 import {Seed} from "../../components/seed.model";
@@ -11,16 +11,23 @@ import {Seed} from "../../components/seed.model";
 export class LoadingPage {
 
   public msg: string;
+  private complete: boolean;
 
   constructor(public navCtrl: NavController, private dataService: SeedsService, private authService: AuthService,
-              private zone: NgZone, private modalCtrl: ModalController, private navParams: NavParams) {
+              private evt: Events, private zone: NgZone, private modalCtrl: ModalController, private navParams: NavParams) {
   }
 
   ionViewDidEnter() {
     let isOnline = this.navParams.get('isOnline');
     this.msg = 'Initialisation de la base de données';
+    this.evt.subscribe("replication:paused", () => {
+      if(!this.complete) {
+        this.complete = true;
+        this.completeSetUp();
+      }
+    });
     if(isOnline) {
-      this.dataService.initDb(() => {this.completeSetUp();}, () => {}, (progress) => {this.msg = progress;});
+      this.dataService.initDb((progress) => {this.msg = progress;});
     } else {
       this.dataService.initLocalDb();
       this.completeSetUp();
@@ -28,13 +35,13 @@ export class LoadingPage {
   }
 
   ionViewWillLeave() {
-    this.dataService.clearChangeListeners();
+    this.evt.unsubscribe("replication:paused");
   }
 
   completeSetUp() {
     this.buildIndexes().then(() => {
       this.msg = "Chargement du profil utilisateur";
-      return this.dataService.getCurrentUserSeed(this.authService.userProfile);
+      return this.dataService.getCurrentUserSeed();
     }).then((data) => {
       this.redirectUser(data);
     });
@@ -84,7 +91,7 @@ export class LoadingPage {
   cancel() {
     this.dataService.cancelReplication();
     this.authService.logOut().then(() => {
-      this.dataService.clearUser();
+      this.dataService.clearAuthData();
       this.navCtrl.pop();
     });
   }

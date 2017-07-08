@@ -19,6 +19,7 @@ import {Keyboard} from "@ionic-native/keyboard";
 import {StatusBar} from "@ionic-native/status-bar";
 import {SplashScreen} from "@ionic-native/splash-screen";
 import {SeedsService} from "../providers/seeds.service";
+import {ProgressHttpModule} from "angular-progress-http";
 
 @NgModule({
   declarations: [
@@ -27,6 +28,7 @@ import {SeedsService} from "../providers/seeds.service";
   imports: [
     BrowserModule,
     HttpModule,
+    ProgressHttpModule,
     IonicModule.forRoot(ApiApp,
       {
         scrollAssist: false,

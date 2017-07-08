@@ -7,6 +7,7 @@ export class Seed {
 
   id: string;
   rev: string;
+  externalId: string;
   label: string;
   description: string;
   category: string;
@@ -29,6 +30,7 @@ export class Seed {
   public constructor(nodeData: any, public isRoot: boolean, public isPrevious: boolean) {
     this.id = nodeData._id;
     this.rev = nodeData._rev;
+    this.externalId = nodeData.external_id;
     this.label = (nodeData.firstname && nodeData.lastname) ? (nodeData.firstname + ' ' + nodeData.lastname) : nodeData.name;
     this.description = nodeData.description;
     this.category = nodeData.type ? this.seedType(nodeData.type) : Seed.DEFAULT_TYPE;
@@ -42,7 +44,7 @@ export class Seed {
     this.archived = nodeData.archived;
     this.scope = nodeData.scope || Seeds.SCOPE_APIDAE;
     this.author = nodeData.author;
-    this.termsConditions = nodeData.termsConditions;
+    this.termsConditions = nodeData.terms_conditions;
     this.connections = nodeData.connections || [];
     this.seeds = [];
     if(nodeData.connections) {
@@ -86,10 +88,11 @@ export class Seed {
     return {
       _id: this.id || this.newId(),
       _rev: this.rev,
+      external_id: this.externalId,
       name: this.label,
       description: this.description,
       _attachments: this.attachment,
-      type: this.category,
+      type: this.category.charAt(0).toUpperCase() + this.category.substring(1),
       email: this.email,
       address: this.address,
       created_at: this.creationDate || new Date().toISOString(),
@@ -99,7 +102,7 @@ export class Seed {
       _deleted: this.archived,
       scope: this.scope,
       author: this.author,
-      termsConditions: this.termsConditions,
+      terms_conditions: this.termsConditions,
       connections: this.connections || [],
       urls: this.urls.map(function(u) { return u.value; }) || []
     };

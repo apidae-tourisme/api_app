@@ -2,19 +2,19 @@ import {Injectable} from "@angular/core";
 import {ApiAppConfig} from "./apiapp.config";
 import {Seed} from "../components/seed.model";
 import PouchDB from 'pouchdb';
-import PouchFind from 'pouchdb-find';
 import {Seeds} from "./seeds";
-import {Http} from "@angular/http";
+import {ProgressHttp} from "angular-progress-http";
+import {Events} from "ionic-angular";
 
 declare var global: any;
 
 @Injectable()
 export class SeedsService {
 
-  public  static readonly BATCH_SIZE = 500;
-
   private static readonly MIN_INTERVAL = 60000;
   private static readonly DEFAULT_SEED = "eb9e3271-f969-4e37-b2da-5955a003fa96";
+  private static readonly AUTH_DOC = "_local/user";
+  private static readonly USERS_INDEX_DOC = "_local/users_by_email";
 
   private localDatabase: any;
   private remoteDatabase: any;
@@ -22,7 +22,6 @@ export class SeedsService {
   private idx: any;
   private lastIdxUpdate: number;
   private idxBuilding: boolean;
-  private isVisible: any;
 
   public userSeed: Seed;
   public userEmail: string;
@@ -43,16 +42,14 @@ export class SeedsService {
   private static readonly CHARMAP_REGEX = new RegExp('(' +
     Object.keys(SeedsService.CHARMAP).map(function(char) {return char.replace(/[\|\$]/g, '\\$&');}).join('|') + ')', 'g');
 
-  constructor(private http: Http) {
-    PouchDB.plugin(PouchFind);
-
+  constructor(private http: ProgressHttp, private evt: Events) {
     // Import fr language indexing rules
     global.lunr = require('lunr');
     require('lunr-languages/lunr.stemmer.support')(global.lunr);
     require('lunr-languages/lunr.fr')(global.lunr);
     global.lunr.tokenizer = this.customTokenizer();
-
-    this.isVisible = (n) => {return (n.scope === 'public' || n.scope === 'apidae' || n.author === this.userEmail) && !n.archived};
+    this.initRemoteDb();
+    this.initLocalDb();
   }
 
   initLocalDb() {
@@ -65,48 +62,35 @@ export class SeedsService {
     this.remoteDatabase = new PouchDB(ApiAppConfig.DB_URL + '/' + ApiAppConfig.REMOTE_DB);
   }
 
-  initDb(success, failure, onProgress) {
-    this.initRemoteDb();
-    this.initLocalDb();
-    onProgress("Mise à jour des données de l'application en cours (0%)");
+  initDb(onProgress) {
+    onProgress("Téléchargement des données de l'application en cours (0%)");
     this.localDatabase.info().then((localInfo) => {
       if(localInfo.doc_count === 0) {
         let remote: any = {};
-        this.http.get("https://dev-db.apiapp.apidae.net/api-app_dev/_design/scopes/_view/scope_user?keys=[%22apidae%22,%22jean-baptiste.vilain@hotentic.com%22]&group=true")
-          .map(res => res.json()).toPromise().then((data) => {
-          return data.rows.reduce((a, b) => {return a.value + b.value;});
-        }).then((totalDocs) => {
-          remote.count = totalDocs;
-          return this.remoteDatabase.info();
-        }).then((remoteInfo) => {
+        this.remoteDatabase.info().then((remoteInfo) => {
           remote.lastSeq = remoteInfo.update_seq;
-          console.log('retrieving ' + remote.count + ' docs for user ' + this.userEmail);
-          let sequence = Promise.resolve();
-          let batchesCount = Math.ceil(remote.count / SeedsService.BATCH_SIZE);
-          for(let i = 0; i < batchesCount; i++) {
-            sequence = sequence.then(() => {
-              return this.http.get(ApiAppConfig.DB_URL + '/' + ApiAppConfig.REMOTE_DB + '/_design/scopes/_list/get/seeds?' +
-                'keys=[%22apidae%22,%22public%22,%22jean-baptiste.vilain@hotentic.com%22]&include_docs=true&attachments=true' +
-                '&limit=' + SeedsService.BATCH_SIZE + '&skip=' + i*SeedsService.BATCH_SIZE)
-                .map(res => res.json()).toPromise().then((data) => {
-                  return this.localDatabase.bulkDocs(data.docs, {new_edits: false}).then((res) => {
-                    onProgress("Mise à jour des données de l'application en cours (" + Math.ceil(((i + 1) / batchesCount)*100) + "%)");
-                  }).catch((err) => {
-                    console.log('bulk docs ' + i + 'err : ' + JSON.stringify(err));
-                  });
-                });
-            });
-          }
-          sequence.then(() => {
-            onProgress("Mise à jour des données de l'application en cours (100%)");
-            this.initReplication(remote.lastSeq);
-            success();
-          }, failure);
+          this.http.withDownloadProgressListener((progress) => {
+            onProgress("Téléchargement des données de l'application en cours (" + Math.ceil(progress.loaded / 1024) + "Ko)");
+          }).get(ApiAppConfig.DB_URL + '/' + ApiAppConfig.REMOTE_DB + '/_design/scopes/_list/get/seeds?' +
+              'keys=[%22apidae%22,%22public%22,%22' + this.userEmail + '%22]&include_docs=true&attachments=true')
+            .map(res => res.json()).toPromise()
+            .then((data) => {
+              onProgress("Import des données téléchargées");
+              this.localDatabase.bulkDocs(data.docs, {new_edits: false}).then((res) => {
+                onProgress("Import terminé.");
+                this.initReplication(remote.lastSeq);
+              }).catch((err) => {
+                onProgress("L'import des données a échoué.");
+                console.log('bulk docs err : ' + JSON.stringify(err));
+              });
+          }).catch((err) => {
+            onProgress("Une erreur s'est produite lors du téléchargement des données.");
+            console.log('download err : ' + JSON.stringify(err));
+          });
         });
 
       } else {
         this.initReplication();
-        success();
       }
     });
   }
@@ -125,15 +109,17 @@ export class SeedsService {
       }
     };
     if(lastSeq) {
-      options['since'] = lastSeq;
+      options['since'] = 'now';
     }
-    this.sync = PouchDB.sync(this.localDatabase, this.remoteDatabase, options).on('paused', (res) => {
+    return this.localDatabase.sync(this.remoteDatabase, options).on('paused', (res) => {
+      this.evt.publish("replication:paused");
       let now = new Date().getTime();
       if(this.idx && !this.idxBuilding && (now - this.lastIdxUpdate) > SeedsService.MIN_INTERVAL) {
         this.buildSearchIndex();
       }
+    }).on('change', (info) => {
+      console.log('replication changed : ' + JSON.stringify(info));
     });
-    return this.sync;
   }
 
   cancelReplication() {
@@ -142,14 +128,23 @@ export class SeedsService {
     }
   }
 
-  clearChangeListeners() {
-    if(this.sync) {
-      this.sync.removeAllListeners('change');
-    }
-  }
-
   buildEmailIndex() {
-    return this.localDatabase.createIndex({index: {fields: ['email']}});
+    let usersByEmail = {};
+    console.time('buildEmailIndex');
+    return this.localDatabase.allDocs({include_docs: true}).then((res) => {
+      let persons = res.rows.filter((row) => {return row.doc && row.doc.type === 'Person' && row.doc.email;});
+      for (let p of persons) {
+        usersByEmail[p.doc.email] = p.id;
+      }
+      console.timeEnd('buildEmailIndex');
+      return this.localDatabase.put({
+        _id: SeedsService.USERS_INDEX_DOC,
+        index: usersByEmail
+      }).catch((err) => {
+        console.log('email index save error : ' + JSON.stringify(err));
+      });
+    });
+    // return this.localDatabase.createIndex({index: {fields: ['email']}});
   }
 
   buildSearchIndex() {
@@ -158,8 +153,9 @@ export class SeedsService {
     return this.localDatabase.allDocs({
       include_docs: true
     }).then((res) => {
+      console.log('buildSearchIndex allDocs - total_row : ' + res.total_rows + ' - offset : ' + res.offset + ' - length : ' + res.rows.length);
       let that = this;
-      let localDocs = res.rows.filter((row) => {return row.doc && this.isVisible(row.doc);}).map((row) => {return row.doc;});
+      let localDocs = res.rows.map((row) => {return row.doc;});
       console.log('indexing ' + localDocs.length + ' docs');
       that.idx = global.lunr(function () {
         this.use(global.lunr.fr);
@@ -182,7 +178,7 @@ export class SeedsService {
     let nodeId = rootNodeId || SeedsService.DEFAULT_SEED;
     let nodeData = {count: 0, nodes: [], links: []};
     return this.localDatabase.allDocs().then((docs) => {
-      nodeData.count = docs.total_rows;
+      nodeData.count = docs.rows.length;
     }).then(() => {
       return this.localDatabase.get(nodeId);
     }).then((rootNode) => {
@@ -222,48 +218,58 @@ export class SeedsService {
     });
   }
 
-  getCurrentUserSeed(userProfile?: any) {
-    return this.getUserSeed(this.userEmail).then((user) => {
-      if(user) {
-        return this.getNodeDetails(user._id);
-      } else if(userProfile) {
-        let userFields = {
-          name: (userProfile.firstName || 'Prénom') + ' ' + (userProfile.lastName || 'Nom'),
-          email: userProfile.email,
-          description: userProfile.profession,
-          urls: [],
-          type: Seeds.PERSON,
-          scope: Seeds.SCOPE_APIDAE
-        };
-        ['phoneNumber', 'gsmNumber', 'facebook', 'twitter'].forEach((lnk) => {
-          if(userProfile[lnk]) {
-            userFields.urls.push(userProfile[lnk]);
-          }
-        });
-        let newUser = new Seed(userFields, false, false);
-        return this.saveNode(newUser).then(data => {
-          if (data.ok) {
-            return this.getNodeDetails(data.id);
-          } else {
-            console.log('New user seed creation failed : ' + JSON.stringify(data));
-            return null;
-          }
+  getCurrentUserSeed() {
+    return this.getUserSeed(this.userEmail).then((userSeed) => {
+      if(userSeed) {
+        return Promise.resolve(userSeed);
+      } else {
+        return this.getAuth().then((doc) => {
+          let newUser = this.buildUserSeed(doc.user);
+          return this.localDatabase.put(newUser.submitParams()).then(data => {
+            if (data.ok) {
+              return this.getNodeDetails(data.id);
+            } else {
+              console.log('New user seed creation failed : ' + JSON.stringify(data));
+              return null;
+            }
+          }).catch((err) => {
+            console.log('newUser err : ' + JSON.stringify(err));
+          });
+        }).catch((err) => {
+          console.log("Local auth data missing");
         });
       }
-      return null;
     });
   }
 
-  getUserSeed(userEmail) {
-    return this.localDatabase.find({selector: {email: userEmail}}).then(function (res) {
-      if (res.docs && res.docs.length > 0) {
-        return res.docs[0];
-      } else {
-        console.log('Unknown user : ' + userEmail);
-        return null;
+  buildUserSeed(userProfile) {
+    let userFields = {
+      name: (userProfile.firstName || 'Prénom') + ' ' + (userProfile.lastName || 'Nom'),
+      email: userProfile.email,
+      external_id: userProfile.id.toString(),
+      description: userProfile.profession,
+      urls: [],
+      type: Seeds.PERSON,
+      scope: Seeds.SCOPE_APIDAE
+    };
+    ['phoneNumber', 'gsmNumber', 'facebook', 'twitter'].forEach((lnk) => {
+      if(userProfile[lnk]) {
+        userFields.urls.push(userProfile[lnk]);
       }
-    }).catch(function (err) {
-      console.log('User seed retrieval error : ' + JSON.stringify(err));
+    });
+    return new Seed(userFields, false, false);
+  }
+
+  getUserSeed(userEmail) {
+    return this.localDatabase.get(SeedsService.USERS_INDEX_DOC).then((doc) => {
+      let userId = doc.index[userEmail];
+      if(userId) {
+        return this.getNodeDetails(userId);
+      } else {
+        Promise.resolve(null);
+      }
+    }).catch((err) => {
+      console.log("getUserSeed error : " + JSON.stringify(err));
     });
   }
 
@@ -331,9 +337,23 @@ export class SeedsService {
     });
   }
 
-  clearUser(): void {
+  getAuth() {
+    return this.localDatabase.get(SeedsService.AUTH_DOC);
+  }
+
+  setAuth(userProfile) {
+    return this.localDatabase.put({
+      _id: SeedsService.AUTH_DOC,
+      user: userProfile
+    });
+  }
+
+  clearAuthData(): void {
     this.userSeed = null;
     this.userEmail = null;
+    return this.getAuth().then((doc) => {
+      this.localDatabase.remove(doc);
+    });
   }
 
   // Unicode normalizer - Extracted from https://github.com/cvan/lunr-unicode-normalizer

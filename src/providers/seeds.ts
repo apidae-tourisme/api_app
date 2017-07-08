@@ -12,7 +12,6 @@ export class Seeds {
   public static readonly CONCEPT = 'concept';
   public static readonly SCHEMA = 'schema';
 
-
   public static readonly CONCEPT_TYPE = {
     type: Seeds.CONCEPT, label: "Etiquette", synonyms: ["tag"]
   };

@@ -58,13 +58,11 @@ export class LoginPage {
     if(this.dataService.userEmail) {
       this.navCtrl.push('LoadingPage', {isOnline: this.hasConnectivity()});
     } else {
-      this.authService.getLocalAuthData().then(authData => {
-        if (authData && authData.email) {
-          this.dataService.userEmail = authData.email;
-          this.navCtrl.push('LoadingPage', {isOnline: this.hasConnectivity()});
-        } else {
-          console.log('Invalid auth data');
-        }
+      this.dataService.getAuth().then(authData => {
+        this.dataService.userEmail = authData.user.email;
+        this.navCtrl.push('LoadingPage', {isOnline: this.hasConnectivity()});
+      }).catch((err) => {
+        console.log('Invalid auth data');
       });
     }
   }

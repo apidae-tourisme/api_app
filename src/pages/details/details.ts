@@ -66,8 +66,10 @@ export class DetailsPage {
   loadAuthor() {
     if(this.explorerService.rootNode.author) {
       this.dataService.getUserSeed(this.explorerService.rootNode.author).then((user) => {
-        this.authorName = user.name;
-        this.authorId = user._id;
+        if(user) {
+          this.authorName = user.name;
+          this.authorId = user._id;
+        }
       });
     }
   }
@@ -144,8 +146,6 @@ export class DetailsPage {
           text: 'Oui',
           handler: () => {
             this.authService.logOut().then(() => {
-              this.dataService.clearUser();
-              this.dataService.cancelReplication();
               this.explorerService.clearData();
               this.zone.run(() => {
                 this.app.getRootNav().setRoot('LoginPage');
