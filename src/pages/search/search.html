@@ -8,7 +8,7 @@
     <ion-toolbar no-border>
       <div id="search_counter">{{(searchQuery && searchQuery.length >= 3) ? (searchService.searching ? '...'  : searchService.nodes.length) : explorerService.networkData.count}}</div>
       <ion-searchbar #search (ionInput)="searchNodes($event)" (ionFocus)="loadResults()" [(ngModel)]="searchQuery"
-                     placeholder="Rechercher" debounce="600"></ion-searchbar>
+                     placeholder="Rechercher" debounce="800"></ion-searchbar>
     </ion-toolbar>
     <ion-buttons right text-center>
       <button ion-button icon-only color="link" (click)="createSeed()" id="create_seed">

@@ -11,43 +11,32 @@ declare var global: any;
 @Injectable()
 export class SeedsService {
 
-  private static readonly MIN_INTERVAL = 60000;
   private static readonly DEFAULT_SEED = "eb9e3271-f969-4e37-b2da-5955a003fa96";
   private static readonly AUTH_DOC = "_local/user";
   private static readonly USERS_INDEX_DOC = "_local/users_by_email";
+  private static readonly SEARCH_DOC = "_design/search_local";
+  private static readonly SEARCH_PATH = "search_local/all_fields";
+  private static readonly USER_SEEDS_FILTER = "seeds/by_user";
 
   private localDatabase: any;
   private remoteDatabase: any;
   private sync: any;
-  private idx: any;
-  private lastIdxUpdate: number;
   private idxBuilding: boolean;
 
   public userSeed: Seed;
   public userEmail: string;
 
   private static readonly CHARMAP = {
-    'À': 'A', 'Á': 'A', 'Â': 'A', 'Ã': 'A', 'Ä': 'A', 'Å': 'A', 'Æ': 'AE',
-    'Ç': 'C', 'È': 'E', 'É': 'E', 'Ê': 'E', 'Ë': 'E', 'Ì': 'I', 'Í': 'I',
-    'Î': 'I', 'Ï': 'I', 'Ð': 'D', 'Ñ': 'N', 'Ò': 'O', 'Ó': 'O', 'Ô': 'O',
-    'Õ': 'O', 'Ö': 'O', 'Ő': 'O', 'Ø': 'O', 'Ù': 'U', 'Ú': 'U', 'Û': 'U',
-    'Ü': 'U', 'Ű': 'U', 'Ý': 'Y', 'Þ': 'TH', 'ß': 'ss',
-    'à': 'a', 'á': 'a', 'â': 'a', 'ã': 'a', 'ä': 'a', 'å': 'a', 'æ': 'ae',
-    'ç': 'c', 'è': 'e', 'é': 'e', 'ê': 'e', 'ë': 'e', 'ì': 'i', 'í': 'i',
-    'î': 'i', 'ï': 'i', 'ð': 'd', 'ñ': 'n', 'ò': 'o', 'ó': 'o', 'ô': 'o',
-    'õ': 'o', 'ö': 'o', 'ő': 'o', 'ø': 'o', 'ù': 'u', 'ú': 'u', 'û': 'u',
-    'ü': 'u', 'ű': 'u', 'ý': 'y', 'þ': 'th', 'ÿ': 'y', 'ẞ': 'SS',
+    'à': 'a', 'á': 'a', 'â': 'a', 'ä': 'a', 'æ': 'ae', 'ç': 'c', 'è': 'e', 'é': 'e', 'ê': 'e', 'ë': 'e',
+    'î': 'i', 'ï': 'i', 'ô': 'o', 'ö': 'o', 'ù': 'u', 'û': 'u', 'ü': 'u', '-': ' ', '_': ' ', '!': ' ', '?': ' ',
+    '.': ' ', ',': ' ', ':': ' ', ';': ' ', '/': ' ', '"': ' ', '(': ' ', ')': ' '
   };
 
-  private static readonly CHARMAP_REGEX = new RegExp('(' +
-    Object.keys(SeedsService.CHARMAP).map(function(char) {return char.replace(/[\|\$]/g, '\\$&');}).join('|') + ')', 'g');
+  private static readonly CHARMAP_REGEX = /[àáâäæçèéêëîïôöùûü\-_!?.,:;/"()]/g;
+
+  private static readonly STOPWORDS = 'aie aient aies ait aura aurai auraient aurais aurait auras aurez auriez aurions aurons auront aux avaient avais avait avec avez aviez avions avons ayant ayez ayons ceci cela ces cet cette dans des elle est eue eues eurent eus eusse eussent eusses eussiez eussions eut eux eumes eut etes furent fus fusse fussent fusses fussiez fussions fut fumes fut futes ici ils les leur leurs lui mais mes moi mon meme nos notre nous ont par pas pour que quel quelle quelles quels qui sans sera serai seraient serais serait seras serez seriez serions serons seront ses soi soient sois soit sommes son sont soyez soyons suis sur tes toi ton une vos votre vous etaient etais etait etant etiez etions ete etee etees etes etes'.split(' ');
 
   constructor(private http: ProgressHttp, private evt: Events) {
-    // Import fr language indexing rules
-    global.lunr = require('lunr');
-    require('lunr-languages/lunr.stemmer.support')(global.lunr);
-    require('lunr-languages/lunr.fr')(global.lunr);
-    global.lunr.tokenizer = this.customTokenizer();
     this.initRemoteDb();
     this.initLocalDb();
   }
@@ -55,7 +44,15 @@ export class SeedsService {
   initLocalDb() {
     let isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
     let localDbName = ApiAppConfig.LOCAL_DB + '_' + btoa(this.userEmail);
-    this.localDatabase = isSafari ? new PouchDB(localDbName, {size: 50, adapter: 'websql'}) : new PouchDB(localDbName);
+    this.localDatabase = isSafari ? new PouchDB(localDbName, {size: 90, adapter: 'websql'}) : new PouchDB(localDbName);
+  }
+
+  resetLocalDb() {
+    this.localDatabase.destroy().then(() => {
+      this.initLocalDb();
+    }).catch((err) => {
+      console.log('local db deletion error : ' + JSON.stringify(err));
+    });
   }
 
   initRemoteDb() {
@@ -104,7 +101,7 @@ export class SeedsService {
         return doc._id.indexOf('_design') !== 0;
       },
       pull: {
-          filter: 'seeds/by_user',
+          filter: SeedsService.USER_SEEDS_FILTER,
           query_params: {user: this.userEmail}
       }
     };
@@ -113,10 +110,6 @@ export class SeedsService {
     }
     return this.localDatabase.sync(this.remoteDatabase, options).on('paused', (res) => {
       this.evt.publish("replication:paused");
-      let now = new Date().getTime();
-      if(this.idx && !this.idxBuilding && (now - this.lastIdxUpdate) > SeedsService.MIN_INTERVAL) {
-        this.buildSearchIndex();
-      }
     }).on('change', (info) => {
       console.log('replication changed : ' + JSON.stringify(info));
     });
@@ -130,48 +123,48 @@ export class SeedsService {
 
   buildEmailIndex() {
     let usersByEmail = {};
-    console.time('buildEmailIndex');
     return this.localDatabase.allDocs({include_docs: true}).then((res) => {
       let persons = res.rows.filter((row) => {return row.doc && row.doc.type === 'Person' && row.doc.email;});
       for (let p of persons) {
         usersByEmail[p.doc.email] = p.id;
       }
-      console.timeEnd('buildEmailIndex');
-      return this.localDatabase.put({
-        _id: SeedsService.USERS_INDEX_DOC,
-        index: usersByEmail
-      }).catch((err) => {
-        console.log('email index save error : ' + JSON.stringify(err));
+      console.timeEnd('building email index');
+      return this.localDatabase.get(SeedsService.USERS_INDEX_DOC).catch((err) => {
+        console.log('email index doc missing');
+        return this.localDatabase.put({
+          _id: SeedsService.USERS_INDEX_DOC,
+          index: usersByEmail
+        }).catch((err) => {
+          console.log('email index save error : ' + JSON.stringify(err));
+        });
       });
     });
-    // return this.localDatabase.createIndex({index: {fields: ['email']}});
   }
 
   buildSearchIndex() {
-    console.time('search-index-update');
-    this.idxBuilding = true;
-    return this.localDatabase.allDocs({
-      include_docs: true
-    }).then((res) => {
-      console.log('buildSearchIndex allDocs - total_row : ' + res.total_rows + ' - offset : ' + res.offset + ' - length : ' + res.rows.length);
-      let that = this;
-      let localDocs = res.rows.map((row) => {return row.doc;});
-      console.log('indexing ' + localDocs.length + ' docs');
-      that.idx = global.lunr(function () {
-        this.use(global.lunr.fr);
-        this.b(0);
-        this.field('name');
-        this.field('description');
-        this.field('address');
-        this.ref('_id');
-        localDocs.forEach((doc) => {
-          this.add(doc);
+    console.log('building search index');
+    if(!this.idxBuilding) {
+      this.idxBuilding = true;
+      let searchDoc = {
+        _id: SeedsService.SEARCH_DOC,
+        views: {
+          all_fields: {
+            map: "function (doc) {\n  var charmap = {'à': 'a', 'á': 'a', 'â': 'a', 'ä': 'a', 'æ': 'ae', 'ç': 'c', 'è': 'e', 'é': 'e', 'ê': 'e', 'ë': 'e', 'î': 'i', 'ï': 'i', 'ô': 'o', 'ö': 'o', 'ù': 'u', 'û': 'u', 'ü': 'u', '-': ' ', '_': ' ', '!': ' ', '?': ' ', '.': ' ', ',': ' ', ':': ' ', ';': ' ', '/': ' ', '\"': ' ', '(': ' ', ')': ' '};\n  var escapedChars = /[àáâäæçèéêëîïôöùûü\\-_!?.,:;/\"()]/g;\n  var stopWords = 'aie aient aies ait aura aurai auraient aurais aurait auras aurez auriez aurions aurons auront aux avaient avais avait avec avez aviez avions avons ayant ayez ayons ceci cela ces cet cette dans des elle est eue eues eurent eus eusse eussent eusses eussiez eussions eut eux eumes eut etes furent fus fusse fussent fusses fussiez fussions fut fumes fut futes ici ils les leur leurs lui mais mes moi mon meme nos notre nous ont par pas pour que quel quelle quelles quels qui sans sera serai seraient serais serait seras serez seriez serions serons seront ses soi soient sois soit sommes son sont soyez soyons suis sur tes toi ton une vos votre vous etaient etais etait etant etiez etions ete etee etees etes etes'.split(' ');\n  \n  var nameTokens = doc.name.toLowerCase().replace(escapedChars, function(char) {return charmap[char];}).split(/\\s+/);\n  for(var i in nameTokens) {\n    if(nameTokens[i].length > 2 && stopWords.indexOf(nameTokens[i] === -1)) {\n      emit(nameTokens[i], null);\n    }\n  }\n  if(doc.address) {\n    var addrTokens = doc.address.toLowerCase().replace(escapedChars, function(char) {return charmap[char];}).split(/\\s+/);\n    for(var j in addrTokens) {\n      if(addrTokens[j].length > 2 && stopWords.indexOf(addrTokens[j] === -1)) {\n        emit(addrTokens[j], null);\n      }\n    }  \n  }\n}"
+          }
+        }
+      };
+      return this.localDatabase.get(SeedsService.SEARCH_DOC).then(() => {
+        console.log('search doc present');
+        return this.searchNodes('init', Seeds.SCOPE_ALL);
+      }).catch((err) => {
+        console.log('search doc missing');
+        return this.localDatabase.put(searchDoc).then(() => {
+          return this.searchNodes('init', Seeds.SCOPE_ALL);
+        }).catch((err) => {
+          console.log("local search doc error : " + JSON.stringify(err));
         });
-        that.lastIdxUpdate = new Date().getTime();
-        that.idxBuilding = false;
-        console.timeEnd('search-index-update');
       });
-    });
+    }
   }
 
   getNodeData(rootNodeId) {
@@ -199,22 +192,70 @@ export class SeedsService {
   }
 
   searchNodes(query, scope) {
-    // Mix lunr querying strategies as recommended in https://github.com/olivernn/lunr.js/issues/273
-    let queryTerms = global.lunr.tokenizer(query);
-    let results = this.idx.query((q) => {
-      queryTerms.forEach((term) => {
-        q.term(term, { usePipeline: true, boost: 100 });
-        q.term(term, { usePipeline: true, wildcard: global.lunr.Query.wildcard.TRAILING, boost: 10 });
+    let tokens = this.tokenize(this.normalize(query));
+
+    console.time('search-query');
+    let results = [];
+    return Promise.all(tokens.map((term) => {
+      return this.searchTerm(term);
+    })).then((allResults) => {
+      console.timeEnd('search-query');
+      console.time('search-results');
+      allResults.forEach((res) => {
+        let otherTerms = tokens.filter((t) => {return t !== res['term'];});
+        results = results.concat(res['results'].filter((result) => {
+            return (scope == Seeds.SCOPE_ALL || result.scope == scope) && this.matchTerms(result, otherTerms);
+          }));
       });
+      console.timeEnd('search-results');
+      return deDup(results);
+    }).catch(function (err) {
+      console.log('search error : ' + JSON.stringify(err));
     });
 
-    return this.localDatabase.allDocs({
-      keys: results.map((res) => { return res.ref; }),
-      include_docs: true,
+    function deDup(arr) {
+      let arrObject = {};
+      for(let i = 0; i < arr.length; i++) {
+        arrObject[arr[i]._id] = arr[i];
+      }
+      return Object.keys(arrObject).map((k) => {return arrObject[k];});
+    }
+  }
+
+  matchTerms(doc, terms) {
+    let match = true;
+    if(terms.length > 0) {
+      terms.forEach((t) => {
+        match = match && this.normalize(doc.name).indexOf(t) !== -1;
+      });
+    }
+    return match;
+  }
+
+  searchTerm(term) {
+    return this.localDatabase.query(SeedsService.SEARCH_PATH, {
+      startkey     : term,
+      endkey       : term + '\uffff',
+      limit        : 25,
+      include_docs : true,
       attachments: true
-    }).then((nodes) => {
-      return nodes.rows.filter((row) => { return row.id && row.doc && (scope == Seeds.SCOPE_ALL || row.doc.scope == scope); })
-        .map((row) => { return row.doc; });
+    }).then((results) => {
+      return {
+        term: term,
+        results: results.rows.filter((row) => { return row.doc && row.doc._id; }).map((row) => { return row.doc; })
+      };
+    }).catch(function (err) {
+      console.log('search error for term ' + term + ' : ' + JSON.stringify(err));
+    });
+  }
+
+  tokenize(query) {
+    return query.split(/\s+/).filter((t) => {return SeedsService.STOPWORDS.indexOf(t) === -1;});
+  }
+
+  normalize(query) {
+    return query.toLowerCase().replace(SeedsService.CHARMAP_REGEX, function(char) {
+      return SeedsService.CHARMAP[char];
     });
   }
 
@@ -246,6 +287,7 @@ export class SeedsService {
     let userFields = {
       name: (userProfile.firstName || 'Prénom') + ' ' + (userProfile.lastName || 'Nom'),
       email: userProfile.email,
+      author: userProfile.email,
       external_id: userProfile.id.toString(),
       description: userProfile.profession,
       urls: [],
@@ -354,49 +396,5 @@ export class SeedsService {
     return this.getAuth().then((doc) => {
       this.localDatabase.remove(doc);
     });
-  }
-
-  // Unicode normalizer - Extracted from https://github.com/cvan/lunr-unicode-normalizer
-  unicodeNormalizer(str) {
-    return str.replace(SeedsService.CHARMAP_REGEX, function(char) {
-      return SeedsService.CHARMAP[char];
-    });
-  };
-
-  // Returns a custom lunr tokenizer which removes accents and splits on spaces & hyphens
-  customTokenizer() {
-    let that = this;
-    let tokenizer = function(obj) {
-      if (!arguments.length || obj === null || obj === undefined) return [];
-      if (Array.isArray(obj)) {
-        return obj.map(function(t) {
-          return that.unicodeNormalizer(t).toLowerCase();
-        });
-      }
-
-      let str = obj.toString().replace(/^\s+/, '');
-
-      for (let i = str.length - 1; i >= 0; i--) {
-        if (/\S/.test(str.charAt(i))) {
-          str = str.substring(0, i + 1);
-          break;
-        }
-      }
-
-      str = that.unicodeNormalizer(str);
-
-      return str
-        .replace('-', ' ')
-        .split(/\s+/)
-        .map(function(token) {
-          return token.toLowerCase();
-        });
-    };
-
-    for(let attr in global.lunr.tokenizer){
-      tokenizer[attr] = global.lunr.tokenizer[attr];
-    }
-
-    return tokenizer;
   }
 }

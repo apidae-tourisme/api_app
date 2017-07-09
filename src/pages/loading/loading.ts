@@ -92,6 +92,7 @@ export class LoadingPage {
     this.dataService.cancelReplication();
     this.authService.logOut().then(() => {
       this.dataService.clearAuthData();
+      this.dataService.resetLocalDb();
       this.navCtrl.pop();
     });
   }

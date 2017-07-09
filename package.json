@@ -10,6 +10,10 @@
     "emulate:before": "build",
     "deploy:before": "build"
   },
+  "config": {
+    "ionic_output_js_file_name": "main-131.js",
+    "ionic_output_css_file_name": "main-131.css"
+  },
   "dependencies": {
     "@angular/common": "4.1.2",
     "@angular/compiler": "4.1.2",
@@ -47,10 +51,7 @@
     "ionic-angular": "3.3.0",
     "ionic-plugin-keyboard": "~2.2.1",
     "ionicons": "3.0.0",
-    "lunr": "^2.1.0",
-    "lunr-languages": "^1.0.0",
     "pouchdb": "^6.2.0",
-    "pouchdb-find": "^6.2.0",
     "requirejs": "^2.3.3",
     "rxjs": "5.1.1",
     "sw-toolbox": "3.6.0",
