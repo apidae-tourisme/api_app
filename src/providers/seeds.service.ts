@@ -4,7 +4,7 @@ import {Seed} from "../components/seed.model";
 import PouchDB from 'pouchdb';
 import {Seeds} from "./seeds";
 import {ProgressHttp} from "angular-progress-http";
-import {Events} from "ionic-angular";
+import {Events, Platform} from "ionic-angular";
 
 declare var global: any;
 
@@ -22,6 +22,7 @@ export class SeedsService {
   private remoteDatabase: any;
   private sync: any;
   private idxBuilding: boolean;
+  private isMobile: boolean;
 
   public userSeed: Seed;
   public userEmail: string;
@@ -36,15 +37,17 @@ export class SeedsService {
 
   private static readonly STOPWORDS = 'aie aient aies ait aura aurai auraient aurais aurait auras aurez auriez aurions aurons auront aux avaient avais avait avec avez aviez avions avons ayant ayez ayons ceci cela ces cet cette dans des elle est eue eues eurent eus eusse eussent eusses eussiez eussions eut eux eumes eut etes furent fus fusse fussent fusses fussiez fussions fut fumes fut futes ici ils les leur leurs lui mais mes moi mon meme nos notre nous ont par pas pour que quel quelle quelles quels qui sans sera serai seraient serais serait seras serez seriez serions serons seront ses soi soient sois soit sommes son sont soyez soyons suis sur tes toi ton une vos votre vous etaient etais etait etant etiez etions ete etee etees etes etes'.split(' ');
 
-  constructor(private http: ProgressHttp, private evt: Events) {
+  constructor(private http: ProgressHttp, private evt: Events, private platform: Platform) {
     this.initRemoteDb();
     this.initLocalDb();
+    this.isMobile = this.platform.is('mobile');
   }
 
   initLocalDb() {
     let isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+    console.log('isSafari : ' + isSafari + ' - platforms : ' + this.platform.platforms());
     let localDbName = ApiAppConfig.LOCAL_DB + '_' + btoa(this.userEmail);
-    this.localDatabase = isSafari ? new PouchDB(localDbName, {size: 90, adapter: 'websql'}) : new PouchDB(localDbName);
+    this.localDatabase = isSafari ? new PouchDB(localDbName, {size: this.isMobile ? 49 : 99, adapter: 'websql'}) : new PouchDB(localDbName);
   }
 
   resetLocalDb() {
