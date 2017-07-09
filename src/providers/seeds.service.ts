@@ -40,7 +40,6 @@ export class SeedsService {
 
   constructor(private http: ProgressHttp, private evt: Events, private platform: Platform) {
     this.initRemoteDb();
-    this.initLocalDb();
     this.isMobile = this.platform.is('mobile');
   }
 
@@ -57,6 +56,10 @@ export class SeedsService {
     }).catch((err) => {
       console.log('local db deletion error : ' + JSON.stringify(err));
     });
+  }
+
+  clearLocalDb() {
+    this.localDatabase = null;
   }
 
   initRemoteDb() {
@@ -130,7 +133,6 @@ export class SeedsService {
       for (let p of persons) {
         usersByEmail[p.doc.email] = p.id;
       }
-      console.timeEnd('building email index');
       return this.localDatabase.get(SeedsService.USERS_INDEX_DOC).catch((err) => {
         console.log('email index doc missing');
         return this.localDatabase.put({
@@ -389,17 +391,19 @@ export class SeedsService {
   }
 
   setAuth(userProfile) {
-    return this.localDatabase.put({
-      _id: SeedsService.AUTH_DOC,
-      user: userProfile
+    this.userEmail = userProfile.email;
+    this.initLocalDb();
+    return this.getAuth().catch((err) => {
+      console.log('auth doc missing - creating one');
+      return this.localDatabase.put({
+        _id: SeedsService.AUTH_DOC,
+        user: userProfile
+      });
     });
   }
 
   clearAuthData(): void {
     this.userSeed = null;
     this.userEmail = null;
-    return this.getAuth().then((doc) => {
-      this.localDatabase.remove(doc);
-    });
   }
 }

@@ -147,6 +147,7 @@ export class DetailsPage {
           handler: () => {
             this.authService.logOut().then(() => {
               this.explorerService.clearData();
+              this.dataService.clearLocalDb();
               this.zone.run(() => {
                 this.app.getRootNav().setRoot('LoginPage');
               });

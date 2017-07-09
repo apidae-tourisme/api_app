@@ -20,6 +20,7 @@ export class LoadingPage {
   ionViewDidEnter() {
     let isOnline = this.navParams.get('isOnline');
     this.msg = 'Initialisation de la base de données';
+    this.complete = false;
     this.evt.subscribe("replication:paused", () => {
       if(!this.complete) {
         this.complete = true;
@@ -92,7 +93,9 @@ export class LoadingPage {
     this.dataService.cancelReplication();
     this.authService.logOut().then(() => {
       this.dataService.clearAuthData();
-      this.dataService.resetLocalDb();
+      if(!this.complete) {
+        this.dataService.resetLocalDb();
+      }
       this.navCtrl.pop();
     });
   }
