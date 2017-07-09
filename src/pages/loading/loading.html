@@ -1,11 +1,15 @@
 <ion-header></ion-header>
 
 <ion-content id="login">
-  <div id="auth_panel" text-center>
+  <div id="auth_panel" text-center padding-horizontal>
     <img src="assets/img/logo-apiapp.svg"/><br/>
     <div class="loading_spinner" text-center margin-top>
       <ion-spinner name="dots"></ion-spinner>
       <p *ngIf="msg" ion-text color="text_alt">{{msg}}</p>
+      <p *ngIf="msg" margin-top>
+        Note : en fonction de votre appareil, cette étape d'initialisation peut prendre quelques minutes
+        lors de la première utilisation de l'application.
+      </p>
     </div>
     <button ion-button color="person" (click)="cancel()">Annuler</button><br/>
   </div>

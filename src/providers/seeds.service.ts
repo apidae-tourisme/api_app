@@ -17,6 +17,7 @@ export class SeedsService {
   private static readonly SEARCH_DOC = "_design/search_local";
   private static readonly SEARCH_PATH = "search_local/all_fields";
   private static readonly USER_SEEDS_FILTER = "seeds/by_user";
+  private static readonly USER_SEEDS_VIEW = "_design/scopes/_list/get/seeds";
 
   private localDatabase: any;
   private remoteDatabase: any;
@@ -71,8 +72,8 @@ export class SeedsService {
           remote.lastSeq = remoteInfo.update_seq;
           this.http.withDownloadProgressListener((progress) => {
             onProgress("Téléchargement des données de l'application en cours (" + Math.ceil(progress.loaded / 1024) + "Ko)");
-          }).get(ApiAppConfig.DB_URL + '/' + ApiAppConfig.REMOTE_DB + '/_design/scopes/_list/get/seeds?' +
-              'keys=[%22apidae%22,%22public%22,%22' + this.userEmail + '%22]&include_docs=true&attachments=true')
+          }).get(ApiAppConfig.DB_URL + '/' + ApiAppConfig.REMOTE_DB + '/' + SeedsService.USER_SEEDS_VIEW +
+            '?keys=[%22apidae%22,%22public%22,%22' + this.userEmail + '%22]&include_docs=true&attachments=true')
             .map(res => res.json()).toPromise()
             .then((data) => {
               onProgress("Import des données téléchargées");
@@ -113,8 +114,6 @@ export class SeedsService {
     }
     return this.localDatabase.sync(this.remoteDatabase, options).on('paused', (res) => {
       this.evt.publish("replication:paused");
-    }).on('change', (info) => {
-      console.log('replication changed : ' + JSON.stringify(info));
     });
   }
 
@@ -152,7 +151,7 @@ export class SeedsService {
         _id: SeedsService.SEARCH_DOC,
         views: {
           all_fields: {
-            map: "function (doc) {\n  var charmap = {'à': 'a', 'á': 'a', 'â': 'a', 'ä': 'a', 'æ': 'ae', 'ç': 'c', 'è': 'e', 'é': 'e', 'ê': 'e', 'ë': 'e', 'î': 'i', 'ï': 'i', 'ô': 'o', 'ö': 'o', 'ù': 'u', 'û': 'u', 'ü': 'u', '-': ' ', '_': ' ', '!': ' ', '?': ' ', '.': ' ', ',': ' ', ':': ' ', ';': ' ', '/': ' ', '\"': ' ', '(': ' ', ')': ' '};\n  var escapedChars = /[àáâäæçèéêëîïôöùûü\\-_!?.,:;/\"()]/g;\n  var stopWords = 'aie aient aies ait aura aurai auraient aurais aurait auras aurez auriez aurions aurons auront aux avaient avais avait avec avez aviez avions avons ayant ayez ayons ceci cela ces cet cette dans des elle est eue eues eurent eus eusse eussent eusses eussiez eussions eut eux eumes eut etes furent fus fusse fussent fusses fussiez fussions fut fumes fut futes ici ils les leur leurs lui mais mes moi mon meme nos notre nous ont par pas pour que quel quelle quelles quels qui sans sera serai seraient serais serait seras serez seriez serions serons seront ses soi soient sois soit sommes son sont soyez soyons suis sur tes toi ton une vos votre vous etaient etais etait etant etiez etions ete etee etees etes etes'.split(' ');\n  \n  var nameTokens = doc.name.toLowerCase().replace(escapedChars, function(char) {return charmap[char];}).split(/\\s+/);\n  for(var i in nameTokens) {\n    if(nameTokens[i].length > 2 && stopWords.indexOf(nameTokens[i] === -1)) {\n      emit(nameTokens[i], null);\n    }\n  }\n  if(doc.address) {\n    var addrTokens = doc.address.toLowerCase().replace(escapedChars, function(char) {return charmap[char];}).split(/\\s+/);\n    for(var j in addrTokens) {\n      if(addrTokens[j].length > 2 && stopWords.indexOf(addrTokens[j] === -1)) {\n        emit(addrTokens[j], null);\n      }\n    }  \n  }\n}"
+            map: "function (doc) {\n  var charmap = {'à': 'a', 'á': 'a', 'â': 'a', 'ä': 'a', 'æ': 'ae', 'ç': 'c', 'è': 'e', 'é': 'e', 'ê': 'e', 'ë': 'e', 'î': 'i', 'ï': 'i', 'ô': 'o', 'ö': 'o', 'ù': 'u', 'û': 'u', 'ü': 'u', '-': ' ', '_': ' ', '!': ' ', '?': ' ', '.': ' ', ',': ' ', ':': ' ', ';': ' ', '/': ' ', '\"': ' ', '(': ' ', ')': ' '};\n  var escapedChars = /[àáâäæçèéêëîïôöùûü\\-_!?.,:;/\"()]/g;\n  var stopWords = 'aie aient aies ait aura aurai auraient aurais aurait auras aurez auriez aurions aurons auront aux avaient avais avait avec avez aviez avions avons ayant ayez ayons ceci cela ces cet cette dans des elle est eue eues eurent eus eusse eussent eusses eussiez eussions eut eux eumes eut etes furent fus fusse fussent fusses fussiez fussions fut fumes fut futes ici ils les leur leurs lui mais mes moi mon meme nos notre nous ont par pas pour que quel quelle quelles quels qui sans sera serai seraient serais serait seras serez seriez serions serons seront ses soi soient sois soit sommes son sont soyez soyons suis sur tes toi ton une vos votre vous etaient etais etait etant etiez etions ete etee etees etes etes'.split(' ');\n  \n  var nameTokens = doc.name.toLowerCase().replace(escapedChars, function(char) {return charmap[char];}).split(/\\s+/);\n  for(var i in nameTokens) {\n    if(nameTokens[i].length > 2 && stopWords.indexOf(nameTokens[i] === -1)) {\n      emit(nameTokens[i], null);\n    }\n  }\n  if(doc.description) {\n    var descTokens = doc.description.toLowerCase().replace(escapedChars, function(char) {return charmap[char];}).split(/\\s+/);\n    for(var k in descTokens) {\n      if(descTokens[k].length > 2 && stopWords.indexOf(descTokens[k] === -1)) {\n        emit(descTokens[k], null);\n      }\n    }  \n  }\n  if(doc.address) {\n    var addrTokens = doc.address.toLowerCase().replace(escapedChars, function(char) {return charmap[char];}).split(/\\s+/);\n    for(var j in addrTokens) {\n      if(addrTokens[j].length > 2 && stopWords.indexOf(addrTokens[j] === -1)) {\n        emit(addrTokens[j], null);\n      }\n    }  \n  }\n}"
           }
         }
       };
@@ -229,7 +228,7 @@ export class SeedsService {
     let match = true;
     if(terms.length > 0) {
       terms.forEach((t) => {
-        match = match && this.normalize(doc.name).indexOf(t) !== -1;
+        match = match && (this.normalize(doc.name).indexOf(t) !== -1 || this.normalize(doc.description).indexOf(t) !== -1 || this.normalize(doc.address).indexOf(t) !== -1);
       });
     }
     return match;
@@ -257,9 +256,12 @@ export class SeedsService {
   }
 
   normalize(query) {
-    return query.toLowerCase().replace(SeedsService.CHARMAP_REGEX, function(char) {
-      return SeedsService.CHARMAP[char];
-    });
+    if(query) {
+      return query.toLowerCase().replace(SeedsService.CHARMAP_REGEX, function(char) {
+        return SeedsService.CHARMAP[char];
+      });
+    }
+    return '';
   }
 
   getCurrentUserSeed() {
