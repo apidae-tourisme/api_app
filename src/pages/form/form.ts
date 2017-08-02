@@ -1,12 +1,13 @@
 import {Component, ViewChild} from '@angular/core';
 import {NavParams, NavController, ModalController, ToastController, LoadingController, IonicPage} from 'ionic-angular';
-import {Seed} from "../../components/seed.model";
+import {Seed} from "../../models/seed.model";
 import {ExplorerService} from "../../providers/explorer.service";
 import {SeedsService} from "../../providers/seeds.service";
 import {SeedType} from "../seed-type/seed-type";
 import {SearchSeeds} from "../search-seeds/search-seeds";
 import {EditAvatar} from "../edit-avatar/edit-avatar";
 import {Seeds} from "../../providers/seeds";
+import {AuthService} from "../../providers/auth.service";
 
 @IonicPage()
 @Component({
@@ -20,11 +21,11 @@ export class FormPage {
   public disabled: boolean;
 
   constructor(private navCtrl: NavController, private params: NavParams, public modalCtrl: ModalController,
-              public dataService: SeedsService, private explorerService: ExplorerService,
+              private authService: AuthService, public dataService: SeedsService, private explorerService: ExplorerService,
               private loadingCtrl: LoadingController, private toastCtrl: ToastController) {
     let seedName = params.get('name');
     this.node = params.get('node') || new Seed({name: seedName, scope: Seeds.SCOPE_PRIVATE, archived: false}, false, false);
-    this.node.author = this.dataService.userEmail;
+    this.node.author = this.authService.userEmail;
   }
 
   dismissForm(showGraph, refreshUser): void {
@@ -55,8 +56,8 @@ export class FormPage {
   }
 
   updateUserSeed(onComplete): void {
-    this.dataService.getNodeDetails(this.dataService.userSeed.id).then(data => {
-      this.dataService.userSeed = new Seed(data, false, false);
+    this.dataService.getNodeDetails(this.authService.userSeed.id).then(data => {
+      this.authService.userSeed = new Seed(data, false, false);
       onComplete();
     });
   }
@@ -80,7 +81,7 @@ export class FormPage {
         this.node.id = data.id;
         loading.dismiss();
         this.presentToast("La graine a été enregistrée.", () => {
-          this.dismissForm(true, this.node.id == this.dataService.userSeed.id);
+          this.dismissForm(true, this.node.id == this.authService.userSeed.id);
         });
       } else {
         this.presentToast("Une erreur est survenue pendant l'enregistrement de la graine.", () => {});
@@ -120,7 +121,7 @@ export class FormPage {
 
   toggleScope(scope): void {
     this.node.scope = scope;
-    this.node.author = this.dataService.userEmail;
+    this.node.author = this.authService.userEmail;
   }
 
   scopeLabel(): string {
@@ -161,16 +162,14 @@ export class FormPage {
     let seedsModal = this.modalCtrl.create('SearchSeeds', {type: this.node.category});
     seedsModal.onDidDismiss(data => {
       if(data && data.seed) {
-        this.node.seeds.push(data.seed);
-        this.node.connections.push(data.seed.id);
+        this.node.addConnection(data.seed);
       }
     });
     seedsModal.present();
   }
 
-  removeSeed(seed, idx): void {
-    this.node.seeds.splice(idx, 1);
-    this.node.connections.splice(this.node.connections.indexOf(seed.id), 1);
+  removeSeed(seed): void {
+    this.node.removeConnection(seed);
   }
 
   addUrl(): void {

@@ -1,7 +1,7 @@
 import {Platform} from 'ionic-angular';
 import {Injectable} from "@angular/core";
 import {ExplorerService} from "./explorer.service";
-import {Seed} from "../components/seed.model";
+import {Seed} from "../models/seed.model";
 import {SeedsService} from "./seeds.service";
 
 @Injectable()

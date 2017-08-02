@@ -2,7 +2,8 @@ import {Component, NgZone} from '@angular/core';
 import {NavController, IonicPage, ModalController, NavParams, Events} from 'ionic-angular';
 import {SeedsService} from "../../providers/seeds.service";
 import {AuthService} from "../../providers/auth.service";
-import {Seed} from "../../components/seed.model";
+import {Seed} from "../../models/seed.model";
+import {ApiAppConfig} from "../../providers/apiapp.config";
 
 @IonicPage()
 @Component({
@@ -27,12 +28,15 @@ export class LoadingPage {
         this.completeSetUp();
       }
     });
-    if(isOnline) {
-      this.dataService.initDb((progress) => {this.msg = progress;});
-    } else {
-      this.dataService.initLocalDb();
-      this.completeSetUp();
-    }
+
+    this.dataService.initLocalDb().then(() => {
+      if(isOnline) {
+        this.dataService.initDbData((progress) => {this.msg = progress;});
+      } else {
+        this.complete = true;
+        this.completeSetUp();
+      }
+    });
   }
 
   ionViewWillLeave() {
@@ -58,8 +62,8 @@ export class LoadingPage {
 
   redirectUser(data) {
     if(data) {
-      this.dataService.userSeed = new Seed(data, false, false);
-      if(this.dataService.userSeed.termsConditions) {
+      this.authService.userSeed = new Seed(data, false, false);
+      if(this.authService.userSeed.termsConditions) {
         this.navigateHome();
       } else {
         this.displayTermsConditions();
@@ -78,8 +82,8 @@ export class LoadingPage {
     let terms = this.modalCtrl.create('Terms');
     terms.onDidDismiss(data => {
       if(data.accept) {
-        this.dataService.userSeed.termsConditions = true;
-        return this.dataService.saveNode(this.dataService.userSeed).then(() => {
+        this.authService.userSeed.termsConditions = true;
+        return this.dataService.saveNode(this.authService.userSeed).then(() => {
           this.navigateHome();
         });
       } else {
@@ -92,9 +96,8 @@ export class LoadingPage {
   cancel() {
     this.dataService.cancelReplication();
     this.authService.logOut().then(() => {
-      this.dataService.clearAuthData();
       if(!this.complete) {
-        this.dataService.resetLocalDb();
+        this.dataService.clearLocalDb();
       }
       this.navCtrl.pop();
     });

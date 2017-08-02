@@ -2,8 +2,8 @@ import {Component, ViewChild} from '@angular/core';
 import {NavController, Content, NavParams, Platform, IonicPage} from 'ionic-angular';
 import {ExplorerService} from "../../providers/explorer.service";
 import {SearchService} from "../../providers/search.service";
-import {DataService} from "../../providers/data.service";
 import {SeedsService} from "../../providers/seeds.service";
+import {AuthService} from "../../providers/auth.service";
 
 @IonicPage({
   segment: 'liste'
@@ -15,7 +15,8 @@ export class ListPage {
   @ViewChild(Content) content: Content;
 
   constructor(public navCtrl: NavController, private navParams: NavParams, public searchService: SearchService,
-              public explorerService: ExplorerService, public dataService: SeedsService, private platform: Platform) {
+              public authService: AuthService, public explorerService: ExplorerService, public dataService: SeedsService,
+              private platform: Platform) {
   }
 
   ionViewDidEnter(): void {

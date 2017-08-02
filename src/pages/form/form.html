@@ -99,9 +99,9 @@
         <div *ngIf="!seed.picture()" text-center><i class="ion-md-custom-{{seed.category}}"></i></div>
       </ion-avatar>
       <h2>{{seed.label}}</h2>
-      <button ion-button item-right large clear icon-only color="danger" (click)="removeSeed(seed, i)"><ion-icon name="close"></ion-icon></button>
+      <button ion-button item-right large clear icon-only color="danger" (click)="removeSeed(seed)"><ion-icon name="close"></ion-icon></button>
     </ion-item>
-    <ion-item *ngIf="dataService.userEmail == node.author || node.scope == 'public' || node.scope == 'apidae'" border-top>
+    <ion-item *ngIf="authService.userEmail == node.author || node.scope == 'public' || node.scope == 'apidae'" border-top>
       <ion-label>Visible par {{scopeLabel()}}</ion-label>
       <button ion-button item-right large color="link" [clear]="node.scope != 'private'" icon-only (click)="toggleScope('private')">
         <ion-icon name="lock"></ion-icon>

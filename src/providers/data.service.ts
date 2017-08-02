@@ -2,7 +2,7 @@ import {Injectable} from "@angular/core";
 import {Http, Headers} from "@angular/http";
 import {Observable} from "rxjs";
 import 'rxjs/Rx';
-import {Seed} from "../components/seed.model";
+import {Seed} from "../models/seed.model";
 import {ApiAppConfig} from "./apiapp.config";
 
 @Injectable()

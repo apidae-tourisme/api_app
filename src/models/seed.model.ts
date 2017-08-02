@@ -24,6 +24,8 @@ export class Seed {
   scope: string;
   author: string;
   connections: Array<string>;
+  addedConnections: Array<string>;
+  removedConnections: Array<string>;
   seeds: Array<any>;
   urls: Array<any>;
 
@@ -58,6 +60,8 @@ export class Seed {
         this.urls.push({value: nodeData.urls[i]});
       }
     }
+    this.addedConnections = [];
+    this.removedConnections = [];
   }
 
   public picture() {
@@ -82,6 +86,30 @@ export class Seed {
 
   public typeInfo() {
     return Seeds.allSeedsTypes().filter((t) => {return t.type == this.category})[0];
+  }
+
+  public addConnection(seed) {
+    if(this.connections.indexOf(seed.id) == -1) {
+      this.seeds.push(seed);
+      this.connections.push(seed.id);
+    }
+    if(this.removedConnections.indexOf(seed.id) == -1) {
+      this.addedConnections.push(seed.id);
+    } else {
+      this.removedConnections.splice(this.removedConnections.indexOf(seed.id), 1);
+    }
+  }
+
+  public removeConnection(seed) {
+    if(this.connections.indexOf(seed.id) != -1) {
+      this.seeds.splice(this.seeds.indexOf(seed), 1);
+      this.connections.splice(this.connections.indexOf(seed.id), 1);
+    }
+    if(this.addedConnections.indexOf(seed.id) == -1) {
+      this.removedConnections.push(seed.id);
+    } else {
+      this.addedConnections.splice(this.addedConnections.indexOf(seed.id), 1)
+    }
   }
 
   public submitParams(): any {

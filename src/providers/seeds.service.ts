@@ -1,19 +1,18 @@
 import {Injectable} from "@angular/core";
 import {ApiAppConfig} from "./apiapp.config";
-import {Seed} from "../components/seed.model";
+import {Seed} from "../models/seed.model";
 import PouchDB from 'pouchdb';
 import {Seeds} from "./seeds";
 import {ProgressHttp} from "angular-progress-http";
 import {Events, Platform} from "ionic-angular";
-
-declare var global: any;
+import {AuthService} from "./auth.service";
 
 @Injectable()
 export class SeedsService {
 
   private static readonly DEFAULT_SEED = "eb9e3271-f969-4e37-b2da-5955a003fa96";
-  private static readonly AUTH_DOC = "_local/user";
   private static readonly USERS_INDEX_DOC = "_local/users_by_email";
+  private static readonly CURRENT_USER = "_local/current_user";
   private static readonly SEARCH_DOC = "_design/search_local";
   private static readonly SEARCH_PATH = "search_local/all_fields";
   private static readonly USER_SEEDS_FILTER = "seeds/by_user";
@@ -24,49 +23,74 @@ export class SeedsService {
   private sync: any;
   private idxBuilding: boolean;
   private isMobile: boolean;
-
-  public userSeed: Seed;
-  public userEmail: string;
+  private isSafari: boolean;
 
   private static readonly CHARMAP = {
     'à': 'a', 'á': 'a', 'â': 'a', 'ä': 'a', 'æ': 'ae', 'ç': 'c', 'è': 'e', 'é': 'e', 'ê': 'e', 'ë': 'e',
     'î': 'i', 'ï': 'i', 'ô': 'o', 'ö': 'o', 'ù': 'u', 'û': 'u', 'ü': 'u', '-': ' ', '_': ' ', '!': ' ', '?': ' ',
-    '.': ' ', ',': ' ', ':': ' ', ';': ' ', '/': ' ', '"': ' ', '(': ' ', ')': ' '
+    '.': ' ', ',': ' ', ':': ' ', ';': ' ', '/': ' ', '"': ' ', '(': ' ', ')': ' ', '\'': ' ', '`': ' '
   };
 
-  private static readonly CHARMAP_REGEX = /[àáâäæçèéêëîïôöùûü\-_!?.,:;/"()]/g;
+  private static readonly CHARMAP_REGEX = /[àáâäæçèéêëîïôöùûü\-_!?.,:;/"()'`]/g;
 
   private static readonly STOPWORDS = 'aie aient aies ait aura aurai auraient aurais aurait auras aurez auriez aurions aurons auront aux avaient avais avait avec avez aviez avions avons ayant ayez ayons ceci cela ces cet cette dans des elle est eue eues eurent eus eusse eussent eusses eussiez eussions eut eux eumes eut etes furent fus fusse fussent fusses fussiez fussions fut fumes fut futes ici ils les leur leurs lui mais mes moi mon meme nos notre nous ont par pas pour que quel quelle quelles quels qui sans sera serai seraient serais serait seras serez seriez serions serons seront ses soi soient sois soit sommes son sont soyez soyons suis sur tes toi ton une vos votre vous etaient etais etait etant etiez etions ete etee etees etes etes'.split(' ');
 
-  constructor(private http: ProgressHttp, private evt: Events, private platform: Platform) {
-    this.initRemoteDb();
+  constructor(private http: ProgressHttp, private evt: Events, private platform: Platform,
+              private authService: AuthService) {
     this.isMobile = this.platform.is('mobile');
+    this.isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+    this.remoteDatabase = this.getRemoteDb();
+    this.localDatabase = this.getLocalDb(ApiAppConfig.LOCAL_DB, this.isSafari);
   }
 
+  // Inits local db once the user is logged in
+  // Note : only one local db is maintained - this is to prevent the app from exceeding the browsers space storage limit
   initLocalDb() {
-    let isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-    console.log('isSafari : ' + isSafari + ' - platforms : ' + this.platform.platforms());
-    let localDbName = ApiAppConfig.LOCAL_DB + '_' + btoa(this.userEmail);
-    this.localDatabase = isSafari ? new PouchDB(localDbName, {size: this.isMobile ? 49 : 99, adapter: 'websql'}) : new PouchDB(localDbName);
-  }
-
-  resetLocalDb() {
-    this.localDatabase.destroy().then(() => {
-      this.initLocalDb();
+    let legacyDbName = ApiAppConfig.LOCAL_DB + '_' + btoa(this.authService.userEmail);
+    console.log('isSafari : ' + this.isSafari + ' - platforms : ' + this.platform.platforms());
+    // Clear legacy per-user local databases
+    return this.clearDb(legacyDbName, this.isSafari).then(() => {
+      this.localDatabase.get(SeedsService.CURRENT_USER).then((userDoc) => {
+        return userDoc.email;
+      }).catch((err) => {
+        console.log('current user doc missing');
+        return this.authService.userEmail;
+      }).then((prevUser) => {
+        if(prevUser !== this.authService.userEmail) {
+          // if new user, clear local db
+          return this.clearDb(ApiAppConfig.LOCAL_DB, this.isSafari).then(() => {
+            this.localDatabase = this.getLocalDb(ApiAppConfig.LOCAL_DB, this.isSafari);
+            return this.localDatabase.put({_id: SeedsService.CURRENT_USER, email: this.authService.userEmail});
+          });
+        } else {
+          // keep existing db otherwise
+          this.localDatabase = this.getLocalDb(ApiAppConfig.LOCAL_DB, this.isSafari);
+          return Promise.resolve();
+        }
+      });
     }).catch((err) => {
-      console.log('local db deletion error : ' + JSON.stringify(err));
+      console.log('initLocalDb error : ' + JSON.stringify(err));
     });
   }
 
+  clearDb(dbName, isSafari) {
+    console.log('Clearing local database : ' + dbName);
+    return this.getLocalDb(dbName, isSafari).destroy();
+  }
+
   clearLocalDb() {
-    this.localDatabase = null;
+    this.clearDb(ApiAppConfig.LOCAL_DB, this.isSafari);
   }
 
-  initRemoteDb() {
-    this.remoteDatabase = new PouchDB(ApiAppConfig.DB_URL + '/' + ApiAppConfig.REMOTE_DB);
+  getLocalDb(dbName, isSafari) {
+    return isSafari ? new PouchDB(dbName, {size: this.isMobile ? 49 : 99, adapter: 'websql'}) : new PouchDB(dbName);
   }
 
-  initDb(onProgress) {
+  getRemoteDb() {
+    return new PouchDB(ApiAppConfig.DB_URL + '/' + ApiAppConfig.REMOTE_DB);
+  }
+
+  initDbData(onProgress) {
     onProgress("Téléchargement des données de l'application en cours (0%)");
     this.localDatabase.info().then((localInfo) => {
       if(localInfo.doc_count === 0) {
@@ -75,8 +99,7 @@ export class SeedsService {
           remote.lastSeq = remoteInfo.update_seq;
           this.http.withDownloadProgressListener((progress) => {
             onProgress("Téléchargement des données de l'application en cours (" + Math.ceil(progress.loaded / 1024) + "Ko)");
-          }).get(ApiAppConfig.DB_URL + '/' + ApiAppConfig.REMOTE_DB + '/' + SeedsService.USER_SEEDS_VIEW +
-            '?keys=[%22apidae%22,%22public%22,%22' + this.userEmail + '%22]&include_docs=true&attachments=true')
+          }).get(this.userSeedsUrl())
             .map(res => res.json()).toPromise()
             .then((data) => {
               onProgress("Import des données téléchargées");
@@ -96,7 +119,14 @@ export class SeedsService {
       } else {
         this.initReplication();
       }
+    }).catch((err) => {
+      console.log('initDbData error : ' + JSON.stringify(err));
     });
+  }
+
+  userSeedsUrl() {
+    return ApiAppConfig.DB_URL + '/' + ApiAppConfig.REMOTE_DB + '/' + SeedsService.USER_SEEDS_VIEW +
+      '?keys=[%22apidae%22,%22public%22,%22' + this.authService.userEmail + '%22]&include_docs=true&attachments=true'
   }
 
   initReplication(lastSeq?) {
@@ -109,7 +139,7 @@ export class SeedsService {
       },
       pull: {
           filter: SeedsService.USER_SEEDS_FILTER,
-          query_params: {user: this.userEmail}
+          query_params: {user: this.authService.userEmail}
       }
     };
     if(lastSeq) {
@@ -153,7 +183,7 @@ export class SeedsService {
         _id: SeedsService.SEARCH_DOC,
         views: {
           all_fields: {
-            map: "function (doc) {\n  var charmap = {'à': 'a', 'á': 'a', 'â': 'a', 'ä': 'a', 'æ': 'ae', 'ç': 'c', 'è': 'e', 'é': 'e', 'ê': 'e', 'ë': 'e', 'î': 'i', 'ï': 'i', 'ô': 'o', 'ö': 'o', 'ù': 'u', 'û': 'u', 'ü': 'u', '-': ' ', '_': ' ', '!': ' ', '?': ' ', '.': ' ', ',': ' ', ':': ' ', ';': ' ', '/': ' ', '\"': ' ', '(': ' ', ')': ' '};\n  var escapedChars = /[àáâäæçèéêëîïôöùûü\\-_!?.,:;/\"()]/g;\n  var stopWords = 'aie aient aies ait aura aurai auraient aurais aurait auras aurez auriez aurions aurons auront aux avaient avais avait avec avez aviez avions avons ayant ayez ayons ceci cela ces cet cette dans des elle est eue eues eurent eus eusse eussent eusses eussiez eussions eut eux eumes eut etes furent fus fusse fussent fusses fussiez fussions fut fumes fut futes ici ils les leur leurs lui mais mes moi mon meme nos notre nous ont par pas pour que quel quelle quelles quels qui sans sera serai seraient serais serait seras serez seriez serions serons seront ses soi soient sois soit sommes son sont soyez soyons suis sur tes toi ton une vos votre vous etaient etais etait etant etiez etions ete etee etees etes etes'.split(' ');\n  \n  var nameTokens = doc.name.toLowerCase().replace(escapedChars, function(char) {return charmap[char];}).split(/\\s+/);\n  for(var i in nameTokens) {\n    if(nameTokens[i].length > 2 && stopWords.indexOf(nameTokens[i] === -1)) {\n      emit(nameTokens[i], null);\n    }\n  }\n  if(doc.description) {\n    var descTokens = doc.description.toLowerCase().replace(escapedChars, function(char) {return charmap[char];}).split(/\\s+/);\n    for(var k in descTokens) {\n      if(descTokens[k].length > 2 && stopWords.indexOf(descTokens[k] === -1)) {\n        emit(descTokens[k], null);\n      }\n    }  \n  }\n  if(doc.address) {\n    var addrTokens = doc.address.toLowerCase().replace(escapedChars, function(char) {return charmap[char];}).split(/\\s+/);\n    for(var j in addrTokens) {\n      if(addrTokens[j].length > 2 && stopWords.indexOf(addrTokens[j] === -1)) {\n        emit(addrTokens[j], null);\n      }\n    }  \n  }\n}"
+            map: "function (doc) {\n  var charmap = {'à': 'a', 'á': 'a', 'â': 'a', 'ä': 'a', 'æ': 'ae', 'ç': 'c', 'è': 'e', 'é': 'e', 'ê': 'e', 'ë': 'e', 'î': 'i', 'ï': 'i', 'ô': 'o', 'ö': 'o', 'ù': 'u', 'û': 'u', 'ü': 'u', '-': ' ', '_': ' ', '!': ' ', '?': ' ', '.': ' ', ',': ' ', ':': ' ', ';': ' ', '/': ' ', '\"': ' ', '(': ' ', ')': ' ', '\\'': ' ', '`': ' '};\n  var escapedChars = /[àáâäæçèéêëîïôöùûü\\-_!?.,:;/\"()'`]/g;\n  var stopWords = 'aie aient aies ait aura aurai auraient aurais aurait auras aurez auriez aurions aurons auront aux avaient avais avait avec avez aviez avions avons ayant ayez ayons ceci cela ces cet cette dans des elle est eue eues eurent eus eusse eussent eusses eussiez eussions eut eux eumes eut etes furent fus fusse fussent fusses fussiez fussions fut fumes fut futes ici ils les leur leurs lui mais mes moi mon meme nos notre nous ont par pas pour que quel quelle quelles quels qui sans sera serai seraient serais serait seras serez seriez serions serons seront ses soi soient sois soit sommes son sont soyez soyons suis sur tes toi ton une vos votre vous etaient etais etait etant etiez etions ete etee etees etes etes'.split(' ');\n  \n  var nameTokens = doc.name.toLowerCase().replace(escapedChars, function(char) {return charmap[char];}).split(/\\s+/);\n  for(var i in nameTokens) {\n    if(nameTokens[i].length > 2 && stopWords.indexOf(nameTokens[i] === -1)) {\n      emit(nameTokens[i], null);\n    }\n  }\n  if(doc.description) {\n    var descTokens = doc.description.toLowerCase().replace(escapedChars, function(char) {return charmap[char];}).split(/\\s+/);\n    for(var k in descTokens) {\n      if(descTokens[k].length > 2 && stopWords.indexOf(descTokens[k] === -1)) {\n        emit(descTokens[k], null);\n      }\n    }  \n  }\n  if(doc.address) {\n    var addrTokens = doc.address.toLowerCase().replace(escapedChars, function(char) {return charmap[char];}).split(/\\s+/);\n    for(var j in addrTokens) {\n      if(addrTokens[j].length > 2 && stopWords.indexOf(addrTokens[j] === -1)) {\n        emit(addrTokens[j], null);\n      }\n    }  \n  }\n}"
           }
         }
       };
@@ -267,12 +297,14 @@ export class SeedsService {
   }
 
   getCurrentUserSeed() {
-    return this.getUserSeed(this.userEmail).then((userSeed) => {
+    return this.authService.currentUser().then((userEmail) => {
+      return this.getUserSeed(userEmail);
+    }).then((userSeed) => {
       if(userSeed) {
         return Promise.resolve(userSeed);
       } else {
-        return this.getAuth().then((doc) => {
-          let newUser = this.buildUserSeed(doc.user);
+        return this.authService.getUserProfile().then((userProfile) => {
+          let newUser = this.buildUserSeed(userProfile);
           return this.localDatabase.put(newUser.submitParams()).then(data => {
             if (data.ok) {
               return this.getNodeDetails(data.id);
@@ -328,54 +360,32 @@ export class SeedsService {
 
   saveNode(seed) {
     let seedParams = seed.submitParams();
-    return this.connectionsChange(seedParams).then((changes) => {
-      return this.localDatabase.put(seedParams).then((doc) => {
-        return this.updateConnections(doc.id, changes);
-      });
+    return this.localDatabase.put(seedParams).then((doc) => {
+      return this.updateConnections(doc.id, seed);
     });
   }
 
-  connectionsChange(seedParams) {
-    if(seedParams._rev) {
-      return this.getNodeDetails(seedParams._id).then((data) => {
-        let newConnections = seedParams.connections || [];
-        let prevConnections = data.connections || [];
-        let addedNodes = newConnections.filter((c) => {
-          return prevConnections.indexOf(c) == -1;
-        });
-        let removedNodes = prevConnections.filter((c) => {
-          return newConnections.indexOf(c) == -1;
-        });
-        return {added: addedNodes, removed: removedNodes};
-      });
-    } else {
-      return Promise.resolve({added: seedParams.connections, removed: []});
-    }
-  }
-
-  updateConnections(nodeId, changes) {
+  updateConnections(nodeId, seed) {
     let updatedSeeds = [];
     return this.localDatabase.allDocs({
-        keys: changes.added,
+        keys: seed.addedConnections,
         include_docs: true
-      }).then((nodes) => {
-        let docs = nodes.rows.filter((row) => {return row.id;}).map((row) => {return row.doc;});
-        for (let doc of docs) {
-          doc.connections.push(nodeId);
-          updatedSeeds.push(doc);
-        }
-        return changes;
-      }).then((res) => {
+    }).then((nodes) => {
+      let docs = nodes.rows.filter((row) => {return row.id;}).map((row) => {return row.doc;});
+      for (let doc of docs) {
+        doc.connections.push(nodeId);
+        updatedSeeds.push(doc);
+      }
+    }).then(() => {
       return this.localDatabase.allDocs({
-        keys:  res.removed,
+        keys:  seed.removedConnections,
         include_docs: true
       }).then((nodes) => {
         let docs = nodes.rows.filter((row) => {return row.id;}).map((row) => {return row.doc;});
         for (let doc of docs) {
-          doc.connections.splice(doc.connections.indexOf(nodeId));
+          doc.connections.splice(doc.connections.indexOf(nodeId), 1);
           updatedSeeds.push(doc);
         }
-        return res;
       });
     }).then((res) => {
       return this.localDatabase.bulkDocs(updatedSeeds).then((resp) => {
@@ -384,26 +394,5 @@ export class SeedsService {
         console.log('bulk update error : ' + JSON.stringify(err));
       });
     });
-  }
-
-  getAuth() {
-    return this.localDatabase.get(SeedsService.AUTH_DOC);
-  }
-
-  setAuth(userProfile) {
-    this.userEmail = userProfile.email;
-    this.initLocalDb();
-    return this.getAuth().catch((err) => {
-      console.log('auth doc missing - creating one');
-      return this.localDatabase.put({
-        _id: SeedsService.AUTH_DOC,
-        user: userProfile
-      });
-    });
-  }
-
-  clearAuthData(): void {
-    this.userSeed = null;
-    this.userEmail = null;
   }
 }

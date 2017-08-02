@@ -2,7 +2,7 @@ import {IonicPage, NavController, NavParams} from "ionic-angular";
 import {Component, NgZone} from "@angular/core";
 import {AuthService} from "../../providers/auth.service";
 import {ExplorerService} from "../../providers/explorer.service";
-import {Seed} from "../../components/seed.model";
+import {Seed} from "../../models/seed.model";
 import {SeedsService} from "../../providers/seeds.service";
 
 @IonicPage({
@@ -22,14 +22,14 @@ export class LinkPage {
   }
 
   loggedInRedirect(): void {
-    if(this.dataService.userSeed) {
+    if(this.authService.userSeed) {
       this.navigateHome();
     } else {
-      this.dataService.getAuth().then(authData => {
-        this.dataService.userEmail = authData.user.email;
+      this.authService.getUserProfile().then(userProfile => {
+        this.authService.userEmail = userProfile.email;
         this.dataService.getCurrentUserSeed().then((data) => {
           if(data) {
-            this.dataService.userSeed = new Seed(data, false, false);
+            this.authService.userSeed = new Seed(data, false, false);
             this.navigateHome();
           }
         });

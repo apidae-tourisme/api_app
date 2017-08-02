@@ -4,14 +4,19 @@ import 'rxjs/Rx';
 import {ApiAppConfig} from "./apiapp.config";
 import {InAppBrowser} from '@ionic-native/in-app-browser';
 import {Platform} from "ionic-angular";
-import {SeedsService} from "./seeds.service";
+import {Storage} from "@ionic/storage";
+import {Seed} from "../models/seed.model";
 
 declare var window: any;
 
 @Injectable()
 export class AuthService {
 
-  constructor(private dataService: SeedsService, private platform: Platform, private iab: InAppBrowser, private http: Http){
+  public userEmail: string;
+  public userSeed: Seed;
+
+  constructor(private platform: Platform, private iab: InAppBrowser,
+              private http: Http, private storage: Storage){
   }
 
   authenticate(success, error): void {
@@ -49,7 +54,7 @@ export class AuthService {
         this.http.get(ApiAppConfig.OAUTH_PROFILE_URL, profileHeader).map(resp => {
           return resp.json();
         }).subscribe(profile => {
-          this.dataService.setAuth(profile).then(() => {
+          this.setUserProfile(profile).then(() => {
             if(browser) {
               browser.close();
             }
@@ -69,8 +74,27 @@ export class AuthService {
   }
 
   logOut() {
-    this.dataService.clearAuthData();
-    this.dataService.cancelReplication();
-    return Promise.resolve();
+    this.userEmail = null;
+    return this.setUserProfile(null);
+  }
+
+  currentUser() {
+    if(this.userEmail) {
+      return Promise.resolve(this.userEmail);
+    } else {
+      return this.getUserProfile().then((profile) => {
+        this.userEmail = profile.email;
+        return this.userEmail;
+      });
+    }
+  }
+
+  getUserProfile() {
+    return this.storage.get('userProfile');
+  }
+
+  setUserProfile(userProfile) {
+    this.userEmail = userProfile ? userProfile.email : null;
+    return this.storage.set('userProfile', userProfile);
   }
 }

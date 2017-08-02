@@ -13,6 +13,7 @@ import {SeedsService} from "../providers/seeds.service";
 export class ApiApp {
   rootPage = 'LoginPage';
 
+  // Inject app-wide services
   constructor(private platform: Platform, private authService: AuthService, private explorerService: ExplorerService,
               private seedsService: SeedsService, private statusBar: StatusBar, private splashScreen: SplashScreen,
               private app: App) {

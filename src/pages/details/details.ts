@@ -4,7 +4,7 @@ import {DomSanitizer, SafeUrl} from "@angular/platform-browser";
 import {ExplorerService} from "../../providers/explorer.service";
 import {SearchService} from "../../providers/search.service";
 import {AuthService} from "../../providers/auth.service";
-import {Seed} from "../../components/seed.model";
+import {Seed} from "../../models/seed.model";
 import {InAppBrowser} from "@ionic-native/in-app-browser";
 import {SeedsService} from "../../providers/seeds.service";
 
@@ -145,9 +145,9 @@ export class DetailsPage {
         {
           text: 'Oui',
           handler: () => {
+            this.dataService.cancelReplication();
             this.authService.logOut().then(() => {
               this.explorerService.clearData();
-              this.dataService.clearLocalDb();
               this.zone.run(() => {
                 this.app.getRootNav().setRoot('LoginPage');
               });

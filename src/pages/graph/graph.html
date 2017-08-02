@@ -1,4 +1,4 @@
-<ion-header *ngIf="dataService.userSeed">
+<ion-header *ngIf="authService.userSeed">
   <ion-navbar color="lighter" hideBackButton="true">
     <ion-buttons left>
       <button ion-button (click)="navigateTo(null, false)">
@@ -11,10 +11,10 @@
         <ion-icon name="search" color="link"></ion-icon>Rechercher ou créer
       </button>
     </ion-toolbar>
-    <ion-buttons right *ngIf="dataService.userSeed">
-      <button ion-button (click)="navigateTo(dataService.userSeed.id, false)">
-        <img id="avatar_logo" *ngIf="dataService.userSeed.picture()" src="{{dataService.userSeed.pictureData()}}"/>
-        <i id="avatar_icon" *ngIf="!dataService.userSeed.picture()" class="ion-md-custom-person"></i>
+    <ion-buttons right *ngIf="authService.userSeed">
+      <button ion-button (click)="navigateTo(authService.userSeed.id, false)">
+        <img id="avatar_logo" *ngIf="authService.userSeed.picture()" src="{{authService.userSeed.pictureData()}}"/>
+        <i id="avatar_icon" *ngIf="!authService.userSeed.picture()" class="ion-md-custom-person"></i>
       </button>
     </ion-buttons>
   </ion-navbar>

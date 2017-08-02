@@ -34,8 +34,8 @@ export class LoginPage {
 
   ionViewDidEnter() {
     let url = window.location.href;
-    // callback in browser - Apidae SSO from browser
     if(url.indexOf('code') != -1) {
+      // callback in browser - Apidae SSO from browser
       this.authService.handleAuthCallback(url, () => {
         this.loggedInRedirect();
         }, () => {
@@ -55,14 +55,14 @@ export class LoginPage {
   }
 
   loggedInRedirect(): void {
-    if(this.dataService.userEmail) {
+    if(this.authService.userEmail) {
       this.navCtrl.push('LoadingPage', {isOnline: this.hasConnectivity()});
     } else {
-      this.dataService.getAuth().then(authData => {
-        this.dataService.userEmail = authData.user.email;
+      this.authService.getUserProfile().then(userProfile => {
+        this.authService.userEmail = userProfile.email;
         this.navCtrl.push('LoadingPage', {isOnline: this.hasConnectivity()});
       }).catch((err) => {
-        console.log('Invalid auth data');
+        console.log('Auth required');
       });
     }
   }

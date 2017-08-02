@@ -1,7 +1,6 @@
 import {Component, NgZone, ViewChild} from '@angular/core';
 import {App, IonicPage, Tabs} from "ionic-angular";
-import {SeedsService} from "../../providers/seeds.service";
-
+import {AuthService} from "../../providers/auth.service";
 
 @IonicPage({
   segment: 'explorer'
@@ -18,11 +17,11 @@ export class TabsPage {
 
   tabParams: any;
 
-  constructor(private app: App, private dataService: SeedsService, private zone: NgZone) {
+  constructor(private app: App, private authService: AuthService, private zone: NgZone) {
   }
 
   ionViewWillEnter() {
-    if(!this.dataService.userEmail) {
+    if(!this.authService.userEmail) {
       this.zone.run(() => {
         this.app.getRootNav().setRoot('LoginPage');
       });

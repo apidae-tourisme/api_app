@@ -2,9 +2,9 @@ import {Component, ViewChild} from '@angular/core';
 import {Content, IonicPage, NavController, Platform} from 'ionic-angular';
 import {ExplorerService} from "../../providers/explorer.service";
 import {SearchService} from "../../providers/search.service";
-import {DataService} from "../../providers/data.service";
 import {GraphComponent} from "../../components/graph.component";
 import {SeedsService} from "../../providers/seeds.service";
+import {AuthService} from "../../providers/auth.service";
 
 @IonicPage({
   segment: 'graphe'
@@ -21,7 +21,7 @@ export class GraphPage {
   public graphHeight: number;
 
   constructor(public explorerService: ExplorerService, public searchService: SearchService, public dataService: SeedsService,
-              private navCtrl: NavController, private platform: Platform) {
+              public authService: AuthService, private navCtrl: NavController, private platform: Platform) {
     this.loading = true;
   }
 
