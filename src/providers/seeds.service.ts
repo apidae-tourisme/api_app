@@ -91,13 +91,18 @@ export class SeedsService {
   }
 
   initDbData(onProgress) {
+    console.log('initDbData');
     onProgress("Téléchargement des données de l'application en cours (0%)");
     this.localDatabase.info().then((localInfo) => {
+      console.log('localInfo retrieved');
       if(localInfo.doc_count === 0) {
+        console.log('doc_count === 0');
         let remote: any = {};
         this.remoteDatabase.info().then((remoteInfo) => {
+          console.log('remoteInfo retrieved');
           remote.lastSeq = remoteInfo.update_seq;
           this.http.withDownloadProgressListener((progress) => {
+            console.log('progress : ' + JSON.stringify(progress));
             onProgress("Téléchargement des données de l'application en cours (" + Math.ceil(progress.loaded / 1024) + "Ko)");
           }).get(this.userSeedsUrl())
             .map(res => res.json()).toPromise()
