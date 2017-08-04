@@ -91,18 +91,13 @@ export class SeedsService {
   }
 
   initDbData(onProgress) {
-    console.log('initDbData');
     onProgress("Téléchargement des données de l'application en cours (0%)");
     this.localDatabase.info().then((localInfo) => {
-      console.log('localInfo retrieved');
       if(localInfo.doc_count === 0) {
-        console.log('doc_count === 0');
         let remote: any = {};
         this.remoteDatabase.info().then((remoteInfo) => {
-          console.log('remoteInfo retrieved');
           remote.lastSeq = remoteInfo.update_seq;
           this.http.withDownloadProgressListener((progress) => {
-            console.log('progress : ' + JSON.stringify(progress));
             onProgress("Téléchargement des données de l'application en cours (" + Math.ceil(progress.loaded / 1024) + "Ko)");
           }).get(this.userSeedsUrl())
             .map(res => res.json()).toPromise()
@@ -378,8 +373,10 @@ export class SeedsService {
     }).then((nodes) => {
       let docs = nodes.rows.filter((row) => {return row.id;}).map((row) => {return row.doc;});
       for (let doc of docs) {
-        doc.connections.push(nodeId);
-        updatedSeeds.push(doc);
+        if(doc.connections.indexOf(nodeId) == -1) {
+          doc.connections.push(nodeId);
+          updatedSeeds.push(doc);
+        }
       }
     }).then(() => {
       return this.localDatabase.allDocs({
@@ -388,8 +385,10 @@ export class SeedsService {
       }).then((nodes) => {
         let docs = nodes.rows.filter((row) => {return row.id;}).map((row) => {return row.doc;});
         for (let doc of docs) {
-          doc.connections.splice(doc.connections.indexOf(nodeId), 1);
-          updatedSeeds.push(doc);
+          if(doc.connections.indexOf(nodeId) != -1) {
+            doc.connections.splice(doc.connections.indexOf(nodeId), 1);
+            updatedSeeds.push(doc);
+          }
         }
       });
     }).then((res) => {
