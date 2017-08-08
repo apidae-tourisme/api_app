@@ -270,7 +270,7 @@ export class SeedsService {
     return this.localDatabase.query(SeedsService.SEARCH_PATH, {
       startkey     : term,
       endkey       : term + '\uffff',
-      limit        : 25,
+      limit        : 50,
       include_docs : true,
       attachments: true
     }).then((results) => {
