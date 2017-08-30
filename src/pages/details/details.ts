@@ -71,6 +71,9 @@ export class DetailsPage {
           this.authorId = user._id;
         }
       });
+    } else {
+      this.authorName = null;
+      this.authorId = null;
     }
   }
 
