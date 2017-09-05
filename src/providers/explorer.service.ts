@@ -34,7 +34,7 @@ export class ExplorerService {
         edges: [],
         count: data.count
       };
-      let nodes = data.nodes;
+      let nodes = [data.root].concat(data.connectedSeeds);
       let currentRoot = this.rootNode;
       let newPrevious = resetData ? null : this.newPreviousNode(newNode, currentRoot);
       let prevDisconnected = true;
@@ -53,7 +53,13 @@ export class ExplorerService {
           parsedData.nodes.push(networkNode);
         }
       }
-      parsedData.edges = data.links;
+      parsedData.edges = data.connectedSeeds.map((n) => {return {source: n._id, target: data.root._id};});
+
+      let inclusions = [];
+      for (let i = 0; i < data.includedSeeds.length; i++) {
+        inclusions.push(new Seed(data.includedSeeds[i], false, false));
+      }
+      this.rootNode.includedSeeds = inclusions;
 
       // Reset - no history
       if(resetData) {
@@ -69,14 +75,21 @@ export class ExplorerService {
       }
       // Node changed - Nav backward
       else if(newNode && newNode == this.previousNode()) {
-        this.navBackward.pop();
+        this.navForward.push(this.navBackward.pop());
         if(this.navBackward.length == 1) {
           parsedData.previousNode = null;
         } else {
           parsedData.previousNode = this.navBackward[this.navBackward.length - 2];
         }
       }
-      // Node changed - Nav forward / search
+      // Node changed - Nav forward
+      else if(newNode && newNode == this.nextNode()) {
+        this.navBackward.push(this.navForward.pop());
+        if(!parsedData.previousNode) {
+          parsedData.previousNode = currentRoot;
+        }
+      }
+      // Node changed - Search
       else {
         if(!parsedData.previousNode) {
           parsedData.previousNode = currentRoot;
@@ -109,8 +122,8 @@ export class ExplorerService {
     return this.navBackward.length > 1 ? this.navBackward[this.navBackward.length - 2].id : null;
   }
 
-  previousNodeEntity(): Seed {
-    return this.navBackward.length > 1 ? this.navBackward[this.navBackward.length - 2] : null;
+  nextNode(): string {
+    return this.navForward.length > 0 ? this.navForward[this.navForward.length - 1].id : null;
   }
 
   newPreviousNode(newNode, currentRoot): string {

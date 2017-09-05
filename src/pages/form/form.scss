@@ -139,3 +139,20 @@ input.cordova-camera-select {
   overflow: hidden;
   margin: 0 auto;
 }
+
+#form_lists ion-segment-button:last-child {
+  border-color: map_get($colors, bulb);
+  color: map_get($colors, bulb);
+}
+
+#select_results ion-item button {
+  font-size: 1.5rem;
+}
+
+#select_results ion-item ion-label h2 {
+  font-size: 1.4rem;
+}
+
+#select_results ion-item ion-label p {
+  font-size: 1.2rem;
+}

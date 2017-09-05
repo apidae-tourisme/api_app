@@ -42,16 +42,21 @@
       pour lancer une recherche
     </p>
   </div>
-  <ion-list *ngIf="searchService.nodes.length > 0" id="search_results">
-    <ion-item *ngFor="let node of searchService.nodes" text-wrap (click)="selectSeed(node)">
-      <ion-icon *ngIf="node.scope == 'private'" name="lock" class="item_lock"></ion-icon>
-      <ion-avatar item-left class="bg_seed {{node.category}}">
-        <img *ngIf="node.picture()" src="{{node.pictureData()}}"/>
-        <div *ngIf="!node.picture()" text-center><i class="ion-md-custom-{{node.category}}"></i></div>
+  <ion-list *ngIf="searchService.nodes.length > 0" id="select_results">
+    <ion-item *ngFor="let nd of searchService.nodes" text-wrap>
+      <ion-icon *ngIf="nd.scope == 'private'" name="lock" class="item_lock"></ion-icon>
+      <ion-avatar item-left class="bg_seed {{nd.category}}">
+        <img *ngIf="nd.picture()" src="{{nd.pictureData()}}"/>
+        <div *ngIf="!nd.picture()" text-center><i class="ion-md-custom-{{nd.category}}"></i></div>
       </ion-avatar>
-      <h2>{{node.label}}</h2>
-      <p text-nowrap>{{node.description}}</p>
-      <ion-icon item-right color="link" name="arrow-forward" large></ion-icon>
+      <h2>{{nd.label}}</h2>
+      <p text-nowrap>{{nd.description}}</p>
+      <button ion-button item-end (click)="toggleConnection(nd)" clear icon-only>
+        <ion-icon item-right [color]="node.connections.indexOf(nd.id) == -1 ? 'light' : 'dark'" name="custom-graph" large></ion-icon>
+      </button>
+      <button ion-button item-end (click)="toggleInclusion(nd)" clear icon-only>
+        <ion-icon item-right [color]="node.inclusions.indexOf(nd.id) == -1 ? 'light' : 'bulb'" name="hexa-inclusions" large></ion-icon>
+      </button>
     </ion-item>
   </ion-list>
 </ion-content>

@@ -203,21 +203,20 @@ export class SeedsService {
 
   getNodeData(rootNodeId) {
     let nodeId = rootNodeId || SeedsService.DEFAULT_SEED;
-    let nodeData = {count: 0, nodes: [], links: []};
+    let nodeData = {count: 0, root: null, connectedSeeds: [], includedSeeds: []};
     return this.localDatabase.allDocs().then((docs) => {
       nodeData.count = docs.rows.length;
     }).then(() => {
-      return this.localDatabase.get(nodeId);
+      return this.localDatabase.get(nodeId, {attachments: true});
     }).then((rootNode) => {
+      nodeData.root = rootNode;
       // console.log('got root node ' + rootNode._id + ' and connections : ' + rootNode.connections);
-      return this.localDatabase.allDocs({
-        keys: [rootNode._id].concat(rootNode.connections || []),
-        include_docs: true,
-        attachments: true
-      }).then(nodes => {
-        let visibleNodes = nodes.rows.filter((row) => {return row.id && row.doc;}).map((row) => {return row.doc;});
-        nodeData.nodes = visibleNodes;
-        nodeData.links = visibleNodes.slice(1).map((n) => {return {source: n._id, target: visibleNodes[0]._id};});
+      return Promise.all([
+        this.localDatabase.allDocs({keys: (rootNode.connections || []), include_docs: true, attachments: true}),
+        this.localDatabase.allDocs({keys: (rootNode.inclusions || []), include_docs: true, attachments: true}),
+      ]).then((nodes) => {
+        nodeData.connectedSeeds = nodes[0].rows.filter((row) => {return row.id && row.doc;}).map((row) => {return row.doc;});
+        nodeData.includedSeeds = nodes[1].rows.filter((row) => {return row.id && row.doc;}).map((row) => {return row.doc;});
         return nodeData;
       });
     }).catch(function (err) {

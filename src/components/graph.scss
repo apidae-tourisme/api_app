@@ -34,3 +34,13 @@ graph use.icon.idea {
   stroke: map_get($colors, text_alt);
   fill: map_get($colors, text_alt);
 }
+
+.connection text {
+  stroke: white;
+  fill:white;
+  stroke-width: 0.4;
+}
+
+.connection circle {
+  fill: map_get($colors, dark);
+}

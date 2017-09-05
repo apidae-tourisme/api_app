@@ -6,11 +6,22 @@
 
 @font-face {
   font-family: 'apiapp';
-  src:  url('../assets/fonts/apiapp.eot?v3pwbp');
-  src:  url('../assets/fonts/apiapp.eot?v3pwbp#iefix') format('embedded-opentype'),
-  url('../assets/fonts/apiapp.ttf?v3pwbp') format('truetype'),
-  url('../assets/fonts/apiapp.woff?v3pwbp') format('woff'),
-  url('../assets/fonts/apiapp.svg?v3pwbp#apiapp') format('svg');
+  src:  url('../assets/fonts/apiapp.eot');
+  src:  url('../assets/fonts/apiapp.eot#iefix') format('embedded-opentype'),
+  url('../assets/fonts/apiapp.ttf') format('truetype'),
+  url('../assets/fonts/apiapp.woff') format('woff'),
+  url('../assets/fonts/apiapp.svg#apiapp') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'apiapp-actions';
+  src:  url('../assets/fonts/apiapp-actions.eot');
+  src:  url('../assets/fonts/apiapp-actions.eot#iefix') format('embedded-opentype'),
+  url('../assets/fonts/apiapp-actions.ttf') format('truetype'),
+  url('../assets/fonts/apiapp-actions.woff') format('woff'),
+  url('../assets/fonts/apiapp-actions.svg#apiapp-actions') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -83,6 +94,52 @@
   content: "\e90c";
 }
 
+[class^="ion-md-hexa-"], [class*=" ion-md-hexa-"] {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'apiapp-actions' !important;
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.ion-md-hexa-inclusions:before {
+  content: "\e900";
+}
+.ion-md-hexa-validate:before {
+  content: "\e901";
+}
+.ion-md-hexa-add:before {
+  content: "\e902";
+}
+.ion-md-hexa-close:before {
+  content: "\e903";
+}
+.ion-md-hexa-down:before {
+  content: "\e904";
+}
+.ion-md-hexa-right:before {
+  content: "\e905";
+}
+.ion-md-hexa-left:before {
+  content: "\e906";
+}
+.ion-md-hexa-search:before {
+  content: "\e907";
+}
+.ion-md-hexa-up:before {
+  content: "\e908";
+}
+.ion-md-hexa-cancel:before {
+  content: "\e909";
+}
+
 .bg_seed {
   background-repeat: no-repeat;
   background-size: auto 100%;
@@ -129,6 +186,14 @@
   background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 67.42 76.07' fill='%23ffffff'%3E%3Cg%3E%3Cg%3E%3Cpath d='M67.42,54.11V21.93a5.84,5.84,0,0,0-2.92-5L36.64.79a5.78,5.78,0,0,0-5.83,0L2.92,16.88a5.84,5.84,0,0,0-2.92,5V54.14a5.84,5.84,0,0,0,2.92,5L30.81,75.28a5.78,5.78,0,0,0,5.83,0L64.53,59.19A5.92,5.92,0,0,0,67.42,54.11Z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
 }
 
+.bg_seed.inclusions {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 67.42 76.07' fill='%23F4C32E'%3E%3Cg%3E%3Cg%3E%3Cpath d='M67.42,54.11V21.93a5.84,5.84,0,0,0-2.92-5L36.64.79a5.78,5.78,0,0,0-5.83,0L2.92,16.88a5.84,5.84,0,0,0-2.92,5V54.14a5.84,5.84,0,0,0,2.92,5L30.81,75.28a5.78,5.78,0,0,0,5.83,0L64.53,59.19A5.92,5.92,0,0,0,67.42,54.11Z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+.bg_seed.connections {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 67.42 76.07' fill='%237e7665'%3E%3Cg%3E%3Cg%3E%3Cpath d='M67.42,54.11V21.93a5.84,5.84,0,0,0-2.92-5L36.64.79a5.78,5.78,0,0,0-5.83,0L2.92,16.88a5.84,5.84,0,0,0-2.92,5V54.14a5.84,5.84,0,0,0,2.92,5L30.81,75.28a5.78,5.78,0,0,0,5.83,0L64.53,59.19A5.92,5.92,0,0,0,67.42,54.11Z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
 ion-title .bg_seed.concept,
 ion-buttons button.bg_seed.concept {
   background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 67.42 76.07' fill='%23ffffff' stroke='%23666666'%3E%3Cg%3E%3Cg%3E%3Cpath d='M67.42,54.11V21.93a5.84,5.84,0,0,0-2.92-5L36.64.79a5.78,5.78,0,0,0-5.83,0L2.92,16.88a5.84,5.84,0,0,0-2.92,5V54.14a5.84,5.84,0,0,0,2.92,5L30.81,75.28a5.78,5.78,0,0,0,5.83,0L64.53,59.19A5.92,5.92,0,0,0,67.42,54.11Z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
@@ -153,7 +218,8 @@ ion-buttons button.bg_seed.concept {
   min-height: inherit;
 }
 
-#header_logo {
+#header_logo,
+#widget_header img {
   width: 54px;
 }
 

@@ -87,12 +87,20 @@
       <button ion-button item-right large clear icon-only color="danger" (click)="node.urls.splice(i, 1)"><ion-icon name="close"></ion-icon></button>
     </ion-item>
     <button ion-item class="label_only" border-top (click)="addSeed()">
-      <ion-label>Graines liées</ion-label>
+      <ion-label>Ajouter des graines</ion-label>
       <button ion-button icon-only item-right large clear color="link">
         <ion-icon name="add-circle"></ion-icon>
       </button>
     </button>
-    <ion-item *ngFor="let seed of node.seeds; let i = index;" no-lines>
+    <ion-segment id="form_lists" [(ngModel)]="activeList" color="dark" margin-bottom>
+      <ion-segment-button value="connections">
+        Graines connectées
+      </ion-segment-button>
+      <ion-segment-button value="inclusions">
+        Graines incluses
+      </ion-segment-button>
+    </ion-segment>
+    <ion-item *ngFor="let seed of getActiveList(); let i = index;" no-lines>
       <ion-icon *ngIf="seed.scope == 'private'" name="lock" class="item_lock"></ion-icon>
       <ion-avatar item-left class="bg_seed {{seed.category}}">
         <img *ngIf="seed.picture()" src="{{seed.pictureData()}}"/>
@@ -100,6 +108,9 @@
       </ion-avatar>
       <h2>{{seed.label}}</h2>
       <button ion-button item-right large clear icon-only color="danger" (click)="removeSeed(seed)"><ion-icon name="close"></ion-icon></button>
+    </ion-item>
+    <ion-item *ngIf="getActiveList().length == 0" no-lines>
+      <p>Aucune graine {{activeList == 'connections' ? 'connectée' : 'incluse'}}.</p>
     </ion-item>
     <ion-item *ngIf="authService.userEmail == node.author || node.scope == 'public' || node.scope == 'apidae'" border-top>
       <ion-label>Visible par {{scopeLabel()}}</ion-label>

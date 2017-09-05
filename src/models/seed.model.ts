@@ -26,14 +26,16 @@ export class Seed {
   connections: Array<string>;
   addedConnections: Array<string>;
   removedConnections: Array<string>;
-  seeds: Array<any>;
+  connectedSeeds: Array<any>;
+  inclusions: Array<string>;
+  includedSeeds: Array<any>;
   urls: Array<any>;
 
   public constructor(nodeData: any, public isRoot: boolean, public isPrevious: boolean) {
     this.id = nodeData._id;
     this.rev = nodeData._rev;
     this.externalId = nodeData.external_id;
-    this.label = (nodeData.firstname && nodeData.lastname) ? (nodeData.firstname + ' ' + nodeData.lastname) : nodeData.name;
+    this.label = nodeData.name;
     this.description = nodeData.description;
     this.category = nodeData.type ? this.seedType(nodeData.type) : Seed.DEFAULT_TYPE;
     this.email = nodeData.email;
@@ -48,10 +50,17 @@ export class Seed {
     this.author = nodeData.author;
     this.termsConditions = nodeData.terms_conditions;
     this.connections = nodeData.connections || [];
-    this.seeds = [];
+    this.connectedSeeds = [];
     if(nodeData.connections) {
       for(let i = 0; i < nodeData.connections.length; i++) {
-        this.seeds.push(new Seed({_id: nodeData.connections[i]}, false, false));
+        this.connectedSeeds.push(new Seed({_id: nodeData.connections[i]}, false, false));
+      }
+    }
+    this.inclusions = nodeData.inclusions || [];
+    this.includedSeeds = [];
+    if(nodeData.inclusions) {
+      for(let i = 0; i < nodeData.inclusions.length; i++) {
+        this.includedSeeds.push(new Seed({_id: nodeData.inclusions[i]}, false, false));
       }
     }
     this.urls = [];
@@ -88,9 +97,45 @@ export class Seed {
     return Seeds.allSeedsTypes().filter((t) => {return t.type == this.category})[0];
   }
 
+  public formattedUrls() {
+    let urls = [];
+    let phoneRegexp = new RegExp(/^0\d{9,13}$/);
+    let emailRegexp = new RegExp(/^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()\.,;\s@\"]+\.{0,1})+[^<>()\.,;:\s@\"]{2,})$/);
+    let urlRegexp = new RegExp(/((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-_]*)?\??(?:[\-\+=&;%@\.\w_]*)#?(?:[\.\!\/\\\w]*))?)/);
+
+    this.urls.forEach((url) => {
+      let trimmedUrl = url.value.replace(/\s/g, '');
+      if(trimmedUrl.match(phoneRegexp)) {
+        urls.push({label: trimmedUrl, link: ('tel:' + trimmedUrl), icon: 'call'})
+      } else if(trimmedUrl.match(emailRegexp)) {
+        urls.push({label: trimmedUrl, link: ('mailto:' + trimmedUrl), icon: 'at'})
+      } else {
+        let absUrl = trimmedUrl.indexOf('://') != -1 ? trimmedUrl : ('http://' + trimmedUrl);
+        if(absUrl.match(urlRegexp)) {
+          urls.push({label: trimmedUrl, link: absUrl, icon: this.urlIcon(trimmedUrl)})
+        } else {
+          urls.push({label: trimmedUrl, icon: 'help'})
+        }
+      }
+    });
+    return urls;
+  }
+
+  private urlIcon(url): string {
+    let supportedUrls = ['facebook', 'twitter', 'linkedin', 'instagram', 'youtube', 'dropbox', 'google', 'github', 'dribbble',
+      'pinterest', 'reddit', 'rss', 'skype', 'snapchat', 'tumblr', 'vimeo'];
+
+    for(let i = 0; i < supportedUrls.length; i++) {
+      if(url.indexOf(supportedUrls[i]) != -1) {
+        return 'logo-' + supportedUrls[i];
+      }
+    }
+    return 'link';
+  }
+
   public addConnection(seed) {
     if(this.connections.indexOf(seed.id) == -1) {
-      this.seeds.push(seed);
+      this.connectedSeeds.push(seed);
       this.connections.push(seed.id);
     }
     if(this.removedConnections.indexOf(seed.id) == -1) {
@@ -102,7 +147,7 @@ export class Seed {
 
   public removeConnection(seed) {
     if(this.connections.indexOf(seed.id) != -1) {
-      this.seeds.splice(this.seeds.indexOf(seed), 1);
+      this.connectedSeeds.splice(this.connectedSeeds.indexOf(seed), 1);
       this.connections.splice(this.connections.indexOf(seed.id), 1);
     }
     if(this.addedConnections.indexOf(seed.id) == -1) {
@@ -132,6 +177,7 @@ export class Seed {
       author: this.author,
       terms_conditions: this.termsConditions,
       connections: this.connections || [],
+      inclusions: this.inclusions || [],
       urls: this.urls.map(function(u) { return u.value; }) || []
     };
   }

@@ -20,6 +20,7 @@ import {StatusBar} from "@ionic-native/status-bar";
 import {SplashScreen} from "@ionic-native/splash-screen";
 import {SeedsService} from "../providers/seeds.service";
 import {ProgressHttpModule} from "angular-progress-http";
+import {RemoteDataService} from "../providers/remote.service";
 
 @NgModule({
   declarations: [
@@ -34,9 +35,9 @@ import {ProgressHttpModule} from "angular-progress-http";
         scrollAssist: false,
         autoFocusAssist: false,
         mode: 'md',
-        tabsPlacement: 'top',
-        tabsLayout: 'title-hide',
-        tabsHideOnSubPages: true,
+        // tabsPlacement: 'top',
+        // tabsLayout: 'title-hide',
+        // tabsHideOnSubPages: true
         // Web only
         locationStrategy: 'path'
       }
@@ -62,6 +63,7 @@ import {ProgressHttpModule} from "angular-progress-http";
     SeedsService,
     ExplorerService,
     SearchService,
+    RemoteDataService,
     Seeds
   ]
 })

@@ -1,0 +1,115 @@
+#graph_wrapper div.scroll-content {
+  overflow-y: hidden;
+}
+
+graph, pack {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 99;
+  height: 100%;
+  width: 100%;
+}
+
+graph > *, pack > * {
+  height: 100%;
+}
+
+#graph_bg {
+  position: absolute;
+  bottom: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  background-color: map_get($colors, bg);
+}
+
+#graph_bg > img {
+  position: absolute;
+  bottom: 0;
+}
+
+#graph_bg > img:first-child {
+  width: 35%;
+  height: auto;
+  max-width: 160px;
+  left: 0;
+}
+
+#graph_bg > img:last-child {
+  width: 45%;
+  height: auto;
+  max-width: 200px;
+  right: 0;
+}
+
+.slide_left, .slide_right {
+  position: absolute;
+  z-index: 99;
+  height: 80px;
+  top: calc(50% - 40px);
+  color: map-get($colors, text_main);
+  opacity: 0.8;
+}
+
+.slide_left .button-inner,
+.slide_right .button-inner {
+  flex-direction: column;
+}
+
+.slide_left .button-inner > * {
+  padding-left: 32px;
+}
+
+.slide_right .button-inner > * {
+  padding-right: 32px;
+}
+
+.slide_left .button-inner ion-icon,
+.slide_right .button-inner ion-icon {
+  font-size: 2.6rem;
+}
+
+.slide_left .button-inner span,
+.slide_right .button-inner span {
+  font-size: 1.4rem;
+  padding-top: 2px;
+}
+
+.slide_left {
+  left: -46px;
+}
+
+.slide_right {
+  right: -46px;
+}
+
+#slides_wrapper {
+  position: relative;
+  height: 100%;
+}
+
+#explorer_header:after {
+  background-image: url('/assets/img/shadow_header_dark.png');
+}
+
+#explorer_header.inclusions:after {
+  background-image: url('/assets/img/shadow_header_bulb.png');
+}
+
+#explorer_toolbar {
+  min-height: inherit;
+  border-top: 2px solid map_get($colors, dark);
+}
+
+#explorer_header.inclusions #explorer_toolbar {
+  border-top: 2px solid map_get($colors, bulb);
+}
+
+#explorer_toolbar ion-buttons button {
+  font-size: 2rem;
+}
+
+#explorer_toolbar ion-grid button {
+  font-size: 1.6rem;
+}

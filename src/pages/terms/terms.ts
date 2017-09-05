@@ -1,7 +1,9 @@
 import {Component} from "@angular/core";
 import {ViewController, IonicPage} from "ionic-angular";
 
-@IonicPage()
+@IonicPage({
+  segment: 'conditions_generales'
+})
 @Component({
   templateUrl: 'terms.html'
 })

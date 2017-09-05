@@ -33,6 +33,27 @@
   min-width: 56px;
 }
 
+ion-list ion-item#title_details ion-icon.item_lock {
+  top: 8px;
+  left: 24px;
+}
+
+ion-list ion-item#title_details > .item-inner {
+  position: relative;
+}
+
+#title_details p:first-child {
+  color: map-get($colors, text_main);
+  font-size: $font-size-base;
+  margin-bottom: 4px;
+}
+
+#title_details p:last-child {
+  color: map-get($colors, text_alt);
+  font-size: 1.1rem;
+  line-height: 1em;
+}
+
 #list_details #title_details .button-inner {
   justify-content: center;
 }

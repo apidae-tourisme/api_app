@@ -1,0 +1,81 @@
+<ion-header id="explorer_header" [class.inclusions]="currentView == 'inclusions'">
+  <ion-navbar color="lighter" hideBackButton="true">
+    <ion-buttons left>
+      <button ion-button (click)="navigateTo(null, false)">
+        <img id="header_logo" src="assets/img/logo-apiapp-mini.svg"/>
+      </button>
+    </ion-buttons>
+    <ion-toolbar no-border>
+      <div id="total_counter">{{explorerService.networkData ? explorerService.networkData.count : 0}}</div>
+      <button id="top_search" ion-button color="lighter" block icon-left text-left (click)="displaySearch()">
+        <ion-icon name="search" color="link"></ion-icon>Rechercher ou créer
+      </button>
+    </ion-toolbar>
+    <ion-buttons right *ngIf="authService.userSeed">
+      <button ion-button (click)="navigateTo(authService.userSeed.id, false)">
+        <img id="avatar_logo" *ngIf="authService.userSeed.picture()" src="{{authService.userSeed.pictureData()}}"/>
+        <i id="avatar_icon" *ngIf="!authService.userSeed.picture()" class="ion-md-custom-person"></i>
+      </button>
+    </ion-buttons>
+  </ion-navbar>
+  <ion-toolbar id="explorer_toolbar" color="toolbar">
+    <ion-buttons left>
+      <button ion-button (click)="navigateTo(explorerService.previousNode(), false, false)" [disabled]="prevDisabled" icon-only clear>
+        <ion-icon name="hexa-left" color="link"></ion-icon>
+      </button>
+    </ion-buttons>
+    <ion-buttons right>
+      <button ion-button (click)="navigateTo(explorerService.nextNode(), false, false)" [disabled]="nextDisabled" icon-only clear>
+        <ion-icon name="hexa-right" color="link"></ion-icon>
+      </button>
+    </ion-buttons>
+    <ion-grid no-padding>
+      <ion-row no-padding>
+        <ion-col col-1></ion-col>
+        <ion-col col-3 text-center>
+          <button ion-button (click)="displayDetails()" icon-only clear>
+            <ion-icon name="custom-detail" color="link"></ion-icon>
+          </button>
+        </ion-col>
+        <ion-col col-4 text-center>
+          <button ion-button (click)="editSeed()" icon-only clear>
+            <ion-icon name="create" color="link"></ion-icon>
+          </button>
+        </ion-col>
+        <ion-col col-3 text-center>
+          <button ion-button (click)="shareSeed()" icon-only clear>
+            <ion-icon name="share" color="link"></ion-icon>
+          </button>
+        </ion-col>
+        <ion-col col-1></ion-col>
+      </ion-row>
+    </ion-grid>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content id="graph_wrapper">
+  <div id="slides_wrapper">
+    <button *ngIf="currentView == 'connections' && explorerService.rootNode" class="slide_right bg_seed inclusions" ion-button clear (click)="displayInclusions()">
+      <ion-icon name="hexa-inclusions"></ion-icon><span>{{explorerService.rootNode.inclusions.length}}</span>
+    </button>
+    <button *ngIf="currentView == 'inclusions' && explorerService.rootNode" class="slide_left bg_seed connections" ion-button clear (click)="displayConnections()">
+      <ion-icon name="custom-graph"></ion-icon><span>{{explorerService.rootNode.connections.length}}</span>
+    </button>
+
+    <ion-slides #viewSlides id="view_slides" (ionSlideWillChange)="switchView($event)"
+                (ionSlideTap)="slidesTapped($event)">
+      <ion-slide>
+        <graph (showDetails)="displayDetails()" (rootChange)="rootNodeChange($event);" [width]="graphWidth" [height]="graphHeight"></graph>
+      </ion-slide>
+      <ion-slide>
+        <p>Vue inclusions</p>
+        <!--<pack (showDetails)="displayDetails()" (rootChange)="rootNodeChange($event);" [width]="graphWidth" [height]="graphHeight"></pack>-->
+      </ion-slide>
+    </ion-slides>
+    <div id="graph_bg">
+      <img src="assets/img/flowers-left.png"/>
+      <img src="assets/img/flowers-right.png"/>
+    </div>
+  </div>
+
+</ion-content>

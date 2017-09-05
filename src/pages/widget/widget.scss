@@ -1,0 +1,19 @@
+ion-list ion-item ion-icon.item_lock {
+  position: absolute;
+  top: 5px;
+  left: 39px;
+  font-size: 14px;
+}
+
+ion-list ion-item.item-md ion-avatar {
+  padding: 6px;
+}
+
+.item-md ion-avatar img {
+  width: 44px;
+  height: 44px;
+}
+
+#widget_header ion-title > div {
+  text-align: center;
+}

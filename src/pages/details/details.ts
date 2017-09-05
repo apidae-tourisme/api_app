@@ -9,7 +9,7 @@ import {InAppBrowser} from "@ionic-native/in-app-browser";
 import {SeedsService} from "../../providers/seeds.service";
 
 @IonicPage({
-  segment: 'detail'
+  segment: 'details/:id'
 })
 @Component({
   templateUrl: 'details.html'
@@ -27,6 +27,14 @@ export class DetailsPage {
   }
 
   ionViewDidEnter(): void {
+    if(!this.authService.userSeed) {
+      this.dataService.getCurrentUserSeed().then((data) => {
+        if(data) {
+          this.authService.userSeed = new Seed(data, false, false);
+        }
+      });
+    }
+
     this.registerBack();
     let seedId = this.navParams.get('id');
     if(seedId) {
@@ -36,31 +44,6 @@ export class DetailsPage {
     } else {
       this.loadAuthor();
     }
-  }
-
-  seedUrls() {
-    let urls = [];
-    let phoneRegexp = new RegExp(/^0\d{9,13}$/);
-    let emailRegexp = new RegExp(/^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()\.,;\s@\"]+\.{0,1})+[^<>()\.,;:\s@\"]{2,})$/);
-    let urlRegexp = new RegExp(/((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-_]*)?\??(?:[\-\+=&;%@\.\w_]*)#?(?:[\.\!\/\\\w]*))?)/);
-    if(this.explorerService.rootNode) {
-      this.explorerService.rootNode.urls.forEach((url) => {
-        let trimmedUrl = url.value.replace(/\s/g, '');
-        if(trimmedUrl.match(phoneRegexp)) {
-          urls.push({label: trimmedUrl, link: ('tel:' + trimmedUrl), icon: 'call'})
-        } else if(trimmedUrl.match(emailRegexp)) {
-          urls.push({label: trimmedUrl, link: ('mailto:' + trimmedUrl), icon: 'at'})
-        } else {
-          let absUrl = trimmedUrl.indexOf('://') != -1 ? trimmedUrl : ('http://' + trimmedUrl);
-          if(absUrl.match(urlRegexp)) {
-            urls.push({label: trimmedUrl, link: absUrl, icon: this.urlIcon(trimmedUrl)})
-          } else {
-            urls.push({label: trimmedUrl, icon: 'help'})
-          }
-        }
-      });
-    }
-    return urls;
   }
 
   loadAuthor() {
@@ -92,7 +75,7 @@ export class DetailsPage {
   navigateTo(node, showGraph, reset): void {
     if(showGraph) {
       this.explorerService.navigateTo(node, reset, () => {
-        this.navCtrl.parent.select(0);
+        this.navCtrl.pop();
       });
     } else {
       this.explorerService.navigateTo(node, reset, () => {
@@ -105,26 +88,21 @@ export class DetailsPage {
     this.navCtrl.push('SearchPage');
   }
 
-  editSeed(): void {
-    this.dataService.getNodeData(this.explorerService.rootNode.id).then((data) => {
-      let node = new Seed(data.nodes[0], false, false);
-      if(data.nodes.length > 1) {
-        node.seeds = data.nodes.splice(1).map((n) => {return new Seed(n, false, false)});
-      }
-      this.navCtrl.push('FormPage', {node: node});
-    });
+  shareSeed() {
+    this.navCtrl.push('SharePage', {id: this.explorerService.rootNode.id});
   }
 
-  urlIcon(url): string {
-    let supportedUrls = ['facebook', 'twitter', 'linkedin', 'instagram', 'youtube', 'dropbox', 'google', 'github', 'dribbble',
-      'pinterest', 'reddit', 'rss', 'skype', 'snapchat', 'tumblr', 'vimeo'];
-
-    for(let i = 0; i < supportedUrls.length; i++) {
-      if(url.indexOf(supportedUrls[i]) != -1) {
-        return 'logo-' + supportedUrls[i];
+  editSeed(): void {
+    this.dataService.getNodeData(this.explorerService.rootNode.id).then((data) => {
+      let node = new Seed(data.root, false, false);
+      if(data.connectedSeeds.length > 0) {
+        node.connectedSeeds = data.connectedSeeds.map((n) => {return new Seed(n, false, false)});
       }
-    }
-    return 'link';
+      if(data.includedSeeds.length > 0) {
+        node.includedSeeds = data.includedSeeds.map((n) => {return new Seed(n, false, false)});
+      }
+      this.navCtrl.push('FormPage', {id: node.id, node: node});
+    });
   }
 
   dateFormat(date): string {
@@ -167,13 +145,12 @@ export class DetailsPage {
       this.platform.registerBackButtonAction(() => {
         if (this.navCtrl.canGoBack()) {
           this.navCtrl.pop();
-        } else {
-          let prevNode = this.explorerService.previousNode();
-          if(prevNode) {
-            this.explorerService.navigateTo(prevNode, false, () => this.content.resize());
-          }
         }
       }, 100);
     });
+  }
+
+  closeDetails() {
+    this.navCtrl.pop();
   }
 }

@@ -5,7 +5,9 @@ import {AuthService} from "../../providers/auth.service";
 import {Seed} from "../../models/seed.model";
 import {ApiAppConfig} from "../../providers/apiapp.config";
 
-@IonicPage()
+@IonicPage({
+  segment: 'initialisation'
+})
 @Component({
   templateUrl: 'loading.html'
 })
@@ -74,7 +76,7 @@ export class LoadingPage {
   // root change is wrapped in a ng zone call to prevent duplicate controller instances (see https://github.com/driftyco/ionic/issues/5960)
   navigateHome(): void {
     this.zone.run(() => {
-      this.navCtrl.setRoot('TabsPage', {animate: false});
+      this.navCtrl.setRoot('ExplorerPage', {}, {animate: false});
     });
   }
 

@@ -1,0 +1,60 @@
+<ion-header id="seed_header">
+  <ion-navbar color="lighter" hideBackButton="true">
+    <ion-buttons *ngIf="seed" left>
+      <ion-avatar class="bg_seed {{seed.category}}">
+        <img *ngIf="seed.picture()" src="{{seed.pictureData()}}"/>
+        <div *ngIf="!seed.picture()" text-center><i class="ion-md-custom-{{seed.category}}"></i></div>
+      </ion-avatar>
+    </ion-buttons>
+    <ion-title *ngIf="seed">{{seed.label}}</ion-title>
+    <ion-buttons *ngIf="hasParent" right>
+      <button ion-button (click)="closeDetails()" icon-only clear>
+        <ion-icon name="hexa-close" color="link"></ion-icon>
+      </button>
+    </ion-buttons>
+  </ion-navbar>
+</ion-header>
+
+<ion-content padding-top>
+  <ion-list *ngIf="seed" id="list_details" no-lines>
+    <ion-item text-wrap>
+      <p class="pre">{{seed.description}}</p>
+    </ion-item>
+    <ion-item *ngIf="seed.address" class="selectable">
+      <button ion-button full large icon-left (click)="openAddress(seed.address)" color="event">
+        <ion-icon name="ios-pin"></ion-icon>
+        <p class="label_sm">{{seed.address}}</p>
+      </button>
+    </ion-item>
+    <ion-item *ngFor="let url of seed.formattedUrls()" class="selectable" text-wrap>
+      <button ion-button full large icon-left (click)="openUrl(url.link)" color="product">
+        <ion-icon [name]="url.icon"></ion-icon>
+        <p class="label_sm">{{url.label}}</p>
+      </button>
+    </ion-item>
+    <ion-item *ngIf="seed.startDate" class="selectable date_item">
+      <div class="button-md button-large-md button-md-lighter selectable" large>
+        <span class="button_label">Début</span>
+      </div>
+      <span item-right class="button-md button-large-md button-md-event selectable button_eol">
+        {{dateFormat(seed.startDate)}}
+      </span>
+    </ion-item>
+    <ion-item *ngIf="seed.endDate" class="selectable date_item">
+      <div class="button-md button-large-md button-md-lighter selectable" large>
+        <span class="button_label">Fin</span>
+      </div>
+      <span item-right class="button-md button-large-md button-md-event selectable button_eol">
+        {{dateFormat(seed.endDate)}}
+      </span>
+    </ion-item>
+    <ion-item *ngIf="seed.creationDate" class="selectable">
+      <ion-label class="label_sm">Date de création</ion-label>
+      <ion-datetime [(ngModel)]="seed.creationDate" displayFormat="DD/MM/YYYY" disabled="true"></ion-datetime>
+    </ion-item>
+    <ion-item *ngIf="seed.updateDate" class="selectable">
+      <ion-label class="label_sm">Dernière mise à jour</ion-label>
+      <ion-datetime [(ngModel)]="seed.updateDate" displayFormat="DD/MM/YYYY" disabled="true"></ion-datetime>
+    </ion-item>
+  </ion-list>
+</ion-content>

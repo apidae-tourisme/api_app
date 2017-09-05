@@ -1,0 +1,21 @@
+#seed_header button {
+  font-size: 2rem;
+}
+
+#seed_header ion-avatar {
+  width: 56px;
+  margin: 2px -4px 2px 6px;
+  padding: 6px 0;
+  text-align: center;
+}
+
+#seed_header ion-avatar img {
+  border-radius: 50%;
+  overflow: hidden;
+  max-width: 44px;
+  display: inline;
+}
+
+#seed_header ion-avatar i {
+  font-size: 42px;
+}

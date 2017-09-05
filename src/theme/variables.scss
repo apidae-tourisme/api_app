@@ -17,7 +17,7 @@ $colors: (
   light:      #ccc,
   dark:       #7e7665,
   favorite:   #6eb1c6,
-  bulb:       #edc141,
+  bulb:       #F4C32E,
   lighter:    #ffffff,
 
   // theme
@@ -25,6 +25,7 @@ $colors: (
   text_main:  #282828,
   text_alt:   #666666,
   link:       #5db0c7,
+  toolbar:    #ebe2d9,
 
   // seeds
   organization:   #9f3f3e,
@@ -56,7 +57,7 @@ $tabs-md-tab-font-size-active: 1.6rem;
 $tabs-md-tab-icon-size-active: 3.6rem;
 
 // Custom segment bars
-$segment-button-md-border-bottom-width: 0;
+//$segment-button-md-border-bottom-width: 0;
 $segment-button-md-height: 4.6rem;
 $segment-button-md-line-height: 4.6rem;
 $segment-button-md-icon-size: 3.2rem;
@@ -65,6 +66,9 @@ $segment-button-md-icon-size: 3.2rem;
 $searchbar-md-input-search-icon-color: map-get($colors, link);
 $searchbar-md-input-text-color: map-get($colors, text_alt);
 $searchbar-md-input-clear-icon-color: map-get($colors, text_main);
+
+// Display detail push on md
+$item-md-detail-push-show: true;
 
 // App Theme
 // --------------------------------------------------

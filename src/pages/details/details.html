@@ -18,18 +18,34 @@
       </button>
     </ion-buttons>
   </ion-navbar>
+  <ion-toolbar id="explorer_toolbar" color="action">
+    <ion-buttons right>
+      <button ion-button (click)="closeDetails()" icon-only clear>
+        <ion-icon name="hexa-close" color="link"></ion-icon>
+      </button>
+    </ion-buttons>
+    <ion-grid no-padding>
+      <ion-row no-padding>
+        <ion-col col-2></ion-col>
+        <ion-col col-4 text-center>
+          <button ion-button (click)="editSeed()" icon-only clear>
+            <ion-icon name="create" color="link" large></ion-icon>
+          </button>
+        </ion-col>
+        <ion-col col-4 text-center>
+          <button ion-button (click)="shareSeed()" icon-only clear>
+            <ion-icon name="share" color="link"></ion-icon>
+          </button>
+        </ion-col>
+        <ion-col col-2></ion-col>
+      </ion-row>
+    </ion-grid>
+  </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content padding-top>
   <ion-list *ngIf="explorerService.rootNode" id="list_details" no-lines>
     <ion-item id="title_details" text-center text-wrap>
-      <button class="prev_link" color="link" *ngIf="explorerService.previousNode()" ion-button large item-start text-center icon-only outline round
-              (click)="navigateTo(explorerService.previousNode(), false, false)">
-        <ion-icon name="arrow-back" large></ion-icon>
-      </button>
-      <button ion-button large outline item-end round icon-only color="link" (click)="editSeed()" id="edit_seed">
-        <ion-icon name="create" large></ion-icon>
-      </button>
       <ion-icon *ngIf="explorerService.rootNode.scope == 'private'" name="lock" class="item_lock"></ion-icon>
       <ion-avatar class="bg_seed {{explorerService.rootNode.category}}">
         <img *ngIf="explorerService.rootNode.picture()" src="{{explorerService.rootNode.pictureData()}}"/>
@@ -52,7 +68,7 @@
         <p class="label_sm">{{explorerService.rootNode.address}}</p>
       </button>
     </ion-item>
-    <ion-item *ngFor="let url of seedUrls()" class="selectable" text-wrap>
+    <ion-item *ngFor="let url of explorerService.rootNode.formattedUrls()" class="selectable" text-wrap>
       <button ion-button full large icon-left (click)="openUrl(url.link)" color="product">
         <ion-icon [name]="url.icon"></ion-icon>
         <p class="label_sm">{{url.label}}</p>

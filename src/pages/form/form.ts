@@ -9,7 +9,9 @@ import {EditAvatar} from "../edit-avatar/edit-avatar";
 import {Seeds} from "../../providers/seeds";
 import {AuthService} from "../../providers/auth.service";
 
-@IonicPage()
+@IonicPage({
+  segment: 'edition/:id'
+})
 @Component({
   templateUrl: 'form.html'
 })
@@ -19,6 +21,7 @@ export class FormPage {
 
   public node: Seed;
   public disabled: boolean;
+  public activeList: string;
 
   constructor(private navCtrl: NavController, private params: NavParams, public modalCtrl: ModalController,
               private authService: AuthService, public dataService: SeedsService, private explorerService: ExplorerService,
@@ -26,30 +29,18 @@ export class FormPage {
     let seedName = params.get('name');
     this.node = params.get('node') || new Seed({name: seedName, scope: Seeds.SCOPE_PRIVATE, archived: false}, false, false);
     this.node.author = this.authService.userEmail;
+    this.activeList = 'connections';
   }
 
-  dismissForm(showGraph, refreshUser): void {
-    if(showGraph) {
-      let nextNode = this.node.archived ? this.explorerService.previousNode() : this.node.id;
-      if(refreshUser) {
-        this.updateUserSeed(() => {
-          this.explorerService.navigateTo(nextNode, false, () => {
-            let graphTab = this.navCtrl.parent.getByIndex(0);
-            if(this.navCtrl.parent.getSelected() != graphTab) {
-              this.navCtrl.parent.select(graphTab);
-            }
-            this.navCtrl.pop();
-          });
-        })
-      } else {
-        this.explorerService.navigateTo(nextNode, false, () => {
-          let graphTab = this.navCtrl.parent.getByIndex(0);
-          if(this.navCtrl.parent.getSelected() != graphTab) {
-            this.navCtrl.parent.select(graphTab);
-          }
+  dismissForm(): void {
+    if(this.node.archived) {
+      this.explorerService.navigateTo(this.explorerService.previousNode(), false, () => {
           this.navCtrl.pop();
-        });
-      }
+      });
+    } else if(this.authService.userSeed.id == this.node.id) {
+      this.updateUserSeed(() => {
+        this.navCtrl.pop();
+      });
     } else {
       this.navCtrl.pop();
     }
@@ -81,7 +72,7 @@ export class FormPage {
         this.node.id = data.id;
         loading.dismiss();
         this.presentToast("La graine a été enregistrée.", () => {
-          this.dismissForm(true, this.node.id == this.authService.userSeed.id);
+          this.dismissForm();
         });
       } else {
         this.presentToast("Une erreur est survenue pendant l'enregistrement de la graine.", () => {});
@@ -91,6 +82,10 @@ export class FormPage {
       this.presentToast("Une erreur est survenue pendant l'enregistrement de la graine.", () => {});
       console.log("submit error : " + JSON.stringify(error))
     });
+  }
+
+  getActiveList() {
+    return this.activeList == 'inclusions' ? this.node.includedSeeds : this.node.connectedSeeds;
   }
 
   editStartDate(): void {
@@ -159,17 +154,19 @@ export class FormPage {
   }
 
   addSeed(): void {
-    let seedsModal = this.modalCtrl.create('SearchSeeds', {type: this.node.category});
-    seedsModal.onDidDismiss(data => {
-      if(data && data.seed) {
-        this.node.addConnection(data.seed);
-      }
-    });
+    let seedsModal = this.modalCtrl.create('SearchSeeds', {node: this.node});
     seedsModal.present();
   }
 
   removeSeed(seed): void {
-    this.node.removeConnection(seed);
+    if(this.activeList == 'connections') {
+      this.node.removeConnection(seed);
+    } else if(this.activeList == 'inclusions') {
+      if(this.node.inclusions.indexOf(seed.id) != -1) {
+        this.node.includedSeeds.splice(this.node.includedSeeds.indexOf(seed), 1);
+        this.node.inclusions.splice(this.node.inclusions.indexOf(seed.id), 1);
+      }
+    }
   }
 
   addUrl(): void {

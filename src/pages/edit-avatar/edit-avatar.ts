@@ -5,7 +5,9 @@ import {File} from '@ionic-native/file';
 
 declare var cordova: any;
 
-@IonicPage()
+@IonicPage({
+  segment: 'image'
+})
 @Component({
   templateUrl: 'edit-avatar.html'
 })
