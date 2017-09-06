@@ -35,9 +35,6 @@ import {RemoteDataService} from "../providers/remote.service";
         scrollAssist: false,
         autoFocusAssist: false,
         mode: 'md',
-        // tabsPlacement: 'top',
-        // tabsLayout: 'title-hide',
-        // tabsHideOnSubPages: true
         // Web only
         locationStrategy: 'path'
       }

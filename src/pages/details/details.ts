@@ -52,11 +52,13 @@ export class DetailsPage {
         if(user) {
           this.authorName = user.name;
           this.authorId = user._id;
+          console.log('authorId: ' + this.authorId);
         }
       });
     } else {
       this.authorName = null;
       this.authorId = null;
+      console.log('authorId: ' + this.authorId);
     }
   }
 

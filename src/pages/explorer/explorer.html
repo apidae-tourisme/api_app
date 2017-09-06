@@ -65,11 +65,10 @@
     <ion-slides #viewSlides id="view_slides" (ionSlideWillChange)="switchView($event)"
                 (ionSlideTap)="slidesTapped($event)">
       <ion-slide>
-        <graph (showDetails)="displayDetails()" (rootChange)="rootNodeChange($event);" [width]="graphWidth" [height]="graphHeight"></graph>
+        <graph (showDetails)="displayDetails()" (rootChange)="rootNodeChange($event)" [width]="graphWidth" [height]="graphHeight"></graph>
       </ion-slide>
       <ion-slide>
-        <p>Vue inclusions</p>
-        <!--<pack (showDetails)="displayDetails()" (rootChange)="rootNodeChange($event);" [width]="graphWidth" [height]="graphHeight"></pack>-->
+        <pack (showDetails)="displayDetails()" (rootChange)="rootNodeChange($event)" [width]="graphWidth" [height]="graphHeight"></pack>
       </ion-slide>
     </ion-slides>
     <div id="graph_bg">

@@ -197,7 +197,7 @@ export class GraphComponent {
       allLabels.text(function (d) {
         return d.isRoot ? (d.label + "|" + (d.description || '')) : d.label;
       });
-      wrapLabels(allLabels, that);
+      wrapLabels(allLabels);
 
       that.nodesContainer.selectAll("g").on("click", changeRootNode);
 
@@ -228,15 +228,15 @@ export class GraphComponent {
       }
     }
 
-    function wrapLabels(texts, ref) {
+    function wrapLabels(texts) {
       texts.each(function() {
         let text = d3.select(this);
         if(text.text().indexOf("|") != -1) {
           let textTokens = text.text().split("|");
-          ref.doWrap(text, textTokens[0], true, true, layout.textSmall, 0, layout);
-          ref.doWrap(text, textTokens[1], false, true, layout.textTiny, layout.padding * 3, layout);
+          ComponentUtils.doWrap(text, textTokens[0], true, true, layout.textSmall, 0, layout);
+          ComponentUtils.doWrap(text, textTokens[1], false, true, layout.textTiny, layout.padding * 3, layout);
         } else {
-          ref.doWrap(text, text.text(), true, false, layout.textMedium, 0, layout);
+          ComponentUtils.doWrap(text, text.text(), true, false, layout.textMedium, 0, layout);
         }
       });
     }
@@ -250,38 +250,6 @@ export class GraphComponent {
           element.setAttribute("href", GraphComponent.GRAPH_PATH + element.getAttribute("href"));
         });
     }
-  }
-
-  doWrap(textElt, val, reset, isRoot, fontSize, offset, layout) {
-    let words = val.split(/\s+/).reverse(),
-      word,
-      line = [],
-      lines = 1,
-      x = Number.parseInt(textElt.attr("x")),
-      charsCount = 0,
-      textLength = isRoot ? layout.descLength : layout.seedsLength,
-      width = layout.unitX - 2 * layout.padding;
-    if(reset) {
-      textElt.text(null);
-    }
-    let tspan = textElt.append("tspan").attr("x", x).attr("dy", offset).attr("font-size", fontSize + "px");
-    while ((word = words.pop()) && charsCount <= textLength) {
-      charsCount += word.length + 1;
-      if(charsCount > textLength) {
-        word = word.substr(0, word.length - (charsCount - textLength)) + '…';
-      }
-      line.push(word);
-      tspan.text(line.join(" "));
-      if (line.length > 1 && tspan.node().getComputedTextLength() > (width - 2 * layout.padding)) {
-        line.pop();
-        tspan.text(line.join(" "));
-        line = [word];
-        tspan = textElt.append("tspan").attr("x", x).attr("dy", fontSize).attr("font-size", fontSize + "px")
-          .text(word);
-        lines++;
-      }
-    }
-    return lines;
   }
 }
 

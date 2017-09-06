@@ -144,6 +144,6 @@ export class ExplorerPage {
   }
 
   switchView(evt): void {
-
+    this.currentView = this.currentView == 'inclusions' ? 'connections' : 'inclusions';
   }
 }

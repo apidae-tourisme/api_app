@@ -1,0 +1,41 @@
+pack tspan.icon,
+pack text.icon {
+  font-family: 'Ionicons';
+}
+
+pack image.img-node {
+  clip-path: circle(50% at 50% 50%);
+}
+
+pack use.icon,
+pack text.label {
+  stroke: #ffffff;
+  fill: #ffffff;
+  stroke-width: 0.4;
+}
+
+pack use.icon.concept {
+  stroke: map_get($colors, link);
+  fill: map_get($colors, link);
+}
+
+pack text.concept.label,
+pack text.competence.label,
+pack text.action.label,
+pack text.idea.label,
+pack use.icon.competence,
+pack use.icon.action,
+pack use.icon.idea {
+  stroke: map_get($colors, text_alt);
+  fill: map_get($colors, text_alt);
+}
+
+.inclusion text {
+  stroke: map_get($colors, text_main);
+  fill: map_get($colors, text_main);
+  stroke-width: 0.2;
+}
+
+.inclusion circle {
+  fill: map_get($colors, bulb);
+}

@@ -32,17 +32,21 @@ export class FormPage {
     this.activeList = 'connections';
   }
 
+  closeForm(): void {
+    this.navCtrl.pop();
+  }
+
   dismissForm(): void {
     if(this.node.archived) {
       this.explorerService.navigateTo(this.explorerService.previousNode(), false, () => {
-          this.navCtrl.pop();
+          this.navCtrl.popToRoot();
       });
     } else if(this.authService.userSeed.id == this.node.id) {
       this.updateUserSeed(() => {
-        this.navCtrl.pop();
+        this.navCtrl.popToRoot();
       });
     } else {
-      this.navCtrl.pop();
+      this.navCtrl.popToRoot();
     }
   }
 

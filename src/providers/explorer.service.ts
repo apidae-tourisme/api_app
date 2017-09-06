@@ -59,7 +59,7 @@ export class ExplorerService {
       for (let i = 0; i < data.includedSeeds.length; i++) {
         inclusions.push(new Seed(data.includedSeeds[i], false, false));
       }
-      this.rootNode.includedSeeds = inclusions;
+      this.rootNode['children'] = inclusions;
 
       // Reset - no history
       if(resetData) {

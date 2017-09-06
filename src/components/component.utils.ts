@@ -52,4 +52,36 @@ export class ComponentUtils {
     productIcon.append("path").attr("d", "M24.21,8.91,21.14,6.55a.7.7,0,0,0-.41-.14H17.31a.68.68,0,0,0,0,1.36H20.5l2.2,1.68-2.2,1.68H8.56V7.76H15a.68.68,0,0,0,.68-.68V4.72a.68.68,0,1,0-1.36,0V6.4H7.89a.68.68,0,0,0-.68.68v4.73a.68.68,0,0,0,.68.68h6.42V13.7h-5a.7.7,0,0,0-.41.14L5.78,16.2a.66.66,0,0,0,0,1.06l3.07,2.36a.7.7,0,0,0,.41.14h3.42a.68.68,0,1,0,0-1.36H9.49L7.3,16.72,9.49,15H21.43v3.38H15a.68.68,0,0,0-.68.68v6.19a.68.68,0,1,0,1.36,0V19.77h6.46a.68.68,0,0,0,.68-.68V14.37a.68.68,0,0,0-.68-.68H15.65V12.47h5.08a.7.7,0,0,0,.41-.14L24.22,10a.67.67,0,0,0,.27-.53A.68.68,0,0,0,24.21,8.91Z");
   }
 
+  public static doWrap(textElt, val, reset, isRoot, fontSize, offset, layout) {
+    let words = val.split(/\s+/).reverse(),
+      word,
+      line = [],
+      lines = 1,
+      x = Number.parseInt(textElt.attr("x")),
+      charsCount = 0,
+      textLength = isRoot ? layout.descLength : layout.seedsLength,
+      width = layout.unitX - 2 * layout.padding;
+    if(reset) {
+      textElt.text(null);
+    }
+    let tspan = textElt.append("tspan").attr("x", x).attr("dy", offset).attr("font-size", fontSize + "px");
+    while ((word = words.pop()) && charsCount <= textLength) {
+      charsCount += word.length + 1;
+      if(charsCount > textLength) {
+        word = word.substr(0, word.length - (charsCount - textLength)) + '…';
+      }
+      line.push(word);
+      tspan.text(line.join(" "));
+      if (line.length > 1 && tspan.node().getComputedTextLength() > (width - 2 * layout.padding)) {
+        line.pop();
+        tspan.text(line.join(" "));
+        line = [word];
+        tspan = textElt.append("tspan").attr("x", x).attr("dy", fontSize).attr("font-size", fontSize + "px")
+          .text(word);
+        lines++;
+      }
+    }
+    return lines;
+  }
+
 }
