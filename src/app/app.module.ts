@@ -13,7 +13,6 @@ import {HttpModule} from "@angular/http";
 import {InAppBrowser} from '@ionic-native/in-app-browser';
 import {Camera} from "@ionic-native/camera";
 import {File} from '@ionic-native/file';
-import {Transfer} from "@ionic-native/transfer";
 import {Network} from "@ionic-native/network";
 import {Keyboard} from "@ionic-native/keyboard";
 import {StatusBar} from "@ionic-native/status-bar";
@@ -36,7 +35,7 @@ import {RemoteDataService} from "../providers/remote.service";
         autoFocusAssist: false,
         mode: 'md',
         // Web only
-        locationStrategy: 'path'
+        // locationStrategy: 'path'
       }
     ),
     IonicStorageModule.forRoot()
@@ -52,7 +51,6 @@ import {RemoteDataService} from "../providers/remote.service";
     InAppBrowser,
     Camera,
     File,
-    Transfer,
     Network,
     ApiAppConfig,
     AuthService,
