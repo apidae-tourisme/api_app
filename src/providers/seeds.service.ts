@@ -285,8 +285,7 @@ export class SeedsService {
   searchTerm(term) {
     return this.localDatabase.query(SeedsService.SEARCH_PATH, {
       startkey     : term,
-      endkey       : term + '\uffff',
-      limit        : 50
+      endkey       : term + '\uffff'
     }).then((results) => {
       return {
         term: term,
