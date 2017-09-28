@@ -1,0 +1,52 @@
+#wheel_path {
+  fill: map_get($colors, bg);
+  stroke: map_get($colors, light_blue);
+  stroke-width: 2px;
+}
+
+#wheel_inner {
+  fill: map_get($colors, lighter);
+  stroke: map_get($colors, link);
+  stroke-width: 2px;
+}
+
+svg.wheel circle {
+  fill: map_get($colors, bg);
+  stroke: map_get($colors, link);
+  stroke-width: 2px;
+}
+
+svg.wheel .view.active circle {
+  fill: map_get($colors, link);
+}
+
+.view text.icon {
+  font-size: 24px;
+  fill: map_get($colors, link);
+}
+
+.view.active text.icon {
+  fill: map_get($colors, lighter);
+}
+
+.view.active text.counter {
+  fill: map_get($colors, lighter);
+}
+
+.view.icon_0 text.icon, .view.icon_2 text.icon {
+  font-family: 'apiapp';
+}
+
+.view.icon_1 text.icon {
+  font-family: 'Ionicons';
+}
+
+text.main_counter {
+  font-size: 20px;
+  fill: map_get($colors, text_alt);
+}
+
+text.counter {
+  font-size: 12px;
+  fill: map_get($colors, link);
+}

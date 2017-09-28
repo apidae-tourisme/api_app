@@ -18,63 +18,132 @@
       </button>
     </ion-buttons>
   </ion-navbar>
-  <ion-toolbar id="explorer_toolbar" color="toolbar">
-    <ion-buttons left>
-      <button ion-button (click)="navigateTo(explorerService.previousNode(), false, false)" [disabled]="prevDisabled" icon-only clear>
-        <ion-icon name="hexa-left" color="link"></ion-icon>
-      </button>
-    </ion-buttons>
-    <ion-buttons right>
-      <button ion-button (click)="navigateTo(explorerService.nextNode(), false, false)" [disabled]="nextDisabled" icon-only clear>
-        <ion-icon name="hexa-right" color="link"></ion-icon>
-      </button>
-    </ion-buttons>
-    <ion-grid no-padding>
-      <ion-row no-padding>
-        <ion-col col-1></ion-col>
-        <ion-col col-3 text-center>
-          <button ion-button (click)="displayDetails()" icon-only clear>
-            <ion-icon name="custom-detail" color="link"></ion-icon>
-          </button>
-        </ion-col>
-        <ion-col col-4 text-center>
-          <button ion-button (click)="editSeed()" icon-only clear>
-            <ion-icon name="create" color="link"></ion-icon>
-          </button>
-        </ion-col>
-        <ion-col col-3 text-center>
-          <button ion-button (click)="shareSeed()" icon-only clear>
-            <ion-icon name="share" color="link"></ion-icon>
-          </button>
-        </ion-col>
-        <ion-col col-1></ion-col>
-      </ion-row>
-    </ion-grid>
-  </ion-toolbar>
 </ion-header>
 
-<ion-content id="graph_wrapper">
+<ion-content id="explorer">
   <div id="slides_wrapper">
-    <button *ngIf="currentView == 'connections' && explorerService.rootNode" class="slide_right bg_seed inclusions" ion-button clear (click)="displayInclusions()">
-      <ion-icon name="hexa-inclusions"></ion-icon><span>{{explorerService.rootNode.inclusions.length}}</span>
-    </button>
-    <button *ngIf="currentView == 'inclusions' && explorerService.rootNode" class="slide_left bg_seed connections" ion-button clear (click)="displayConnections()">
-      <ion-icon name="custom-graph"></ion-icon><span>{{explorerService.rootNode.connections.length}}</span>
-    </button>
-
     <ion-slides #viewSlides id="view_slides" (ionSlideWillChange)="switchView($event)"
-                (ionSlideTap)="slidesTapped($event)">
+                (ionSlideTap)="slidesTapped($event)" [initialSlide]="1">
       <ion-slide>
+        <ion-scroll *ngIf="!loading" scrollY="true">
+          <ion-item-group id="list_details" class="scroll_view" *ngIf="explorerService.rootNode && explorerService.rootNode.children" no-lines>
+            <ion-item-divider color="{{explorerService.rootNode.category}}" text-wrap sticky class="view_header">
+              <ion-icon *ngIf="explorerService.rootNode.scope == 'private'" name="lock" item-end></ion-icon>
+              <button ion-button (click)="editSeed()" icon-only clear large item-end>
+                <ion-icon name="hexa-pen"></ion-icon>
+              </button>
+              <ion-avatar item-start *ngIf="explorerService.rootNode.picture() || explorerService.rootNode.category != 'concept'">
+                <img *ngIf="explorerService.rootNode.picture()" src="{{explorerService.rootNode.pictureData()}}"/>
+                <div *ngIf="!explorerService.rootNode.picture()" text-center>
+                  <i class="ion-md-custom-{{explorerService.rootNode.category}}"></i>
+                </div>
+              </ion-avatar>
+              <h2 text-left ion-text [color]="explorerService.rootNode.category == 'concept' ? 'text_main' : 'lighter'">{{explorerService.rootNode.label}}</h2>
+            </ion-item-divider>
+            <ion-item text-wrap>
+              <p class="pre">{{explorerService.rootNode.description}}</p>
+            </ion-item>
+            <ion-item right *ngIf="authService.userSeed && explorerService.rootNode.id == authService.userSeed.id">
+              <button ion-button full large icon-left (click)="logOut()" color="person">
+                <ion-icon name="exit"></ion-icon>
+                <p class="label_sm">Déconnexion</p>
+              </button>
+            </ion-item>
+            <ion-item *ngIf="explorerService.rootNode.address" class="selectable">
+              <button ion-button full large icon-left (click)="openAddress(explorerService.rootNode.address)" color="event">
+                <ion-icon name="ios-pin"></ion-icon>
+                <p class="label_sm">{{explorerService.rootNode.address}}</p>
+              </button>
+            </ion-item>
+            <ion-item *ngFor="let url of explorerService.rootNode.formattedUrls()" class="selectable" text-wrap>
+              <button ion-button full large icon-left (click)="openUrl(url.link)" color="product">
+                <ion-icon [name]="url.icon"></ion-icon>
+                <p class="label_sm">{{url.label}}</p>
+              </button>
+            </ion-item>
+            <ion-item *ngIf="explorerService.rootNode.startDate" class="selectable date_item">
+              <div class="button-md button-large-md button-md-lighter selectable" large>
+                <span class="button_label">Début</span>
+              </div>
+              <span item-right class="button-md button-large-md button-md-event selectable button_eol">
+                {{dateFormat(explorerService.rootNode.startDate)}}
+              </span>
+            </ion-item>
+            <ion-item *ngIf="explorerService.rootNode.endDate" class="selectable date_item">
+              <div class="button-md button-large-md button-md-lighter selectable" large>
+                <span class="button_label">Fin</span>
+              </div>
+              <span item-right class="button-md button-large-md button-md-event selectable button_eol">
+                {{dateFormat(explorerService.rootNode.endDate)}}
+              </span>
+            </ion-item>
+            <ion-item *ngIf="explorerService.rootNode.creationDate" class="selectable">
+              <ion-label class="label_sm">Date de création</ion-label>
+              <ion-datetime [(ngModel)]="explorerService.rootNode.creationDate" displayFormat="DD/MM/YYYY" disabled="true"></ion-datetime>
+            </ion-item>
+            <ion-item *ngIf="explorerService.rootNode.updateDate" class="selectable">
+              <ion-label class="label_sm">Dernière mise à jour</ion-label>
+              <ion-datetime [(ngModel)]="explorerService.rootNode.updateDate" displayFormat="DD/MM/YYYY" disabled="true"></ion-datetime>
+            </ion-item>
+            <ion-item *ngIf="authorId" class="selectable item-datetime-disabled details_author">
+              <ion-label no-margin class="label_sm">Par </ion-label>
+              <button ion-button item-right clear color="link" (click)="navigateTo(authorId, true, false)">{{authorName}}</button>
+            </ion-item>
+          </ion-item-group>
+        </ion-scroll>
+      </ion-slide>
+      <ion-slide>
+        <div id="graph_links">
+          <button large ion-button (click)="navigateTo(explorerService.previousNode(), false, false)" [disabled]="prevDisabled" icon-only clear>
+            <ion-icon name="hexa-left" color="link"></ion-icon>
+          </button>
+          <button large ion-button (click)="navigateTo(explorerService.nextNode(), false, false)" [disabled]="nextDisabled" icon-only clear>
+            <ion-icon name="hexa-right" color="link"></ion-icon>
+          </button>
+        </div>
         <graph (showDetails)="displayDetails()" (rootChange)="rootNodeChange($event)" [width]="graphWidth" [height]="graphHeight"></graph>
       </ion-slide>
       <ion-slide>
-        <pack (showDetails)="displayDetails()" (rootChange)="rootNodeChange($event)" [width]="graphWidth" [height]="graphHeight"></pack>
+        <ion-scroll *ngIf="!loading" scrollY="true">
+          <ion-item-group id="inclusions" class="scroll_view {{explorerService.rootNode.category}}"
+                          *ngIf="explorerService.rootNode && explorerService.rootNode.children">
+            <ion-item-divider color="{{explorerService.rootNode.category}}" class="view_header" text-wrap sticky>
+              <ion-icon *ngIf="explorerService.rootNode.scope == 'private'" name="lock" item-end></ion-icon>
+              <button ion-button (click)="shareSeed()" icon-only clear large item-end>
+                <ion-icon name="hexa-share"></ion-icon>
+              </button>
+              <ion-avatar item-start *ngIf="explorerService.rootNode.picture() || explorerService.rootNode.category != 'concept'">
+                <img *ngIf="explorerService.rootNode.picture()" src="{{explorerService.rootNode.pictureData()}}"/>
+                <div *ngIf="!explorerService.rootNode.picture()" text-center>
+                  <i class="ion-md-custom-{{explorerService.rootNode.category}}"></i>
+                </div>
+              </ion-avatar>
+              <h2 text-left>{{explorerService.rootNode.label}}</h2>
+              <!--<p text-left ion-text [color]="explorerService.rootNode.category == 'concept' ? 'text_main' : 'lighter'">{{explorerService.rootNode.description}}</p>-->
+            </ion-item-divider>
+            <ion-item *ngFor="let node of explorerService.rootNode.children" (click)="navigateTo(node.id, false, false)" text-wrap>
+              <ion-icon *ngIf="node.scope == 'private'" name="lock" class="item_lock"></ion-icon>
+              <ion-avatar item-left class="bg_seed {{node.category}}">
+                <img *ngIf="node.picture()" src="{{node.pictureData()}}"/>
+                <div *ngIf="!node.picture()" text-center><i class="ion-md-custom-{{node.category}}"></i></div>
+              </ion-avatar>
+              <h2>{{node.label}}</h2>
+              <p text-nowrap>{{node.description}}</p>
+              <button ion-button large clear item-right color="link"><ion-icon name="arrow-forward"></ion-icon></button>
+            </ion-item>
+            <ion-item *ngIf="explorerService.rootNode.children.length == 0" text-center>
+              <p>Aucune graine incluse.</p>
+            </ion-item>
+          </ion-item-group>
+        </ion-scroll>
       </ion-slide>
     </ion-slides>
-    <div id="graph_bg">
+  </div>
+  <div id="wheel_wrapper">
+    <div>
       <img src="assets/img/flowers-left.png"/>
       <img src="assets/img/flowers-right.png"/>
+      <apiwheel (viewChange)="updateView($event)"></apiwheel>
     </div>
   </div>
-
 </ion-content>

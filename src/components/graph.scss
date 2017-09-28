@@ -44,3 +44,7 @@ graph use.icon.idea {
 .connection circle {
   fill: map_get($colors, dark);
 }
+
+g.node {
+  pointer-events: all;
+}

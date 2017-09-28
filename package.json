@@ -13,8 +13,8 @@
         "test-ci": "karma start ./test-config/karma.conf.js --single-run"
     },
     "config": {
-        "ionic_output_js_file_name": "main.js",
-        "ionic_output_css_file_name": "main.css"
+        "ionic_output_js_file_name": "main-135.js",
+        "ionic_output_css_file_name": "main-135.css"
     },
     "dependencies": {
         "@angular/common": "4.1.3",

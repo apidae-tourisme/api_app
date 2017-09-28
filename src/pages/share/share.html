@@ -1,11 +1,11 @@
 <ion-header id="seed_header">
   <ion-navbar color="lighter" hideBackButton="true">
-    <ion-title>Partager la graine</ion-title>
-    <ion-buttons right>
+    <ion-buttons left>
       <button ion-button (click)="closeShare()" icon-only clear>
-        <ion-icon name="hexa-close" color="link"></ion-icon>
+        <ion-icon name="hexa-left" color="link"></ion-icon>
       </button>
     </ion-buttons>
+    <ion-title>Partager la graine</ion-title>
   </ion-navbar>
 </ion-header>
 
@@ -15,21 +15,21 @@
       <ion-label stacked>Lien direct</ion-label>
       <ion-input type="text" [ngModel]="directLink"></ion-input>
       <a ion-button clear item-right icon-only [href]="directLink" target="_blank" color="link" large>
-        <ion-icon name="open"></ion-icon>
+        <ion-icon class="hexa-link"></ion-icon>
       </a>
     </ion-item>
     <ion-item>
       <ion-label stacked>Liste des graines incluses (ordre alphabétique)</ion-label>
       <ion-input type="text" [ngModel]="widgetUrl('alpha')"></ion-input>
       <a ion-button clear item-right icon-only [href]="widgetUrl('alpha')" target="_blank" color="link" large>
-        <ion-icon name="open"></ion-icon>
+        <ion-icon class="hexa-link"></ion-icon>
       </a>
     </ion-item>
     <ion-item>
       <ion-label stacked>Liste des graines incluses (ordre chronologique)</ion-label>
       <ion-input type="text" [ngModel]="widgetUrl('chrono')"></ion-input>
       <a ion-button clear item-right icon-only [href]="widgetUrl('chrono')" target="_blank" color="link" large>
-        <ion-icon name="open"></ion-icon>
+        <ion-icon class="hexa-link"></ion-icon>
       </a>
     </ion-item>
   </ion-list>

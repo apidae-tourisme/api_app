@@ -182,7 +182,8 @@ export class FormPage {
     avatarModal.onDidDismiss(data => {
       if(data && data.data) {
         this.node.attachment = {};
-        this.node.attachment[data.name] = {content_type: data.type, data: data.data};
+        let attName = 'attachment.' + data.name.split('.').pop();
+        this.node.attachment[attName] = {content_type: data.type, data: data.data};
       }
     });
     avatarModal.present();

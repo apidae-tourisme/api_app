@@ -6,7 +6,6 @@ import {FormPage} from "../form/form";
 import {DataService} from "../../providers/data.service";
 import {Keyboard} from "@ionic-native/keyboard";
 import {Seeds} from "../../providers/seeds";
-import {ExplorerPage} from "../explorer/explorer";
 
 @IonicPage({
   segment: 'recherche'

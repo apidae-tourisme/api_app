@@ -42,7 +42,7 @@
 }
 
 .ion-md-custom-concept:before {
-  content: "\00a0 ";
+  content: "\00a0";
   padding: 0 9px;
 }
 .ion-md-custom-competence:before {
@@ -139,6 +139,30 @@
 .ion-md-hexa-cancel:before {
   content: "\e909";
 }
+.ion-md-hexa-my-seeds:before {
+  content: "\e90a";
+}
+.ion-md-hexa-graph:before {
+  content: "\e90b";
+}
+.ion-md-hexa-history:before {
+  content: "\e90c";
+}
+.ion-md-hexa-link:before {
+   content: "\e90d";
+}
+.ion-md-hexa-list:before {
+  content: "\e90e";
+}
+.ion-md-hexa-pen:before {
+  content: "\e90f";
+}
+.ion-md-hexa-share:before {
+  content: "\e910";
+}
+.ion-md-hexa-star:before {
+  content: "\e912";
+}
 
 .bg_seed {
   background-repeat: no-repeat;
@@ -207,6 +231,22 @@ ion-buttons button.bg_seed.concept {
 .bg_seed.competence i[class^="ion-md-custom-"],
 .bg_seed.action i[class^="ion-md-custom-"],
 .bg_seed.idea i[class^="ion-md-custom-"] {
+  color: map_get($colors, text_alt)
+}
+
+.view_header ion-icon[name^="hexa-"],
+.view_header h2 {
+  color: white;
+}
+
+ion-item-group.concept ion-icon[name^="hexa-"],
+ion-item-group.concept h2,
+ion-item-group.competence ion-icon[name^="hexa-"],
+ion-item-group.competence h2,
+ion-item-group.action ion-icon[name^="hexa-"],
+ion-item-group.action h2,
+ion-item-group.idea ion-icon[name^="hexa-"],
+ion-item-group.idea h2 {
   color: map_get($colors, text_alt)
 }
 
@@ -572,7 +612,8 @@ ion-header .toolbar_header button.close_toolbar .button-inner > ion-icon.item_lo
   pointer-events: none;
 }
 
-ion-list ion-item ion-avatar {
+ion-list ion-item ion-avatar,
+ion-item-group ion-item ion-avatar {
   width: 56px;
   height: 56px;
   padding: 8px;
@@ -624,18 +665,4 @@ ion-toolbar .header_title p:last-child {
   color: map-get($colors, text_alt);
   font-size: 1.1rem;
   line-height: 1em;
-}
-
-#prev_node {
-  position: absolute;
-  top: 14px;
-  left: 11px;
-  margin: 0;
-  z-index: 100;
-  width: 56px;
-  height: 56px;
-}
-
-button.prev_link ion-icon {
-  font-size: 30px;
 }

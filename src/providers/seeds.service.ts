@@ -26,14 +26,14 @@ export class SeedsService {
   private isSafari: boolean;
 
   private static readonly CHARMAP = {
-    'à': 'a', 'á': 'a', 'â': 'a', 'ä': 'a', 'æ': 'ae', 'ç': 'c', 'è': 'e', 'é': 'e', 'ê': 'e', 'ë': 'e',
+    'à': 'a', 'á': 'a', 'â': 'a', 'ä': 'a', 'æ': 'ae', 'œ': 'oe', 'ç': 'c', 'è': 'e', 'é': 'e', 'ê': 'e', 'ë': 'e',
     'î': 'i', 'ï': 'i', 'ô': 'o', 'ö': 'o', 'ù': 'u', 'û': 'u', 'ü': 'u', '-': ' ', '_': ' ', '!': ' ', '?': ' ',
     '.': ' ', ',': ' ', ':': ' ', ';': ' ', '/': ' ', '"': ' ', '(': ' ', ')': ' ', '\'': ' ', '`': ' '
   };
 
   private static readonly CHARMAP_REGEX = /[àáâäæçèéêëîïôöùûü\-_!?.,:;/"()'`]/g;
 
-  private static readonly STOPWORDS = 'aie aient aies ait aura aurai auraient aurais aurait auras aurez auriez aurions aurons auront aux avaient avais avait avec avez aviez avions avons ayant ayez ayons ceci cela ces cet cette dans des elle est eue eues eurent eus eusse eussent eusses eussiez eussions eut eux eumes eut etes furent fus fusse fussent fusses fussiez fussions fut fumes fut futes ici ils les leur leurs lui mais mes moi mon meme nos notre nous ont par pas pour que quel quelle quelles quels qui sans sera serai seraient serais serait seras serez seriez serions serons seront ses soi soient sois soit sommes son sont soyez soyons suis sur tes toi ton une vos votre vous etaient etais etait etant etiez etions ete etee etees etes etes'.split(' ');
+  private static readonly STOPWORDS = 'aux avec bis ceci cela ces cet cette ceux dans des elle elles est eux etes for ici ils les leur leurs lui mais mes mis moi mon meme nos notre nous oeuvre ont par pas plus pour que quel quelle quelles quels qui sans ses soi sommes son sont suis sur surtout tes the toi ton une vers via vos votre vous'.split(' ');
 
   constructor(private http: ProgressHttp, private evt: Events, private platform: Platform,
               private authService: AuthService) {
@@ -126,7 +126,8 @@ export class SeedsService {
 
   userSeedsUrl() {
     return ApiAppConfig.DB_URL + '/' + ApiAppConfig.REMOTE_DB + '/' + SeedsService.USER_SEEDS_VIEW +
-      '?keys=[%22apidae%22,%22public%22,%22' + this.authService.userEmail + '%22]&include_docs=true&attachments=true'
+      '?keys=[%22' + Seeds.SCOPE_APIDAE + '%22,%22' + Seeds.SCOPE_PUBLIC + '%22,%22' + this.authService.userEmail +
+      '%22]&include_docs=true&attachments=true'
   }
 
   initReplication(lastSeq?) {
@@ -183,7 +184,28 @@ export class SeedsService {
         _id: SeedsService.SEARCH_DOC,
         views: {
           all_fields: {
-            map: "function (doc) {\n  var charmap = {'à': 'a', 'á': 'a', 'â': 'a', 'ä': 'a', 'æ': 'ae', 'ç': 'c', 'è': 'e', 'é': 'e', 'ê': 'e', 'ë': 'e', 'î': 'i', 'ï': 'i', 'ô': 'o', 'ö': 'o', 'ù': 'u', 'û': 'u', 'ü': 'u', '-': ' ', '_': ' ', '!': ' ', '?': ' ', '.': ' ', ',': ' ', ':': ' ', ';': ' ', '/': ' ', '\"': ' ', '(': ' ', ')': ' ', '\\'': ' ', '`': ' '};\n  var escapedChars = /[àáâäæçèéêëîïôöùûü\\-_!?.,:;/\"()'`]/g;\n  var stopWords = 'aie aient aies ait aura aurai auraient aurais aurait auras aurez auriez aurions aurons auront aux avaient avais avait avec avez aviez avions avons ayant ayez ayons ceci cela ces cet cette dans des elle est eue eues eurent eus eusse eussent eusses eussiez eussions eut eux eumes eut etes furent fus fusse fussent fusses fussiez fussions fut fumes fut futes ici ils les leur leurs lui mais mes moi mon meme nos notre nous ont par pas pour que quel quelle quelles quels qui sans sera serai seraient serais serait seras serez seriez serions serons seront ses soi soient sois soit sommes son sont soyez soyons suis sur tes toi ton une vos votre vous etaient etais etait etant etiez etions ete etee etees etes etes'.split(' ');\n  \n  var nameTokens = doc.name.toLowerCase().replace(escapedChars, function(char) {return charmap[char];}).split(/\\s+/);\n  for(var i in nameTokens) {\n    if(nameTokens[i].length > 2 && stopWords.indexOf(nameTokens[i] === -1)) {\n      emit(nameTokens[i], null);\n    }\n  }\n  if(doc.description) {\n    var descTokens = doc.description.toLowerCase().replace(escapedChars, function(char) {return charmap[char];}).split(/\\s+/);\n    for(var k in descTokens) {\n      if(descTokens[k].length > 2 && stopWords.indexOf(descTokens[k] === -1)) {\n        emit(descTokens[k], null);\n      }\n    }  \n  }\n  if(doc.address) {\n    var addrTokens = doc.address.toLowerCase().replace(escapedChars, function(char) {return charmap[char];}).split(/\\s+/);\n    for(var j in addrTokens) {\n      if(addrTokens[j].length > 2 && stopWords.indexOf(addrTokens[j] === -1)) {\n        emit(addrTokens[j], null);\n      }\n    }  \n  }\n}"
+            map: "function (doc) {\n" +
+            "  var charmap = {'à': 'a', 'á': 'a', 'â': 'a', 'ä': 'a', 'æ': 'ae', 'œ': 'oe', 'ç': 'c', 'è': 'e', 'é': 'e', 'ê': 'e', 'ë': 'e', 'î': 'i', 'ï': 'i', 'ô': 'o', 'ö': 'o', 'ù': 'u', 'û': 'u', 'ü': 'u', '-': ' ', '_': ' ', '!': ' ', '?': ' ', '.': ' ', ',': ' ', ':': ' ', ';': ' ', '/': ' ', '\"': ' ', '(': ' ', ')': ' ', '\\'': ' ', '`': ' '};\n" +
+            "  var escapedChars = /[àáâäæçèéêëîïôöùûü\\-_!?.,:;/\"()'`]/g;\n" +
+            "  var stopWords = 'aux avec bis ceci cela ces cet cette ceux dans des elle elles est eux etes for ici ils les leur leurs lui mais mes mis moi mon meme nos notre nous oeuvre ont par pas plus pour que quel quelle quelles quels qui sans ses soi sommes son sont suis sur surtout tes the toi ton une vers via vos votre vous'.split(' ');\n" +
+            "  \n" +
+            "  var nameTokens = doc.name.toLowerCase().replace(escapedChars, function(char) {return charmap[char];}).split(/\\s+/).filter(function(t) {return t.length > 2 && stopWords.indexOf(t) === -1;});\n" +
+            "  var descTokens = doc.description ? doc.description.toLowerCase().replace(escapedChars, function(char) {return charmap[char];}).split(/\\s+/).filter(function(t) { return t.length > 2 && stopWords.indexOf(t) === -1;}) : [];\n" +
+            "  var addrTokens = doc.address ? doc.address.toLowerCase().replace(escapedChars, function(char) {return charmap[char];}).split(/\\s+/).filter(function(t) {return t.length > 2 && stopWords.indexOf(t) === -1;}) : [];\n" +
+            "  var allTokens = nameTokens.concat(descTokens).concat(addrTokens).join(';');\n" +
+            "  \n" +
+            "  for(var i in nameTokens) {\n" +
+            "    emit(nameTokens[i], allTokens);\n" +
+            "  }\n" +
+            "  \n" +
+            "  for(var k in descTokens) {\n" +
+            "    emit(descTokens[k], allTokens);\n" +
+            "  }  \n" +
+            "    \n" +
+            "  for(var j in addrTokens) {\n" +
+            "    emit(addrTokens[j], allTokens);\n" +
+            "  }  \n" +
+            "}"
           }
         }
       };
@@ -233,15 +255,20 @@ export class SeedsService {
       return this.searchTerm(term);
     })).then((allResults) => {
       console.timeEnd('search-query');
+      console.time('search-filter');
+      let matches = deDup(allResults.map((r) => r['results']).reduce((a, b) => a.concat(b), []));
+      results = matches
+        .filter((result) => {
+          return tokens.every((t) => result.value.indexOf(t) !== -1)
+        })
+        .map((result) => result.id);
+      console.timeEnd('search-filter');
       console.time('search-results');
-      allResults.forEach((res) => {
-        let otherTerms = tokens.filter((t) => {return t !== res['term'];});
-        results = results.concat(res['results'].filter((result) => {
-            return (scope == Seeds.SCOPE_ALL || result.scope == scope) && this.matchTerms(result, otherTerms);
-          }));
-      });
+      return this.localDatabase.allDocs({keys: results, include_docs: true, attachments: true});
+    }).then((queryResults) => {
       console.timeEnd('search-results');
-      return deDup(results);
+      return queryResults.rows.map((row) => {return row.doc;})
+        .filter((doc) => {return (scope == Seeds.SCOPE_ALL || doc.scope == scope);});
     }).catch(function (err) {
       console.log('search error : ' + JSON.stringify(err));
     });
@@ -249,33 +276,21 @@ export class SeedsService {
     function deDup(arr) {
       let arrObject = {};
       for(let i = 0; i < arr.length; i++) {
-        arrObject[arr[i]._id] = arr[i];
+        arrObject[arr[i].id] = arr[i];
       }
       return Object.keys(arrObject).map((k) => {return arrObject[k];});
     }
-  }
-
-  matchTerms(doc, terms) {
-    let match = true;
-    if(terms.length > 0) {
-      terms.forEach((t) => {
-        match = match && (this.normalize(doc.name).indexOf(t) !== -1 || this.normalize(doc.description).indexOf(t) !== -1 || this.normalize(doc.address).indexOf(t) !== -1);
-      });
-    }
-    return match;
   }
 
   searchTerm(term) {
     return this.localDatabase.query(SeedsService.SEARCH_PATH, {
       startkey     : term,
       endkey       : term + '\uffff',
-      limit        : 50,
-      include_docs : true,
-      attachments: true
+      limit        : 50
     }).then((results) => {
       return {
         term: term,
-        results: results.rows.filter((row) => { return row.doc && row.doc._id; }).map((row) => { return row.doc; })
+        results: results.rows
       };
     }).catch(function (err) {
       console.log('search error for term ' + term + ' : ' + JSON.stringify(err));

@@ -1,5 +1,8 @@
 export class ComponentUtils {
 
+  public static readonly SEED = "M70,56.19V22.77a6.06,6.06,0,0,0-3-5.24L38,.82A6,6,0,0,0,32,.82L3,17.53a6.06,6.06,0,0,0-3,5.24V56.21a6.06,6.06,0,0,0,3,5.24L32,78.16a6,6,0,0,0,6.06,0L67,61.46A6.14,6.14,0,0,0,70,56.19Z";
+  public static readonly HEXAGON = "M34.64101615137754 0L69.28203230275508 20L69.28203230275508 60L34.64101615137754 80L0 60L0 20Z";
+
   public static defineCommonPaths(defs): void {
     defs.append("font-face")
       .attr("font-family", "Ionicons")
@@ -8,7 +11,7 @@ export class ComponentUtils {
       .attr("xlink:href", "assets/fonts/ionicons.svg#Ionicons");
 
     // seed hexagonal shape
-    defs.append("path").attr("id", "seed").attr("d", "M70,56.19V22.77a6.06,6.06,0,0,0-3-5.24L38,.82A6,6,0,0,0,32,.82L3,17.53a6.06,6.06,0,0,0-3,5.24V56.21a6.06,6.06,0,0,0,3,5.24L32,78.16a6,6,0,0,0,6.06,0L67,61.46A6.14,6.14,0,0,0,70,56.19Z");
+    defs.append("path").attr("id", "seed").attr("d", ComponentUtils.SEED);
 
     // icons
     let actionIcon = defs.append("symbol").attr("id", "action").attr("viewBox", "0 0 30 30");

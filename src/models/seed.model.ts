@@ -73,6 +73,10 @@ export class Seed {
     this.removedConnections = [];
   }
 
+  public linksCount() {
+    return this.connections.length + this.inclusions.length + this.urls.length;
+  }
+
   public picture() {
     return this.attachment && Object.keys(this.attachment)[0];
   }

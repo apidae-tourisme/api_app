@@ -35,7 +35,7 @@ import {RemoteDataService} from "../providers/remote.service";
         autoFocusAssist: false,
         mode: 'md',
         // Web only
-        // locationStrategy: 'path'
+        locationStrategy: 'path'
       }
     ),
     IonicStorageModule.forRoot()

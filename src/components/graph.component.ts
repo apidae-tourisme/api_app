@@ -92,12 +92,12 @@ export class GraphComponent {
           return d.source.y;
         })
         .attr("x2", that.width / 2)
-        .attr("y2", that.height / 2);
+        .attr("y2", (that.height - layout.unitY)/ 2);
 
       that.node.attr("transform", function (d) {
           let scale = d.isRoot ? layout.rootScaleX : 1;
           let tx = (d.isRoot ? that.width / 2 : d.x)  - layout.unitX * scale / 2;
-          let ty = (d.isRoot ? that.height / 2 : d.y)  - layout.unitY * scale / 2;
+          let ty = (d.isRoot ? (that.height - layout.unitY / 2) / 2 : d.y)  - layout.unitY * scale / 2;
           return "translate(" + tx + "," + ty + ") scale(" + scale + ")";
         });
     }
@@ -153,23 +153,6 @@ export class GraphComponent {
           return d.scope == 'private' ? '\uf31d' : ''
         });
 
-      let connections = nodesEnter.append("g")
-        .attr("class", "connection");
-
-      connections.append("circle")
-        .attr("r", 7)
-        .attr("cx", 0)
-        .attr("cy", -3);
-
-      connections.append("text")
-        .attr("font-size", 8)
-        .attr("text-anchor", "middle")
-        .attr("textLength", "8")
-        .attr("lengthAdjust", "spacing")
-        .text(function (d) {
-          return d.connections.length;
-        });
-
       nodesEnter.append("text")
         .attr("text-anchor", "middle")
         .attr("x", function (d) {
@@ -200,13 +183,17 @@ export class GraphComponent {
       wrapLabels(allLabels);
 
       that.nodesContainer.selectAll("g").on("click", changeRootNode);
+      that.nodesContainer.selectAll("g").call(d3.drag()
+        .on("start", dragstarted)
+        .on("drag", dragged)
+        .on("end", dragended));
 
-      that.simulation.force("center", d3.forceCenter(that.width / 2, that.height / 2));
+      that.simulation.force("center", d3.forceCenter(that.width / 2, (that.height - layout.unitY / 2) / 2));
       that.simulation.alpha(1).restart();
 
       // Fix svg display issue on FF when using <base> tag (see https://gist.github.com/leonderijke/c5cf7c5b2e424c0061d2)
       // Web only
-      // prependBaseUrl();
+      prependBaseUrl();
     }, 350);
 
     function changeRootNode() {
@@ -214,7 +201,7 @@ export class GraphComponent {
 
       let clickedNode = d3.select(this).datum();
       if(clickedNode.isRoot) {
-        that.showDetails.emit();
+        // that.showDetails.emit();
       } else {
         that.rootChange.emit({newRoot: clickedNode.id});
         that.nodesContainer.selectAll("g.node").filter(function (d) {
@@ -222,9 +209,9 @@ export class GraphComponent {
         }).style("opacity", 0);
         that.linksContainer.selectAll("line").style("opacity", 0);
 
-        d3.select(this).transition().duration(600)
+        d3.select(this).transition('graph').duration(600)
           .attr("transform", "translate(" + (that.width / 2 - (layout.unitX * layout.rootScaleX / 2)) + ","
-            + (that.height / 2 - (layout.unitY * layout.rootScaleY / 2)) + ") scale(" + layout.rootScaleX + "," + layout.rootScaleY + ")");
+            + ((that.height - layout.unitY / 2) / 2 - (layout.unitY * layout.rootScaleY / 2)) + ") scale(" + layout.rootScaleX + "," + layout.rootScaleY + ")");
       }
     }
 
@@ -249,6 +236,23 @@ export class GraphComponent {
         .forEach(function (element) {
           element.setAttribute("href", GraphComponent.GRAPH_PATH + element.getAttribute("href"));
         });
+    }
+
+    function dragstarted(d) {
+      if (!d3.event.active) that.simulation.alphaTarget(0.3).restart();
+      d.fx = d.x;
+      d.fy = d.y;
+    }
+
+    function dragged(d) {
+      d.fx = d3.event.x;
+      d.fy = d3.event.y;
+    }
+
+    function dragended(d) {
+      if (!d3.event.active) that.simulation.alphaTarget(0);
+      d.fx = null;
+      d.fy = null;
     }
   }
 }
