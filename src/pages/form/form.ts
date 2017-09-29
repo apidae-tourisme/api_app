@@ -4,13 +4,13 @@ import {Seed} from "../../models/seed.model";
 import {ExplorerService} from "../../providers/explorer.service";
 import {SeedsService} from "../../providers/seeds.service";
 import {SeedType} from "../seed-type/seed-type";
-import {SearchSeeds} from "../search-seeds/search-seeds";
+import {InternalLinksPage} from "../internal-links/internal-links";
 import {EditAvatar} from "../edit-avatar/edit-avatar";
 import {Seeds} from "../../providers/seeds";
 import {AuthService} from "../../providers/auth.service";
 
 @IonicPage({
-  segment: 'edition/:id'
+  segment: 'edition'
 })
 @Component({
   templateUrl: 'form.html'
@@ -158,7 +158,7 @@ export class FormPage {
   }
 
   addSeed(): void {
-    let seedsModal = this.modalCtrl.create('SearchSeeds', {node: this.node});
+    let seedsModal = this.modalCtrl.create('InternalLinksPage', {node: this.node});
     seedsModal.present();
   }
 

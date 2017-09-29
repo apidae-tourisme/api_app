@@ -14,6 +14,7 @@ export class SeedsService {
   private static readonly USERS_INDEX_DOC = "_local/users_by_email";
   private static readonly CURRENT_USER = "_local/current_user";
   private static readonly SEARCH_DOC = "_design/search_local";
+  private static readonly HISTORY_DOC = "_design/history";
   private static readonly SEARCH_PATH = "search_local/all_fields";
   private static readonly USER_SEEDS_FILTER = "seeds/by_user";
   private static readonly USER_SEEDS_VIEW = "_design/scopes/_list/get/seeds";
@@ -157,6 +158,17 @@ export class SeedsService {
     }
   }
 
+  changesFeed(limit) {
+    return this.localDatabase.changes({
+      since: 0,
+      live: false,
+      descending: true,
+      include_docs: true,
+      attachments: true,
+      limit: limit
+    });
+  }
+
   buildEmailIndex() {
     let usersByEmail = {};
     return this.localDatabase.allDocs({include_docs: true}).then((res) => {
@@ -174,6 +186,16 @@ export class SeedsService {
         });
       });
     });
+  }
+
+  buildHistory() {
+    console.log('building history index');
+    let historyDoc = {
+      _id: SeedsService.HISTORY_DOC,
+      views: {
+
+      }
+    }
   }
 
   buildSearchIndex() {
@@ -362,6 +384,24 @@ export class SeedsService {
       } else {
         Promise.resolve(null);
       }
+    }).catch((err) => {
+      console.log("getUserSeed error : " + JSON.stringify(err));
+    });
+  }
+
+  getUserSeeds(emails) {
+    let usersByEmail = {};
+    return this.localDatabase.get(SeedsService.USERS_INDEX_DOC).then((doc) => {
+      let usersIds = emails.map((email) => doc.index[email]);
+      return this.localDatabase.allDocs({
+        keys: usersIds,
+        include_docs: true
+      });
+    }).then((results) => {
+      results.rows.map((row) => row.doc).forEach((doc) => {
+        usersByEmail[doc.email] = {id: doc._id, name: doc.name};
+      });
+      return usersByEmail;
     }).catch((err) => {
       console.log("getUserSeed error : " + JSON.stringify(err));
     });

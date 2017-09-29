@@ -26,7 +26,8 @@
                 (ionSlideTap)="slidesTapped($event)" [initialSlide]="1">
       <ion-slide>
         <ion-scroll *ngIf="!loading" scrollY="true">
-          <ion-item-group id="list_details" class="scroll_view" *ngIf="explorerService.rootNode && explorerService.rootNode.children" no-lines>
+          <ion-item-group id="list_details" class="scroll_view {{explorerService.rootNode.category}}"
+                          *ngIf="explorerService.rootNode && explorerService.rootNode.children" no-lines>
             <ion-item-divider color="{{explorerService.rootNode.category}}" text-wrap sticky class="view_header">
               <ion-icon *ngIf="explorerService.rootNode.scope == 'private'" name="lock" item-end></ion-icon>
               <button ion-button (click)="editSeed()" icon-only clear large item-end>
@@ -119,9 +120,8 @@
                 </div>
               </ion-avatar>
               <h2 text-left>{{explorerService.rootNode.label}}</h2>
-              <!--<p text-left ion-text [color]="explorerService.rootNode.category == 'concept' ? 'text_main' : 'lighter'">{{explorerService.rootNode.description}}</p>-->
             </ion-item-divider>
-            <ion-item *ngFor="let node of explorerService.rootNode.children" (click)="navigateTo(node.id, false, false)" text-wrap>
+            <button ion-item *ngFor="let node of explorerService.rootNode.children" (click)="navigateTo(node.id, false, false)" text-wrap>
               <ion-icon *ngIf="node.scope == 'private'" name="lock" class="item_lock"></ion-icon>
               <ion-avatar item-left class="bg_seed {{node.category}}">
                 <img *ngIf="node.picture()" src="{{node.pictureData()}}"/>
@@ -129,8 +129,7 @@
               </ion-avatar>
               <h2>{{node.label}}</h2>
               <p text-nowrap>{{node.description}}</p>
-              <button ion-button large clear item-right color="link"><ion-icon name="arrow-forward"></ion-icon></button>
-            </ion-item>
+            </button>
             <ion-item *ngIf="explorerService.rootNode.children.length == 0" text-center>
               <p>Aucune graine incluse.</p>
             </ion-item>

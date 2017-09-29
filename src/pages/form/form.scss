@@ -55,6 +55,27 @@
   color: $label-md-text-color;
 }
 
+.counter ion-icon {
+  position: relative;
+  padding-right: 8px;
+  font-size: 3.4rem;
+}
+
+.counter ion-icon > span {
+  font-family: "Roboto", "Helvetica Neue", sans-serif;
+  font-size: 1rem;
+  padding: 4px;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  display: block;
+  min-width: 18px;
+  text-align: center;
+  background-color: map_get($colors, primary);
+  color: map_get($colors, lighter);
+  border-radius: 50%;
+}
+
 #seed_types div.bg_seed {
   min-height: 15vh;
   padding-top: 12px;
@@ -86,6 +107,12 @@
   max-width: 2.4em;
   margin-top: 5px;
   margin-bottom: 5px;
+}
+
+#seed_form .button[icon-only][large],
+#internal_links .button[icon-only][large] {
+  height: 2.4em;
+  width: 2.4em;
 }
 
 #seed_form ion-datetime.hidden {
@@ -143,16 +170,4 @@ input.cordova-camera-select {
 #form_lists ion-segment-button:last-child {
   border-color: map_get($colors, bulb);
   color: map_get($colors, bulb);
-}
-
-#select_results ion-item button {
-  font-size: 1.5rem;
-}
-
-#select_results ion-item ion-label h2 {
-  font-size: 1.4rem;
-}
-
-#select_results ion-item ion-label p {
-  font-size: 1.2rem;
 }

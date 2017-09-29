@@ -239,6 +239,11 @@ ion-buttons button.bg_seed.concept {
   color: white;
 }
 
+.view_header ion-icon[name^="hexa-"] {
+  padding: 0.1em;
+  font-size: 2.5em;
+}
+
 ion-item-group.concept ion-icon[name^="hexa-"],
 ion-item-group.concept h2,
 ion-item-group.competence ion-icon[name^="hexa-"],
@@ -351,6 +356,7 @@ ion-searchbar.searchbar-md .searchbar-search-icon {
 
 #search_filters span {
   text-transform: initial;
+  font-size: 1.1em;
 }
 
 #search_filters.toolbar .segment-md .segment-button:first-child span {
@@ -517,6 +523,12 @@ ion-header ion-navbar ion-buttons button .button-inner {
   height: 48px;
 }
 
+button.bar-button-md[icon-only] ion-icon[name^='hexa-'],
+#seed_form button.button-md[icon-only] ion-icon[name^='hexa-'] {
+  padding: 0;
+  font-size: 40px;
+}
+
 ion-header .toolbar_header .toolbar-title {
   white-space: inherit;
   font-size: 1.4rem;
@@ -613,13 +625,16 @@ ion-header .toolbar_header button.close_toolbar .button-inner > ion-icon.item_lo
 }
 
 ion-list ion-item ion-avatar,
-ion-item-group ion-item ion-avatar {
+ion-list button[ion-item] ion-avatar,
+ion-item-group ion-item ion-avatar,
+ion-item-group button[ion-item] ion-avatar {
   width: 56px;
   height: 56px;
-  padding: 8px;
+  padding: 6px;
 }
 
-ion-list ion-avatar.bg_seed i[class^="ion-md-custom-"] {
+ion-list ion-avatar.bg_seed i[class^="ion-md-custom-"],
+ion-item-group ion-avatar.bg_seed i[class^="ion-md-custom-"] {
   line-height: 40px;
   font-size: 3rem;
 }

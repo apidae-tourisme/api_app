@@ -5,14 +5,22 @@ import {ExplorerService} from "../../providers/explorer.service";
 import {Seeds} from "../../providers/seeds";
 import {Keyboard} from "@ionic-native/keyboard";
 import {Seed} from "../../models/seed.model";
+import {animate, state, style, transition, trigger} from "@angular/animations";
 
 @IonicPage({
-  segment: 'selectionner'
+  segment: 'graines'
 })
 @Component({
-  templateUrl: 'search-seeds.html'
+  templateUrl: 'internal-links.html',
+  animations: [
+    trigger('fadeInOut', [
+      state('void', style({ opacity: '0' })),
+      state('*', style({ opacity: '1' })),
+      transition('void <=> *', animate('500ms ease-out'))
+    ])
+  ]
 })
-export class SearchSeeds {
+export class InternalLinksPage {
   @ViewChild(Content) content: Content;
   @ViewChild(Searchbar) searchbar: Searchbar;
 

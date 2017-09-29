@@ -20,6 +20,7 @@ import {SplashScreen} from "@ionic-native/splash-screen";
 import {SeedsService} from "../providers/seeds.service";
 import {ProgressHttpModule} from "angular-progress-http";
 import {RemoteDataService} from "../providers/remote.service";
+import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 
 @NgModule({
   declarations: [
@@ -29,6 +30,7 @@ import {RemoteDataService} from "../providers/remote.service";
     BrowserModule,
     HttpModule,
     ProgressHttpModule,
+    BrowserAnimationsModule,
     IonicModule.forRoot(ApiApp,
       {
         scrollAssist: false,

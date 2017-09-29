@@ -93,6 +93,16 @@ export class Seed {
     return realType.charAt(0).toLowerCase() + realType.substring(1);
   }
 
+  public linkedSeeds() {
+    let allSeeds = this.connectedSeeds.concat(this.includedSeeds);
+    let seedsObj = {};
+    for(let i = 0; i < allSeeds.length; i++) {
+      seedsObj[allSeeds[i].id] = allSeeds[i];
+    }
+    return Object.keys(seedsObj).map((k) => {return seedsObj[k];})
+      .sort((a, b) => {return a.label > b.label ? 1 : -1;});
+  }
+
   public noIcon() {
     return !this.picture() && this.category == 'concept';
   }

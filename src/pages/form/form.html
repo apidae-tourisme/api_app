@@ -2,13 +2,13 @@
   <ion-navbar color="lighter" hideBackButton="true">
     <ion-buttons left>
       <button ion-button icon-only color="link" (click)="closeForm()" large>
-        <ion-icon name="arrow-back" large></ion-icon>
+        <ion-icon name="hexa-left" color="link"></ion-icon>
       </button>
     </ion-buttons>
     <ion-title text-center>{{node.id ? 'Modifier la ' : 'Créer une '}}graine</ion-title>
     <ion-buttons right>
       <button ion-button icon-only color="link" (click)="submitForm()" large [disabled]="disabled">
-        <ion-icon name="checkmark-circle-outline" large></ion-icon>
+        <ion-icon name="hexa-validate" color="link"></ion-icon>
       </button>
     </ion-buttons>
   </ion-navbar>
@@ -16,7 +16,7 @@
 
 <ion-content id="seed_form">
   <ion-list>
-    <button ion-item large (click)="seedTypes()">
+    <button ion-item large (click)="seedTypes()" detail-none>
       <ion-label>Type</ion-label>
       <h2 item-right text-right>{{node.typeInfo().label}}<br/><span ion-text class="synonyms" color="text_alt">{{node.typeInfo().synonyms.join(', ')}}</span></h2>
       <ion-avatar item-right class="bg_seed {{node.category}}">
@@ -76,49 +76,29 @@
       <ion-label fixed>Adresse</ion-label>
       <ion-input type="text" [(ngModel)]="node.address"></ion-input>
     </ion-item>
-    <button ion-item (click)="addUrl()" class="label_only" no-lines>
-      <ion-label>Tél., email, réseaux sociaux, lien web...</ion-label>
-      <button ion-button icon-only item-right large clear color="link">
-        <ion-icon name="add-circle"></ion-icon>
-      </button>
+    <button ion-item (click)="addUrl()" class="label_only counter" no-lines detail-none text-wrap>
+      <h2>Liens externes</h2>
+      <p>(tél., email, réseaux sociaux, lien web...)</p>
+      <ion-icon color="link" name="ios-link" item-end><span>{{node.urls.length}}</span></ion-icon>
     </button>
     <ion-item *ngFor="let url of node.urls; let i = index" no-lines>
       <ion-input type="text" [(ngModel)]="url.value" placeholder="Tél., email, liens..."></ion-input>
       <button ion-button item-right large clear icon-only color="danger" (click)="node.urls.splice(i, 1)"><ion-icon name="close"></ion-icon></button>
     </ion-item>
-    <button ion-item class="label_only" border-top (click)="addSeed()">
-      <ion-label>Ajouter des graines</ion-label>
-      <button ion-button icon-only item-right large clear color="link">
-        <ion-icon name="add-circle"></ion-icon>
-      </button>
+    <button ion-item class="label_only counter" border-top (click)="addSeed()" detail-none text-wrap>
+      <h2>Liens entre graines</h2>
+      <p>connexions et inclusions</p>
+      <ion-icon color="link" name="custom-graph" item-end><span>{{node.connectedSeeds.length}}</span></ion-icon>
+      <ion-icon color="link" name="custom-list" item-end><span>{{node.includedSeeds.length}}</span></ion-icon>
     </button>
-    <ion-segment id="form_lists" [(ngModel)]="activeList" color="dark" margin-bottom>
-      <ion-segment-button value="connections">
-        Graines connectées
-      </ion-segment-button>
-      <ion-segment-button value="inclusions">
-        Graines incluses
-      </ion-segment-button>
-    </ion-segment>
-    <ion-item *ngFor="let seed of getActiveList(); let i = index;" no-lines>
-      <ion-icon *ngIf="seed.scope == 'private'" name="lock" class="item_lock"></ion-icon>
-      <ion-avatar item-left class="bg_seed {{seed.category}}">
-        <img *ngIf="seed.picture()" src="{{seed.pictureData()}}"/>
-        <div *ngIf="!seed.picture()" text-center><i class="ion-md-custom-{{seed.category}}"></i></div>
-      </ion-avatar>
-      <h2>{{seed.label}}</h2>
-      <button ion-button item-right large clear icon-only color="danger" (click)="removeSeed(seed)"><ion-icon name="close"></ion-icon></button>
-    </ion-item>
-    <ion-item *ngIf="getActiveList().length == 0" no-lines>
-      <p>Aucune graine {{activeList == 'connections' ? 'connectée' : 'incluse'}}.</p>
-    </ion-item>
-    <ion-item *ngIf="authService.userEmail == node.author || node.scope == 'public' || node.scope == 'apidae'" border-top>
-      <ion-label>Visible par {{scopeLabel()}}</ion-label>
+    <ion-item *ngIf="authService.userEmail == node.author || node.scope == 'public' || node.scope == 'apidae'" border-top text-wrap>
+      <h2>Visibilité</h2>
+      <p>{{scopeLabel()}}</p>
       <button ion-button item-right large color="link" [clear]="node.scope != 'private'" icon-only (click)="toggleScope('private')">
         <ion-icon name="lock"></ion-icon>
       </button>
       <button ion-button item-right large color="link" [clear]="node.scope != 'apidae'" icon-only (click)="toggleScope('apidae')">
-        <ion-icon name="custom-graph"></ion-icon>
+        <ion-icon name="custom-organization"></ion-icon>
       </button>
       <button ion-button item-right large color="link" [clear]="node.scope != 'public' || node.scope" icon-only (click)="toggleScope('public')">
         <ion-icon name="globe"></ion-icon>
