@@ -10,11 +10,9 @@ import {AuthService} from "./auth.service";
 @Injectable()
 export class SeedsService {
 
-  private static readonly DEFAULT_SEED = "eb9e3271-f969-4e37-b2da-5955a003fa96";
   private static readonly USERS_INDEX_DOC = "_local/users_by_email";
   private static readonly CURRENT_USER = "_local/current_user";
   private static readonly SEARCH_DOC = "_design/search_local";
-  private static readonly HISTORY_DOC = "_design/history";
   private static readonly SEARCH_PATH = "search_local/all_fields";
   private static readonly USER_SEEDS_FILTER = "seeds/by_user";
   private static readonly USER_SEEDS_VIEW = "_design/scopes/_list/get/seeds";
@@ -188,16 +186,6 @@ export class SeedsService {
     });
   }
 
-  buildHistory() {
-    console.log('building history index');
-    let historyDoc = {
-      _id: SeedsService.HISTORY_DOC,
-      views: {
-
-      }
-    }
-  }
-
   buildSearchIndex() {
     console.log('building search index');
     if(!this.idxBuilding) {
@@ -245,26 +233,27 @@ export class SeedsService {
     }
   }
 
-  getNodeData(rootNodeId) {
-    let nodeId = rootNodeId || SeedsService.DEFAULT_SEED;
+  getNodeData(nodeId) {
     let nodeData = {count: 0, root: null, connectedSeeds: [], includedSeeds: []};
-    return this.localDatabase.allDocs().then((docs) => {
-      nodeData.count = docs.rows.length;
-    }).then(() => {
-      return this.localDatabase.get(nodeId, {attachments: true});
-    }).then((rootNode) => {
-      nodeData.root = rootNode;
-      // console.log('got root node ' + rootNode._id + ' and connections : ' + rootNode.connections);
+    return this.localDatabase.allDocs({keys: [nodeId], include_docs: true, attachments: true}).then((docs) => {
+      nodeData.count = docs.total_rows;
+      nodeData.root = new Seed(docs.rows[0].doc, true, false);
       return Promise.all([
-        this.localDatabase.allDocs({keys: (rootNode.connections || []), include_docs: true, attachments: true}),
-        this.localDatabase.allDocs({keys: (rootNode.inclusions || []), include_docs: true, attachments: true}),
+        this.localDatabase.allDocs({keys: (nodeData.root.connections || []), include_docs: true, attachments: true}),
+        this.localDatabase.allDocs({keys: (nodeData.root.inclusions || []), include_docs: true, attachments: true}),
       ]).then((nodes) => {
-        nodeData.connectedSeeds = nodes[0].rows.filter((row) => {return row.id && row.doc;}).map((row) => {return row.doc;});
-        nodeData.includedSeeds = nodes[1].rows.filter((row) => {return row.id && row.doc;}).map((row) => {return row.doc;});
+        nodeData.root.connectedSeeds = nodes[0].rows.filter((row) => {return row.id && row.doc;}).map((row) => {return new Seed(row.doc, false, false);});
+        nodeData.root.includedSeeds = nodes[1].rows.filter((row) => {return row.id && row.doc;}).map((row) => {return new Seed(row.doc, false, false);});
         return nodeData;
       });
     }).catch(function (err) {
       console.log('getNodeData err : ' + JSON.stringify(err));
+    });
+  }
+
+  getNodes(nodesIds) {
+    return this.localDatabase.allDocs({keys: nodesIds, include_docs: true, attachments: true}).then((docs) => {
+      return docs.rows.filter((row) => {return row.id && row.doc;}).map((row) => {return new Seed(row.doc, false, false);});
     });
   }
 

@@ -24,9 +24,6 @@ export class ExplorerPage {
   public loading: boolean;
   public graphWidth: number;
   public graphHeight: number;
-  public currentView: string;
-  public prevDisabled: boolean;
-  public nextDisabled: boolean;
   public authorName;
   public authorId;
 
@@ -34,13 +31,10 @@ export class ExplorerPage {
               public authService: AuthService, private navCtrl: NavController, private platform: Platform,
               private alertCtrl: AlertController, private app: App, private iab: InAppBrowser) {
     this.loading = true;
-    this.currentView = 'connections';
-    this.prevDisabled = true;
-    this.nextDisabled = true;
   }
 
   rootNodeChange(event): void {
-    this.navigateTo(event.newRoot, false);
+    this.navigateTo(event.newRoot);
   }
 
   updateView(event): void {
@@ -69,19 +63,27 @@ export class ExplorerPage {
 
     this.registerBack();
     if(!this.explorerService.rootNode) {
-      this.explorerService.navigateTo(null, true, () => this.updateViews());
+      this.explorerService.navigateTo(null, () => this.updateViews());
     } else {
       this.updateViews();
     }
     this.viewSlides.lockSwipes(true);
   }
 
-  navigateTo(node, reset): void {
-    console.log('navigateTo : ' + node + ' - previousNode : ' + this.explorerService.previousNode() +
-      ' - nextNode : ' + this.explorerService.nextNode());
-    this.explorerService.navigateTo(node, reset, () => {
-      this.prevDisabled = this.explorerService.previousNode() == null;
-      this.nextDisabled = this.explorerService.nextNode() == null;
+  navigateTo(node): void {
+    this.explorerService.navigateTo(node, () => {
+      this.updateViews();
+    });
+  }
+
+  navigateForward(): void {
+    this.explorerService.navigateForward(() => {
+      this.updateViews();
+    });
+  }
+
+  navigateBackward(): void {
+    this.explorerService.navigateBackward(() => {
       this.updateViews();
     });
   }
@@ -91,16 +93,7 @@ export class ExplorerPage {
   }
 
   editSeed(): void {
-    this.dataService.getNodeData(this.explorerService.rootNode.id).then((data) => {
-      let node = new Seed(data.root, false, false);
-      if(data.connectedSeeds.length > 0) {
-        node.connectedSeeds = data.connectedSeeds.map((n) => {return new Seed(n, false, false)});
-      }
-      if(data.includedSeeds.length > 0) {
-        node.includedSeeds = data.includedSeeds.map((n) => {return new Seed(n, false, false)});
-      }
-      this.navCtrl.push('FormPage', {id: node.id, node: node});
-    });
+    this.navCtrl.push('FormPage', {id: this.explorerService.rootNode.id, node: this.explorerService.rootNode});
   }
 
   shareSeed(): void {
@@ -129,13 +122,11 @@ export class ExplorerPage {
         if(user) {
           this.authorName = user.name;
           this.authorId = user._id;
-          console.log('authorId: ' + this.authorId);
         }
       });
     } else {
       this.authorName = null;
       this.authorId = null;
-      console.log('authorId: ' + this.authorId);
     }
   }
 
@@ -162,7 +153,7 @@ export class ExplorerPage {
           handler: () => {
             this.dataService.cancelReplication();
             this.authService.logOut().then(() => {
-              this.explorerService.clearData();
+              this.explorerService.initData();
               this.app.getRootNav().setRoot('LoginPage');
             });
           }
@@ -180,36 +171,19 @@ export class ExplorerPage {
     this.iab.create('https://maps.google.com?q=' + address, '_blank', 'location=yes');
   }
 
+  displayHistory() {
+    this.navCtrl.push('HistoryPage');
+  }
+
   registerBack() {
     this.platform.ready().then(() => {
       this.platform.registerBackButtonAction(() => {
         if (this.navCtrl.canGoBack()) {
           this.navCtrl.pop();
         } else {
-          let prevNode = this.explorerService.previousNode();
-          if(prevNode) {
-            this.explorerService.navigateTo(prevNode, false, () => this.updateViews());
-          }
+          this.explorerService.navigateBackward(() => this.updateViews());
         }
       }, 100);
     });
-  }
-
-  slidesTapped(evt): void {
-    // let date = null;
-    // let elt = evt.originalEvent.target;
-    // if(elt.tagName == 'SPAN') {
-    //   date = elt.parentElement.id;
-    // } else if(elt.tagName == 'BUTTON') {
-    //   date = elt.id;
-    // }
-    //
-    // if(date) {
-    //   this.request.toggleDate(date);
-    // }
-  }
-
-  switchView(evt): void {
-    this.currentView = this.currentView == 'inclusions' ? 'connections' : 'inclusions';
   }
 }

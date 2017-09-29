@@ -74,7 +74,7 @@ export class Seed {
   }
 
   public linksCount() {
-    return this.connections.length + this.inclusions.length + this.urls.length;
+    return this.connectedSeeds.length + this.includedSeeds.length + this.urls.length;
   }
 
   public picture() {

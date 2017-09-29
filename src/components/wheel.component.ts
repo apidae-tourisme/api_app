@@ -80,7 +80,7 @@ export class WheelComponent {
   render(seed) {
     this.views.selectAll("text.counter").text((d) => {
       let viewIdx = d % 3;
-      return viewIdx == 0 ? seed.connections.length : (viewIdx == 1 ? seed.urls.length : seed.inclusions.length);
+      return viewIdx == 0 ? seed.connectedSeeds.length : (viewIdx == 1 ? seed.urls.length : seed.includedSeeds.length);
     });
     this.wheelContainer.selectAll("text.main_counter").text((d) => {
       return seed.linksCount();

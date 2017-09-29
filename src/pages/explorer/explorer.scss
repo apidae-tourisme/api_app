@@ -34,8 +34,12 @@ graph > *, pack > * {
   margin: 0;
 }
 
-#graph_links .button-large-md:last-child {
+#graph_links .button-large-md:not(:first-child) {
   margin-left: -0.2em;
+}
+
+#graph_links .button-large-md:last-child {
+  margin-top: -0.5em;
 }
 
 #graph_links .button-large-md ion-icon {

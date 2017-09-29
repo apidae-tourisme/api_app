@@ -182,8 +182,9 @@ export class GraphComponent {
       });
       wrapLabels(allLabels);
 
-      that.nodesContainer.selectAll("g").on("click", changeRootNode);
-      that.nodesContainer.selectAll("g").call(d3.drag()
+      that.nodesContainer.selectAll("g").on("click", changeRootNode)
+        .attr("transform", "translate(" + that.width / 2 + "," + (that.height - layout.unitY / 2) / 2 + ")")
+        .call(d3.drag()
         .on("start", dragstarted)
         .on("drag", dragged)
         .on("end", dragended));

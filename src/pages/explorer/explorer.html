@@ -1,7 +1,7 @@
-<ion-header id="explorer_header" [class.inclusions]="currentView == 'inclusions'">
+<ion-header id="explorer_header">
   <ion-navbar color="lighter" hideBackButton="true">
     <ion-buttons left>
-      <button ion-button (click)="navigateTo(null, false)">
+      <button ion-button (click)="navigateTo(null)">
         <img id="header_logo" src="assets/img/logo-apiapp-mini.svg"/>
       </button>
     </ion-buttons>
@@ -12,7 +12,7 @@
       </button>
     </ion-toolbar>
     <ion-buttons right *ngIf="authService.userSeed">
-      <button ion-button (click)="navigateTo(authService.userSeed.id, false)">
+      <button ion-button (click)="navigateTo(authService.userSeed.id)">
         <img id="avatar_logo" *ngIf="authService.userSeed.picture()" src="{{authService.userSeed.pictureData()}}"/>
         <i id="avatar_icon" *ngIf="!authService.userSeed.picture()" class="ion-md-custom-person"></i>
       </button>
@@ -22,12 +22,10 @@
 
 <ion-content id="explorer">
   <div id="slides_wrapper">
-    <ion-slides #viewSlides id="view_slides" (ionSlideWillChange)="switchView($event)"
-                (ionSlideTap)="slidesTapped($event)" [initialSlide]="1">
+    <ion-slides #viewSlides id="view_slides" [initialSlide]="1">
       <ion-slide>
         <ion-scroll *ngIf="!loading" scrollY="true">
-          <ion-item-group id="list_details" class="scroll_view {{explorerService.rootNode.category}}"
-                          *ngIf="explorerService.rootNode && explorerService.rootNode.children" no-lines>
+          <ion-item-group id="list_details" class="scroll_view {{explorerService.rootNode.category}}" *ngIf="explorerService.rootNode" no-lines>
             <ion-item-divider color="{{explorerService.rootNode.category}}" text-wrap sticky class="view_header">
               <ion-icon *ngIf="explorerService.rootNode.scope == 'private'" name="lock" item-end></ion-icon>
               <button ion-button (click)="editSeed()" icon-only clear large item-end>
@@ -88,26 +86,29 @@
             </ion-item>
             <ion-item *ngIf="authorId" class="selectable item-datetime-disabled details_author">
               <ion-label no-margin class="label_sm">Par </ion-label>
-              <button ion-button item-right clear color="link" (click)="navigateTo(authorId, true, false)">{{authorName}}</button>
+              <button ion-button item-right clear color="link" (click)="navigateTo(authorId)">{{authorName}}</button>
             </ion-item>
           </ion-item-group>
         </ion-scroll>
       </ion-slide>
       <ion-slide>
-        <div id="graph_links">
-          <button large ion-button (click)="navigateTo(explorerService.previousNode(), false, false)" [disabled]="prevDisabled" icon-only clear>
+        <div id="graph_links" text-center>
+          <button large ion-button (click)="navigateBackward()" [disabled]="explorerService.isFirstStep()" icon-only clear>
             <ion-icon name="hexa-left" color="link"></ion-icon>
           </button>
-          <button large ion-button (click)="navigateTo(explorerService.nextNode(), false, false)" [disabled]="nextDisabled" icon-only clear>
+          <button large ion-button (click)="navigateForward()" [disabled]="explorerService.isLastStep()" icon-only clear>
             <ion-icon name="hexa-right" color="link"></ion-icon>
+          </button>
+          <br/>
+          <button large ion-button (click)="displayHistory()" [disabled]="explorerService.isFirstStep()" icon-only clear>
+              <ion-icon name="hexa-history" color="link"></ion-icon>
           </button>
         </div>
         <graph (showDetails)="displayDetails()" (rootChange)="rootNodeChange($event)" [width]="graphWidth" [height]="graphHeight"></graph>
       </ion-slide>
       <ion-slide>
         <ion-scroll *ngIf="!loading" scrollY="true">
-          <ion-item-group id="inclusions" class="scroll_view {{explorerService.rootNode.category}}"
-                          *ngIf="explorerService.rootNode && explorerService.rootNode.children">
+          <ion-item-group id="inclusions" class="scroll_view {{explorerService.rootNode.category}}" *ngIf="explorerService.rootNode">
             <ion-item-divider color="{{explorerService.rootNode.category}}" class="view_header" text-wrap sticky>
               <ion-icon *ngIf="explorerService.rootNode.scope == 'private'" name="lock" item-end></ion-icon>
               <button ion-button (click)="shareSeed()" icon-only clear large item-end>
@@ -121,7 +122,7 @@
               </ion-avatar>
               <h2 text-left>{{explorerService.rootNode.label}}</h2>
             </ion-item-divider>
-            <button ion-item *ngFor="let node of explorerService.rootNode.children" (click)="navigateTo(node.id, false, false)" text-wrap>
+            <button ion-item *ngFor="let node of explorerService.rootNode.includedSeeds" (click)="navigateTo(node.id, false, false)" text-wrap>
               <ion-icon *ngIf="node.scope == 'private'" name="lock" class="item_lock"></ion-icon>
               <ion-avatar item-left class="bg_seed {{node.category}}">
                 <img *ngIf="node.picture()" src="{{node.pictureData()}}"/>
@@ -130,7 +131,7 @@
               <h2>{{node.label}}</h2>
               <p text-nowrap>{{node.description}}</p>
             </button>
-            <ion-item *ngIf="explorerService.rootNode.children.length == 0" text-center>
+            <ion-item *ngIf="explorerService.rootNode.includedSeeds.length == 0" text-center>
               <p>Aucune graine incluse.</p>
             </ion-item>
           </ion-item-group>

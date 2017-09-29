@@ -43,7 +43,7 @@
       <ion-icon name="pulse"></ion-icon>
       Activité du réseau
     </ion-list-header>
-    <button ion-item *ngFor="let node of lastChanges" text-wrap (click)="navigateTo(node.id, false)">
+    <button ion-item *ngFor="let node of lastChanges" text-wrap (click)="navigateTo(node.id)">
       <ion-icon *ngIf="node.scope == 'private'" name="lock" class="item_lock"></ion-icon>
       <ion-avatar item-left class="bg_seed {{node.category}}">
         <img *ngIf="node.picture()" src="{{node.pictureData()}}"/>
@@ -54,7 +54,7 @@
     </button>
   </ion-list>
   <ion-list *ngIf="searchService.nodes.length > 0" id="search_results">
-    <button ion-item *ngFor="let node of searchService.nodes" text-wrap (click)="navigateTo(node.id, false)">
+    <button ion-item *ngFor="let node of searchService.nodes" text-wrap (click)="navigateTo(node.id)">
       <ion-icon *ngIf="node.scope == 'private'" name="lock" class="item_lock"></ion-icon>
       <ion-avatar item-left class="bg_seed {{node.category}}">
         <img *ngIf="node.picture()" src="{{node.pictureData()}}"/>

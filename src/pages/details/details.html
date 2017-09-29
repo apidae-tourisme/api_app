@@ -1,7 +1,7 @@
 <ion-header>
   <ion-navbar color="lighter" hideBackButton="true">
     <ion-buttons left>
-      <button ion-button (click)="navigateTo(null, true, false)">
+      <button ion-button (click)="navigateTo(null)">
         <img id="header_logo" src="assets/img/logo-apiapp-mini.svg"/>
       </button>
     </ion-buttons>
@@ -12,7 +12,7 @@
       </button>
     </ion-toolbar>
     <ion-buttons right *ngIf="authService.userSeed">
-      <button ion-button (click)="navigateTo(authService.userSeed.id, true, false)">
+      <button ion-button (click)="navigateTo(authService.userSeed.id)">
         <img id="avatar_logo" *ngIf="authService.userSeed.picture()" src="{{authService.userSeed.pictureData()}}"/>
         <i id="avatar_icon" *ngIf="!authService.userSeed.picture()" class="ion-md-custom-person"></i>
       </button>
@@ -100,7 +100,7 @@
     </ion-item>
     <ion-item *ngIf="authorId" class="selectable item-datetime-disabled details_author">
       <ion-label no-margin class="label_sm">Par </ion-label>
-      <button ion-button item-right clear color="link" (click)="navigateTo(authorId, true, false)">{{authorName}}</button>
+      <button ion-button item-right clear color="link" (click)="navigateTo(authorId)">{{authorName}}</button>
     </ion-item>
   </ion-list>
 </ion-content>

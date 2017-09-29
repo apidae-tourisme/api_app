@@ -100,8 +100,8 @@ export class SearchPage {
     return d < 10 ? ('0' + d) : d;
   }
 
-  navigateTo(node, reset): void {
-    this.explorerService.navigateTo(node, reset, () => {this.navCtrl.popToRoot();});
+  navigateTo(node): void {
+    this.explorerService.navigateTo(node, () => {this.navCtrl.popToRoot();});
   }
 
   loadResults(): void {

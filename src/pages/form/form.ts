@@ -38,7 +38,7 @@ export class FormPage {
 
   dismissForm(): void {
     if(this.node.archived) {
-      this.explorerService.navigateTo(this.explorerService.previousNode(), false, () => {
+      this.explorerService.navigateBackward(() => {
           this.navCtrl.popToRoot();
       });
     } else if(this.authService.userSeed.id == this.node.id) {

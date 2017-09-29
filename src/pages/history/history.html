@@ -1,0 +1,24 @@
+<ion-header>
+  <ion-navbar color="lighter" hideBackButton="true">
+    <ion-buttons left>
+      <button ion-button icon-only color="link" (click)="dismiss()" large>
+        <ion-icon name="hexa-left" color="link"></ion-icon>
+      </button>
+    </ion-buttons>
+    <ion-title text-center>Historique de navigation</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content>
+  <ion-list *ngIf="history.length > 0">
+    <button ion-item *ngFor="let node of history" text-wrap (click)="navigateTo(node.id)">
+      <ion-icon *ngIf="node.scope == 'private'" name="lock" class="item_lock"></ion-icon>
+      <ion-avatar item-left class="bg_seed {{node.category}}">
+        <img *ngIf="node.picture()" src="{{node.pictureData()}}"/>
+        <div *ngIf="!node.picture()" text-center><i class="ion-md-custom-{{node.category}}"></i></div>
+      </ion-avatar>
+      <h2>{{node.label}}</h2>
+      <p text-nowrap>{{node.description}}</p>
+    </button>
+  </ion-list>
+</ion-content>

@@ -38,7 +38,7 @@ export class DetailsPage {
     this.registerBack();
     let seedId = this.navParams.get('id');
     if(seedId) {
-      this.explorerService.navigateTo(seedId, false, () => {
+      this.explorerService.navigateTo(seedId, () => {
         this.loadAuthor();
       });
     } else {
@@ -74,13 +74,13 @@ export class DetailsPage {
     this.iab.create('https://maps.google.com?q=' + address, '_blank', 'location=yes');
   }
 
-  navigateTo(node, showGraph, reset): void {
+  navigateTo(node, showGraph): void {
     if(showGraph) {
-      this.explorerService.navigateTo(node, reset, () => {
+      this.explorerService.navigateTo(node, () => {
         this.navCtrl.pop();
       });
     } else {
-      this.explorerService.navigateTo(node, reset, () => {
+      this.explorerService.navigateTo(node, () => {
         this.content.resize()
       });
     }
@@ -95,16 +95,7 @@ export class DetailsPage {
   }
 
   editSeed(): void {
-    this.dataService.getNodeData(this.explorerService.rootNode.id).then((data) => {
-      let node = new Seed(data.root, false, false);
-      if(data.connectedSeeds.length > 0) {
-        node.connectedSeeds = data.connectedSeeds.map((n) => {return new Seed(n, false, false)});
-      }
-      if(data.includedSeeds.length > 0) {
-        node.includedSeeds = data.includedSeeds.map((n) => {return new Seed(n, false, false)});
-      }
-      this.navCtrl.push('FormPage', {id: node.id, node: node});
-    });
+    this.navCtrl.push('FormPage', {id: this.explorerService.rootNode.id, node: this.explorerService.rootNode});
   }
 
   dateFormat(date): string {
@@ -130,7 +121,7 @@ export class DetailsPage {
           handler: () => {
             this.dataService.cancelReplication();
             this.authService.logOut().then(() => {
-              this.explorerService.clearData();
+              this.explorerService.initData();
               this.zone.run(() => {
                 this.app.getRootNav().setRoot('LoginPage');
               });
