@@ -4,6 +4,9 @@ import {v4 as uuid} from "uuid";
 export class Seed {
 
   public static readonly DEFAULT_TYPE = Seeds.CONCEPT;
+  public static readonly PHONE_REGEXP = new RegExp(/^0\d{9,13}$/);
+  public static readonly EMAIL_REGEXP = new RegExp(/^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()\.,;\s@\"]+\.{0,1})+[^<>()\.,;:\s@\"]{2,})$/);
+  public static readonly URL_REGEXP = new RegExp(/((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-_]*)?\??(?:[\-\+=&;%@\.\w_]*)#?(?:[\.\!\/\\\w]*))?)/);
 
   id: string;
   rev: string;
@@ -111,31 +114,27 @@ export class Seed {
     return Seeds.allSeedsTypes().filter((t) => {return t.type == this.category})[0];
   }
 
-  public formattedUrls() {
-    let urls = [];
-    let phoneRegexp = new RegExp(/^0\d{9,13}$/);
-    let emailRegexp = new RegExp(/^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()\.,;\s@\"]+\.{0,1})+[^<>()\.,;:\s@\"]{2,})$/);
-    let urlRegexp = new RegExp(/((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-_]*)?\??(?:[\-\+=&;%@\.\w_]*)#?(?:[\.\!\/\\\w]*))?)/);
-
-    this.urls.forEach((url) => {
-      let trimmedUrl = url.value.replace(/\s/g, '');
-      if(trimmedUrl.match(phoneRegexp)) {
-        urls.push({label: trimmedUrl, link: ('tel:' + trimmedUrl), icon: 'call'})
-      } else if(trimmedUrl.match(emailRegexp)) {
-        urls.push({label: trimmedUrl, link: ('mailto:' + trimmedUrl), icon: 'at'})
+  public static formattedUrl(url) {
+    let trimmedUrl = this.trimmed(url);
+    if(trimmedUrl.match(Seed.PHONE_REGEXP)) {
+      return {link: ('tel:' + trimmedUrl), icon: 'call'};
+    } else if(trimmedUrl.match(Seed.EMAIL_REGEXP)) {
+      return {link: ('mailto:' + trimmedUrl), icon: 'at'};
+    } else {
+      let absUrl = trimmedUrl.indexOf('://') != -1 ? trimmedUrl : ('http://' + trimmedUrl);
+      if(absUrl.match(Seed.URL_REGEXP)) {
+        return {link: absUrl, icon: this.urlIcon(trimmedUrl)};
       } else {
-        let absUrl = trimmedUrl.indexOf('://') != -1 ? trimmedUrl : ('http://' + trimmedUrl);
-        if(absUrl.match(urlRegexp)) {
-          urls.push({label: trimmedUrl, link: absUrl, icon: this.urlIcon(trimmedUrl)})
-        } else {
-          urls.push({label: trimmedUrl, icon: 'help'})
-        }
+        return {link: '', icon: 'help'};
       }
-    });
-    return urls;
+    }
   }
 
-  private urlIcon(url): string {
+  public static trimmed(url) {
+    return url.value.replace(/\s/g, '');
+  }
+
+  private static urlIcon(url): string {
     let supportedUrls = ['facebook', 'twitter', 'linkedin', 'instagram', 'youtube', 'dropbox', 'google', 'github', 'dribbble',
       'pinterest', 'reddit', 'rss', 'skype', 'snapchat', 'tumblr', 'vimeo'];
 

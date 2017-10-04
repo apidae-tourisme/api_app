@@ -9,7 +9,7 @@ import {Events, Platform} from "ionic-angular";
 import {AuthService} from "./auth.service";
 // import * as DbWorker from "worker-loader!../workers/db.worker";
 // import PromiseWorker from 'promise-worker';
-// import WorkerPouch from 'worker-pouch';
+import WorkerPouch from 'worker-pouch';
 
 @Injectable()
 export class SeedsService {
@@ -45,7 +45,7 @@ export class SeedsService {
               private authService: AuthService) {
     this.isMobile = this.platform.is('mobile');
     this.isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-    // (<any>PouchDB).adapter('worker', WorkerPouch);
+    (<any>PouchDB).adapter('worker', WorkerPouch);
 
     // platform.ready().then(() => {
       // PouchDB.plugin(PouchAdapterSqlite);
@@ -98,7 +98,7 @@ export class SeedsService {
   }
 
   getLocalDb(dbName, isSafari) {
-    return new PouchDB(dbName);
+    return new PouchDB(dbName, {adapter: 'worker'});
     // return isSafari ? new PouchDB(dbName, {size: this.isMobile ? 49 : 99, adapter: 'websql'}) : new PouchDB(dbName);
   }
 

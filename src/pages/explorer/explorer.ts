@@ -164,12 +164,19 @@ export class ExplorerPage {
   }
 
   openUrl(url): void {
-    console.log('openUrl : ' + url);
-    this.iab.create(url, '_system');
+    this.iab.create(Seed.formattedUrl(url).link, '_system');
   }
 
   openAddress(address) {
     this.iab.create('https://maps.google.com?q=' + address, '_blank', 'location=yes');
+  }
+
+  linkIcon(url): string {
+    return Seed.formattedUrl(url).icon;
+  }
+
+  linkLabel(url): string {
+    return Seed.trimmed(url);
   }
 
   displayHistory() {

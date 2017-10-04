@@ -13,14 +13,14 @@
 */
 declare module '*';
 
-declare module "worker-loader!./workers/db.worker" {
-  const content: any;
-  export = content;
-}
+// declare module "worker-loader!./workers/db.worker" {
+//   const content: any;
+//   export = content;
+// }
 
-declare module 'promise-worker';
+// declare module 'promise-worker';
 
-// declare module 'worker-pouch';
+declare module 'worker-pouch';
 //
 // declare module 'pouchdb-adapter-fruitdown';
 //

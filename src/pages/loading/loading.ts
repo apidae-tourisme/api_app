@@ -57,7 +57,9 @@ export class LoadingPage {
     this.msg = "Mise à jour de l'index - 1/2";
     return this.dataService.buildEmailIndex().then(() => {
       this.msg = "Mise à jour de l'index - 2/2";
-      return this.dataService.buildSearchIndex();
+      this.dataService.buildSearchIndex().then(() => {
+        this.dataService.idxBuilding = false;
+      });
     });
   }
 
