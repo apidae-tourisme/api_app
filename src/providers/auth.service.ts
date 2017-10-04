@@ -89,12 +89,23 @@ export class AuthService {
     }
   }
 
-  getUserProfile() {
-    return this.storage.get('userProfile');
+  getUserProfile(): Promise<any> {
+    console.log('getUserProfile : ' + this.userEmail);
+    if(!this.userEmail) {
+      return Promise.reject('Missing user email');
+    } else {
+      return Promise.resolve({email: this.userEmail});
+    }
+    // return this.storage.ready().then(() => {
+    //   return this.storage.get('userProfile');
+    // });
   }
 
   setUserProfile(userProfile) {
     this.userEmail = userProfile ? userProfile.email : null;
-    return this.storage.set('userProfile', userProfile);
+    return Promise.resolve();
+    // return this.storage.ready().then(() => {
+    //   return this.storage.set('userProfile', userProfile);
+    // });
   }
 }

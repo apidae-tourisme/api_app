@@ -55,6 +55,7 @@ export class LoginPage {
   }
 
   loggedInRedirect(): void {
+    console.log('authService.userEmail : ' + this.authService.userEmail);
     if(this.authService.userEmail) {
       this.navCtrl.push('LoadingPage', {isOnline: this.hasConnectivity()});
     } else {
