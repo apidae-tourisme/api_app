@@ -261,7 +261,7 @@ export class SeedsService {
           console.log("local search doc error : " + JSON.stringify(err));
         });
       }).then(() => {
-        this.localDatabase.get(SeedsService.LOOKUP_DOC).then(() => {
+        return this.localDatabase.get(SeedsService.LOOKUP_DOC).then(() => {
           console.log('lookup doc present');
           return this.lookUpNodes('xxx');
         }).catch((err) => {
