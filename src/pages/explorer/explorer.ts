@@ -164,6 +164,7 @@ export class ExplorerPage {
   }
 
   openUrl(url): void {
+    console.log('openUrl : ' + url);
     this.iab.create(url, '_system');
   }
 
@@ -173,6 +174,10 @@ export class ExplorerPage {
 
   displayHistory() {
     this.navCtrl.push('HistoryPage');
+  }
+
+  displayUserSeeds() {
+    this.navCtrl.push('UserSeedsPage');
   }
 
   registerBack() {

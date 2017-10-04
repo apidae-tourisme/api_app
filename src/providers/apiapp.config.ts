@@ -17,7 +17,7 @@ export class ApiAppConfig {
   public static readonly DB_URL = 'https://dev-db.apiapp.apidae.net';
 
   // Sharing
-  public static readonly SHARING_HOST = 'https://preprod.apiapp.apidae.net';
+  public static readonly SHARING_HOST = 'http://localhost:8100/#';
 
   public static authUrl(redirectUrl): string {
     return ApiAppConfig.OAUTH_AUTH_URL + '?client_id=' + ApiAppConfig.OAUTH_CLIENT_ID + '&redirect_uri=' +

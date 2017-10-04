@@ -37,7 +37,7 @@
                   <i class="ion-md-custom-{{explorerService.rootNode.category}}"></i>
                 </div>
               </ion-avatar>
-              <h2 text-left ion-text [color]="explorerService.rootNode.category == 'concept' ? 'text_main' : 'lighter'">{{explorerService.rootNode.label}}</h2>
+              <h2 text-left>{{explorerService.rootNode.label}}</h2>
             </ion-item-divider>
             <ion-item text-wrap>
               <p class="pre">{{explorerService.rootNode.description}}</p>
@@ -102,6 +102,11 @@
           <br/>
           <button large ion-button (click)="displayHistory()" [disabled]="explorerService.isFirstStep()" icon-only clear>
               <ion-icon name="hexa-history" color="link"></ion-icon>
+          </button>
+        </div>
+        <div id="user_link">
+          <button large ion-button (click)="displayUserSeeds()" icon-only clear>
+            <ion-icon name="hexa-my-seeds" color="link"></ion-icon>
           </button>
         </div>
         <graph (showDetails)="displayDetails()" (rootChange)="rootNodeChange($event)" [width]="graphWidth" [height]="graphHeight"></graph>

@@ -13,27 +13,24 @@ import {Seed} from "../../models/seed.model";
 export class WidgetPage {
   @ViewChild(Content) content: Content;
 
-  private static SORT_ALPHABET = 'alpha';
-  private static SORT_CHRONO = 'chrono';
+  public static SORT_ALPHABET = 'alpha';
+  public static SORT_CHRONO = 'chrono';
 
   public root: Seed;
   public inclusions: Array<Seed>;
 
-  private sorting: string;
-
   constructor(public navCtrl: NavController, private navParams: NavParams, private dataService: RemoteDataService) {
-    this.sorting = this.navParams.get('sort');
   }
 
   ionViewDidEnter(): void {
     let seedId = this.navParams.get('id');
-    console.log('sorting : ' + this.sorting);
+    let sorting = this.navParams.get('sort');;
     if(seedId) {
       this.dataService.getSeedWithInclusions(seedId, Seeds.SCOPE_APIDAE).then((data) => {
         this.root = new Seed(data.root, false, false);
         if(data.includedSeeds.length > 0) {
           this.inclusions = data.includedSeeds.map((n) => {return new Seed(n, false, false)})
-            .sort(this.sorting == WidgetPage.SORT_CHRONO ? this.chronologically() : this.alphabetically());
+            .sort(sorting == WidgetPage.SORT_CHRONO ? this.chronologically() : this.alphabetically());
         } else {
           this.inclusions = [];
         }

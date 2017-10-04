@@ -1,28 +1,33 @@
 import {Injectable} from "@angular/core";
 import {ApiAppConfig} from "./apiapp.config";
 import {Seed} from "../models/seed.model";
-import PouchDB from 'pouchdb';
+import PouchDB from 'pouchdb-browser';
+// import PouchAdapterSqlite from 'pouchdb-adapter-cordova-sqlite';
 import {Seeds} from "./seeds";
 import {ProgressHttp} from "angular-progress-http";
 import {Events, Platform} from "ionic-angular";
 import {AuthService} from "./auth.service";
+import * as DbWorker from "worker-loader!../workers/db.worker";
+import PromiseWorker from 'promise-worker';
+// import WorkerPouch from 'worker-pouch';
 
 @Injectable()
 export class SeedsService {
 
   private static readonly USERS_INDEX_DOC = "_local/users_by_email";
   private static readonly CURRENT_USER = "_local/current_user";
-  private static readonly SEARCH_DOC = "_design/search_local";
   private static readonly SEARCH_PATH = "search_local/all_fields";
   private static readonly USER_SEEDS_FILTER = "seeds/by_user";
   private static readonly USER_SEEDS_VIEW = "_design/scopes/_list/get/seeds";
+  private static readonly LOOKUP_BY_AUTHOR = "lookup/by_author";
 
   private localDatabase: any;
   private remoteDatabase: any;
   private sync: any;
-  private idxBuilding: boolean;
+  public idxBuilding: boolean;
   private isMobile: boolean;
   private isSafari: boolean;
+  private worker: any;
 
   private static readonly CHARMAP = {
     'à': 'a', 'á': 'a', 'â': 'a', 'ä': 'a', 'æ': 'ae', 'œ': 'oe', 'ç': 'c', 'è': 'e', 'é': 'e', 'ê': 'e', 'ë': 'e',
@@ -38,10 +43,18 @@ export class SeedsService {
               private authService: AuthService) {
     this.isMobile = this.platform.is('mobile');
     this.isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-    this.remoteDatabase = this.getRemoteDb();
-    this.localDatabase = this.getLocalDb(ApiAppConfig.LOCAL_DB, this.isSafari);
+    // (<any>PouchDB).adapter('worker', WorkerPouch);
+
+    // platform.ready().then(() => {
+      // PouchDB.plugin(PouchAdapterSqlite);
+      this.worker = new PromiseWorker(new DbWorker());
+      this.remoteDatabase = this.getRemoteDb();
+      this.localDatabase = this.getLocalDb(ApiAppConfig.LOCAL_DB, this.isSafari);
+      console.log('Using adapter in main : ' + this.localDatabase.adapter);
+    // });
   }
 
+  // Todo : es6-related runtime issue... to be investigated
   // Inits local db once the user is logged in
   // Note : only one local db is maintained - this is to prevent the app from exceeding the browsers space storage limit
   initLocalDb() {
@@ -79,10 +92,12 @@ export class SeedsService {
 
   clearLocalDb() {
     this.clearDb(ApiAppConfig.LOCAL_DB, this.isSafari);
+    this.idxBuilding = false;
   }
 
   getLocalDb(dbName, isSafari) {
-    return isSafari ? new PouchDB(dbName, {size: this.isMobile ? 49 : 99, adapter: 'websql'}) : new PouchDB(dbName);
+    return new PouchDB(dbName);
+    // return isSafari ? new PouchDB(dbName, {size: this.isMobile ? 49 : 99, adapter: 'websql'}) : new PouchDB(dbName);
   }
 
   getRemoteDb() {
@@ -190,45 +205,10 @@ export class SeedsService {
     console.log('building search index');
     if(!this.idxBuilding) {
       this.idxBuilding = true;
-      let searchDoc = {
-        _id: SeedsService.SEARCH_DOC,
-        views: {
-          all_fields: {
-            map: "function (doc) {\n" +
-            "  var charmap = {'à': 'a', 'á': 'a', 'â': 'a', 'ä': 'a', 'æ': 'ae', 'œ': 'oe', 'ç': 'c', 'è': 'e', 'é': 'e', 'ê': 'e', 'ë': 'e', 'î': 'i', 'ï': 'i', 'ô': 'o', 'ö': 'o', 'ù': 'u', 'û': 'u', 'ü': 'u', '-': ' ', '_': ' ', '!': ' ', '?': ' ', '.': ' ', ',': ' ', ':': ' ', ';': ' ', '/': ' ', '\"': ' ', '(': ' ', ')': ' ', '\\'': ' ', '`': ' '};\n" +
-            "  var escapedChars = /[àáâäæçèéêëîïôöùûü\\-_!?.,:;/\"()'`]/g;\n" +
-            "  var stopWords = 'aux avec bis ceci cela ces cet cette ceux dans des elle elles est eux etes for ici ils les leur leurs lui mais mes mis moi mon meme nos notre nous oeuvre ont par pas plus pour que quel quelle quelles quels qui sans ses soi sommes son sont suis sur surtout tes the toi ton une vers via vos votre vous'.split(' ');\n" +
-            "  \n" +
-            "  var nameTokens = doc.name.toLowerCase().replace(escapedChars, function(char) {return charmap[char];}).split(/\\s+/).filter(function(t) {return t.length > 2 && stopWords.indexOf(t) === -1;});\n" +
-            "  var descTokens = doc.description ? doc.description.toLowerCase().replace(escapedChars, function(char) {return charmap[char];}).split(/\\s+/).filter(function(t) { return t.length > 2 && stopWords.indexOf(t) === -1;}) : [];\n" +
-            "  var addrTokens = doc.address ? doc.address.toLowerCase().replace(escapedChars, function(char) {return charmap[char];}).split(/\\s+/).filter(function(t) {return t.length > 2 && stopWords.indexOf(t) === -1;}) : [];\n" +
-            "  var allTokens = nameTokens.concat(descTokens).concat(addrTokens).join(';');\n" +
-            "  \n" +
-            "  for(var i in nameTokens) {\n" +
-            "    emit(nameTokens[i], allTokens);\n" +
-            "  }\n" +
-            "  \n" +
-            "  for(var k in descTokens) {\n" +
-            "    emit(descTokens[k], allTokens);\n" +
-            "  }  \n" +
-            "    \n" +
-            "  for(var j in addrTokens) {\n" +
-            "    emit(addrTokens[j], allTokens);\n" +
-            "  }  \n" +
-            "}"
-          }
-        }
-      };
-      return this.localDatabase.get(SeedsService.SEARCH_DOC).then(() => {
-        console.log('search doc present');
-        return this.searchNodes('init', Seeds.SCOPE_ALL);
-      }).catch((err) => {
-        console.log('search doc missing');
-        return this.localDatabase.put(searchDoc).then(() => {
-          return this.searchNodes('init', Seeds.SCOPE_ALL);
-        }).catch((err) => {
-          console.log("local search doc error : " + JSON.stringify(err));
-        });
+      console.log('building with worker : ' + this.worker);
+      this.worker.postMessage({}).then((response) => {
+        this.idxBuilding = false;
+        console.log('search index resp : ' + response);
       });
     }
   }
@@ -254,6 +234,21 @@ export class SeedsService {
   getNodes(nodesIds) {
     return this.localDatabase.allDocs({keys: nodesIds, include_docs: true, attachments: true}).then((docs) => {
       return docs.rows.filter((row) => {return row.id && row.doc;}).map((row) => {return new Seed(row.doc, false, false);});
+    });
+  }
+
+  lookUpNodes(email) {
+    console.time('look up author ' + email);
+    return this.localDatabase.query(SeedsService.LOOKUP_BY_AUTHOR, {
+      keys: [email],
+      include_docs: true,
+      attachments: true
+    }).then((results) => {
+      console.timeEnd('look up author ' + email);
+      return results.rows.filter((row) => {return row.id && row.doc;})
+        .map((row) => {return new Seed(row.doc, false, false);});
+    }).catch(function (err) {
+      console.log('lookup error for email ' + email + ' : ' + JSON.stringify(err));
     });
   }
 

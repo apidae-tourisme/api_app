@@ -6,6 +6,7 @@ import {Seeds} from "../../providers/seeds";
 import {Keyboard} from "@ionic-native/keyboard";
 import {Seed} from "../../models/seed.model";
 import {animate, state, style, transition, trigger} from "@angular/animations";
+import {SeedsService} from "../../providers/seeds.service";
 
 @IonicPage({
   segment: 'graines'
@@ -29,7 +30,7 @@ export class InternalLinksPage {
   public searchScope: string;
 
   constructor(public viewCtrl: ViewController, public searchService: SearchService, private params: NavParams,
-              private keyboard: Keyboard, public explorerService: ExplorerService) {
+              private keyboard: Keyboard, public explorerService: ExplorerService, public seedsService: SeedsService) {
     this.searchQuery = null;
     this.searchScope = Seeds.SCOPE_ALL;
     this.node = params.get('node');

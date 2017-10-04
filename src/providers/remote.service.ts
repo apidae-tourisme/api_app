@@ -1,6 +1,6 @@
 import {Injectable} from "@angular/core";
 import {ApiAppConfig} from "./apiapp.config";
-import PouchDB from 'pouchdb';
+import PouchDB from 'pouchdb-browser';
 import {Seeds} from "./seeds";
 
 @Injectable()

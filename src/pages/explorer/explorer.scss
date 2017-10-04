@@ -28,7 +28,8 @@ graph > *, pack > * {
   padding: 0.2em;
 }
 
-#graph_links .button-large-md {
+#graph_links .button-large-md,
+#user_link .button-large-md {
   height: 2em;
   font-size: 2.4rem;
   margin: 0;
@@ -42,8 +43,17 @@ graph > *, pack > * {
   margin-top: -0.5em;
 }
 
-#graph_links .button-large-md ion-icon {
+#graph_links .button-large-md ion-icon,
+#user_link .button-large-md ion-icon {
   padding: 0;
+}
+
+#user_link {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 100;
+  padding: 0.2em;
 }
 
 #wheel_wrapper {

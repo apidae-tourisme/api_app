@@ -5,32 +5,25 @@
         <ion-icon name="hexa-left" color="link"></ion-icon>
       </button>
     </ion-buttons>
-    <ion-title>Partager la graine</ion-title>
+    <ion-title text-center>Partager le contenu</ion-title>
   </ion-navbar>
 </ion-header>
 
-<ion-content id="share_form" padding-top>
+<ion-content id="share_form">
   <ion-list>
-    <ion-item>
-      <ion-label stacked>Lien direct</ion-label>
-      <ion-input type="text" [ngModel]="directLink"></ion-input>
-      <a ion-button clear item-right icon-only [href]="directLink" target="_blank" color="link" large>
-        <ion-icon class="hexa-link"></ion-icon>
-      </a>
+    <ion-item text-wrap>
+      <h2>Tri</h2>
+      <p>par ordre {{sortBy == 'alpha' ? 'alphabétique' : 'chronologique'}}</p>
+      <button ion-button item-right large color="link" [clear]="sortBy != 'alpha'" icon-only (click)="setSortBy('alpha')">
+        <ion-icon name="ios-list"></ion-icon>
+      </button>
+      <button ion-button item-right large color="link" [clear]="sortBy != 'chrono'" icon-only (click)="setSortBy('chrono')">
+        <ion-icon name="custom-clock"></ion-icon>
+      </button>
     </ion-item>
-    <ion-item>
-      <ion-label stacked>Liste des graines incluses (ordre alphabétique)</ion-label>
-      <ion-input type="text" [ngModel]="widgetUrl('alpha')"></ion-input>
-      <a ion-button clear item-right icon-only [href]="widgetUrl('alpha')" target="_blank" color="link" large>
-        <ion-icon class="hexa-link"></ion-icon>
-      </a>
-    </ion-item>
-    <ion-item>
-      <ion-label stacked>Liste des graines incluses (ordre chronologique)</ion-label>
-      <ion-input type="text" [ngModel]="widgetUrl('chrono')"></ion-input>
-      <a ion-button clear item-right icon-only [href]="widgetUrl('chrono')" target="_blank" color="link" large>
-        <ion-icon class="hexa-link"></ion-icon>
-      </a>
-    </ion-item>
+    <button ion-item *ngFor="let mode of sharingModes" text-wrap (click)="shareWidget(mode)">
+      <ion-icon color="link" [name]="mode.icon" item-start></ion-icon>
+      <p>{{mode.label}}</p>
+    </button>
   </ion-list>
 </ion-content>

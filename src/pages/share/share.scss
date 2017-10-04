@@ -3,3 +3,9 @@
   border-bottom-color: map_get($colors, light);
   box-shadow: none;
 }
+
+#share_form .button[icon-only] {
+  max-width: 2.4em;
+  margin-top: 5px;
+  margin-bottom: 5px;
+}

@@ -46,7 +46,9 @@ export class FormPage {
         this.navCtrl.popToRoot();
       });
     } else {
-      this.navCtrl.popToRoot();
+      this.explorerService.loadNodeData(this.node.id, () => {
+        this.navCtrl.popToRoot();
+      });
     }
   }
 
