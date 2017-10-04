@@ -58,7 +58,6 @@
     "sw-toolbox": "3.6.0",
     "uuid": "^3.1.0",
     "web-animations-js": "^2.3.1",
-    "worker-pouch": "^2.0.0",
     "zone.js": "0.8.18"
   },
   "devDependencies": {

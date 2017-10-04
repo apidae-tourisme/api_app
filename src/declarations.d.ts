@@ -20,7 +20,7 @@ declare module '*';
 
 // declare module 'promise-worker';
 
-declare module 'worker-pouch';
+// declare module 'worker-pouch';
 //
 // declare module 'pouchdb-adapter-fruitdown';
 //

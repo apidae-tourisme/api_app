@@ -9,7 +9,9 @@ import {Events, Platform} from "ionic-angular";
 import {AuthService} from "./auth.service";
 // import * as DbWorker from "worker-loader!../workers/db.worker";
 // import PromiseWorker from 'promise-worker';
-import WorkerPouch from 'worker-pouch';
+// import WorkerPouch from 'worker-pouch';
+
+declare var workerPouch: any;
 
 @Injectable()
 export class SeedsService {
@@ -45,7 +47,7 @@ export class SeedsService {
               private authService: AuthService) {
     this.isMobile = this.platform.is('mobile');
     this.isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-    (<any>PouchDB).adapter('worker', WorkerPouch);
+    (<any>PouchDB).adapter('worker', workerPouch);
 
     // platform.ready().then(() => {
       // PouchDB.plugin(PouchAdapterSqlite);
