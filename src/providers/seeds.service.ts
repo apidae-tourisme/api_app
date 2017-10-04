@@ -7,8 +7,8 @@ import {Seeds} from "./seeds";
 import {ProgressHttp} from "angular-progress-http";
 import {Events, Platform} from "ionic-angular";
 import {AuthService} from "./auth.service";
-import * as DbWorker from "worker-loader!../workers/db.worker";
-import PromiseWorker from 'promise-worker';
+// import * as DbWorker from "worker-loader!../workers/db.worker";
+// import PromiseWorker from 'promise-worker';
 // import WorkerPouch from 'worker-pouch';
 
 @Injectable()
@@ -16,9 +16,11 @@ export class SeedsService {
 
   private static readonly USERS_INDEX_DOC = "_local/users_by_email";
   private static readonly CURRENT_USER = "_local/current_user";
+  private static readonly SEARCH_DOC = "_design/search_local";
   private static readonly SEARCH_PATH = "search_local/all_fields";
   private static readonly USER_SEEDS_FILTER = "seeds/by_user";
   private static readonly USER_SEEDS_VIEW = "_design/scopes/_list/get/seeds";
+  private static readonly LOOKUP_DOC = "_design/lookup";
   private static readonly LOOKUP_BY_AUTHOR = "lookup/by_author";
 
   private localDatabase: any;
@@ -27,7 +29,7 @@ export class SeedsService {
   public idxBuilding: boolean;
   private isMobile: boolean;
   private isSafari: boolean;
-  private worker: any;
+  // private worker: any;
 
   private static readonly CHARMAP = {
     'à': 'a', 'á': 'a', 'â': 'a', 'ä': 'a', 'æ': 'ae', 'œ': 'oe', 'ç': 'c', 'è': 'e', 'é': 'e', 'ê': 'e', 'ë': 'e',
@@ -47,7 +49,7 @@ export class SeedsService {
 
     // platform.ready().then(() => {
       // PouchDB.plugin(PouchAdapterSqlite);
-      this.worker = new PromiseWorker(new DbWorker());
+      // this.worker = new PromiseWorker(new DbWorker());
       this.remoteDatabase = this.getRemoteDb();
       this.localDatabase = this.getLocalDb(ApiAppConfig.LOCAL_DB, this.isSafari);
       console.log('Using adapter in main : ' + this.localDatabase.adapter);
@@ -201,14 +203,76 @@ export class SeedsService {
     });
   }
 
+
   buildSearchIndex() {
     console.log('building search index');
     if(!this.idxBuilding) {
       this.idxBuilding = true;
-      console.log('building with worker : ' + this.worker);
-      this.worker.postMessage({}).then((response) => {
-        this.idxBuilding = false;
-        console.log('search index resp : ' + response);
+      let searchDoc = {
+        _id: SeedsService.SEARCH_DOC,
+        views: {
+          all_fields: {
+            map: "function (doc) {\n" +
+            "  var charmap = {'à': 'a', 'á': 'a', 'â': 'a', 'ä': 'a', 'æ': 'ae', 'œ': 'oe', 'ç': 'c', 'è': 'e', 'é': 'e', 'ê': 'e', 'ë': 'e', 'î': 'i', 'ï': 'i', 'ô': 'o', 'ö': 'o', 'ù': 'u', 'û': 'u', 'ü': 'u', '-': ' ', '_': ' ', '!': ' ', '?': ' ', '.': ' ', ',': ' ', ':': ' ', ';': ' ', '/': ' ', '\"': ' ', '(': ' ', ')': ' ', '\\'': ' ', '`': ' '};\n" +
+            "  var escapedChars = /[àáâäæçèéêëîïôöùûü\\-_!?.,:;/\"()'`]/g;\n" +
+            "  var stopWords = 'aux avec bis ceci cela ces cet cette ceux dans des elle elles est eux etes for ici ils les leur leurs lui mais mes mis moi mon meme nos notre nous oeuvre ont par pas plus pour que quel quelle quelles quels qui sans ses soi sommes son sont suis sur surtout tes the toi ton une vers via vos votre vous'.split(' ');\n" +
+            "  \n" +
+            "  var nameTokens = doc.name.toLowerCase().replace(escapedChars, function(char) {return charmap[char];}).split(/\\s+/).filter(function(t) {return t.length > 2 && stopWords.indexOf(t) === -1;});\n" +
+            "  var descTokens = doc.description ? doc.description.toLowerCase().replace(escapedChars, function(char) {return charmap[char];}).split(/\\s+/).filter(function(t) { return t.length > 2 && stopWords.indexOf(t) === -1;}) : [];\n" +
+            "  var addrTokens = doc.address ? doc.address.toLowerCase().replace(escapedChars, function(char) {return charmap[char];}).split(/\\s+/).filter(function(t) {return t.length > 2 && stopWords.indexOf(t) === -1;}) : [];\n" +
+            "  var allTokens = nameTokens.concat(descTokens).concat(addrTokens).join(';');\n" +
+            "  \n" +
+            "  for(var i in nameTokens) {\n" +
+            "    emit(nameTokens[i], allTokens);\n" +
+            "  }\n" +
+            "  \n" +
+            "  for(var k in descTokens) {\n" +
+            "    emit(descTokens[k], allTokens);\n" +
+            "  }  \n" +
+            "    \n" +
+            "  for(var j in addrTokens) {\n" +
+            "    emit(addrTokens[j], allTokens);\n" +
+            "  }  \n" +
+            "}"
+          }
+        }
+      };
+      let lookupDoc = {
+        _id: SeedsService.LOOKUP_DOC,
+        views: {
+          by_author: {
+            map: "function (doc) {\n" +
+            "  if(doc.author) {\n" +
+            "    emit(doc.author, null);  \n" +
+            "  }\n" +
+            "}"
+          }
+        }
+      };
+
+      return this.localDatabase.get(SeedsService.SEARCH_DOC).then(() => {
+        console.log('search doc present');
+        return this.searchNodes('init', Seeds.SCOPE_ALL);
+      }).catch((err) => {
+        console.log('search doc missing');
+        return this.localDatabase.put(searchDoc).then(() => {
+          return this.searchNodes('init', Seeds.SCOPE_ALL);
+        }).catch((err) => {
+          console.log("local search doc error : " + JSON.stringify(err));
+        });
+      }).then(() => {
+        this.localDatabase.get(SeedsService.LOOKUP_DOC).then(() => {
+          console.log('lookup doc present');
+          return this.lookUpNodes('xxx');
+        }).catch((err) => {
+          console.log('lookup doc missing');
+          return this.localDatabase.put(lookupDoc).then(() => {
+            console.log('lookup doc added');
+            return this.lookUpNodes('xxx');
+          }).catch((err) => {
+            console.log("lookup doc error : " + JSON.stringify(err));
+          });
+        });
       });
     }
   }

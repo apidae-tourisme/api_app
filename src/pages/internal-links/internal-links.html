@@ -34,10 +34,10 @@
     <ion-spinner name="dots"></ion-spinner>
     <p ion-text color="light">Recherche en cours</p>
   </div>
-  <div class="loading_spinner" *ngIf="seedsService.idxBuilding" text-center>
-    <ion-spinner name="dots"></ion-spinner>
-    <p ion-text color="light">Indexation en cours, veuillez patienter quelques instants</p>
-  </div>
+  <!--<div class="loading_spinner" *ngIf="seedsService.idxBuilding" text-center>-->
+    <!--<ion-spinner name="dots"></ion-spinner>-->
+    <!--<p ion-text color="light">Indexation en cours, veuillez patienter quelques instants</p>-->
+  <!--</div>-->
   <ion-list *ngIf="!searchQuery || searchQuery.length < 3">
     <ion-list-header icon-left color="action" text-left no-margin class="counter">
       <h2>Graines liées</h2>

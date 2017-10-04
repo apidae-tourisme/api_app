@@ -3,7 +3,6 @@ import {NavController, IonicPage, ModalController, NavParams, Events} from 'ioni
 import {SeedsService} from "../../providers/seeds.service";
 import {AuthService} from "../../providers/auth.service";
 import {Seed} from "../../models/seed.model";
-import {ApiAppConfig} from "../../providers/apiapp.config";
 
 @IonicPage({
   segment: 'initialisation'
@@ -58,7 +57,7 @@ export class LoadingPage {
     this.msg = "Mise à jour de l'index - 1/2";
     return this.dataService.buildEmailIndex().then(() => {
       this.msg = "Mise à jour de l'index - 2/2";
-      this.dataService.buildSearchIndex();
+      return this.dataService.buildSearchIndex();
     });
   }
 
