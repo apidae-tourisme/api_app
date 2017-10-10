@@ -5,14 +5,14 @@
         <ion-icon name="hexa-left" color="link"></ion-icon>
       </button>
     </ion-buttons>
-    <ion-title text-center>Partager le contenu</ion-title>
+    <ion-title text-center>Partager la graine</ion-title>
   </ion-navbar>
 </ion-header>
 
 <ion-content id="share_form">
   <ion-list>
     <ion-item text-wrap>
-      <h2>Tri</h2>
+      <h2>Trier le contenu</h2>
       <p>par ordre {{sortBy == 'alpha' ? 'alphabétique' : 'chronologique'}}</p>
       <button ion-button item-right large color="link" [clear]="sortBy != 'alpha'" icon-only (click)="setSortBy('alpha')">
         <ion-icon name="ios-list"></ion-icon>

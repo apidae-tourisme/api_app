@@ -2,9 +2,7 @@ import {Component, ViewChild, NgZone} from '@angular/core';
 import {App, NavParams, Events, NavController, Content, AlertController, Platform, IonicPage} from 'ionic-angular';
 import {DomSanitizer, SafeUrl} from "@angular/platform-browser";
 import {ExplorerService} from "../../providers/explorer.service";
-import {SearchService} from "../../providers/search.service";
 import {AuthService} from "../../providers/auth.service";
-import {Seed} from "../../models/seed.model";
 import {InAppBrowser} from "@ionic-native/in-app-browser";
 import {SeedsService} from "../../providers/seeds.service";
 
@@ -21,16 +19,16 @@ export class DetailsPage {
   public authorId;
 
   constructor(private app: App, private navCtrl: NavController, public events: Events, private sanitizer: DomSanitizer,
-              public explorerService: ExplorerService, public searchService: SearchService, public authService: AuthService,
+              public explorerService: ExplorerService, public authService: AuthService,
               public alertCtrl: AlertController, public dataService: SeedsService, private navParams: NavParams,
               private iab: InAppBrowser, private zone: NgZone, private platform: Platform) {
   }
 
   ionViewDidEnter(): void {
     if(!this.authService.userSeed) {
-      this.dataService.getCurrentUserSeed().then((data) => {
-        if(data) {
-          this.authService.userSeed = new Seed(data, false, false);
+      this.dataService.getCurrentUserSeed().then((userSeed) => {
+        if(userSeed) {
+          this.authService.userSeed = userSeed;
         }
       });
     }
@@ -48,10 +46,11 @@ export class DetailsPage {
 
   loadAuthor() {
     if(this.explorerService.rootNode.author) {
-      this.dataService.getUserSeed(this.explorerService.rootNode.author).then((user) => {
-        if(user) {
-          this.authorName = user.name;
-          this.authorId = user._id;
+      this.dataService.getUsersSeeds([this.explorerService.rootNode.author]).then((seeds) => {
+        let userSeed = seeds[this.explorerService.rootNode.author];
+        if(userSeed) {
+          this.authorName = userSeed.label;
+          this.authorId = userSeed.id;
           console.log('authorId: ' + this.authorId);
         }
       });

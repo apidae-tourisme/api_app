@@ -27,7 +27,6 @@
         <ion-scroll *ngIf="!loading" scrollY="true">
           <ion-item-group id="list_details" class="scroll_view {{explorerService.rootNode.category}}" *ngIf="explorerService.rootNode" no-lines>
             <ion-item-divider color="{{explorerService.rootNode.category}}" text-wrap sticky class="view_header">
-              <ion-icon *ngIf="explorerService.rootNode.scope == 'private'" name="lock" item-end></ion-icon>
               <button ion-button (click)="editSeed()" icon-only clear large item-end>
                 <ion-icon name="hexa-pen"></ion-icon>
               </button>
@@ -37,7 +36,10 @@
                   <i class="ion-md-custom-{{explorerService.rootNode.category}}"></i>
                 </div>
               </ion-avatar>
-              <h2 text-left>{{explorerService.rootNode.label}}</h2>
+              <h2 text-left>
+                {{explorerService.rootNode.label}}&nbsp;
+                <ion-icon *ngIf="explorerService.rootNode.scope == 'private'" name="lock"></ion-icon>
+              </h2>
             </ion-item-divider>
             <ion-item text-wrap>
               <p class="pre">{{explorerService.rootNode.description}}</p>
@@ -104,18 +106,12 @@
               <ion-icon name="hexa-history" color="link"></ion-icon>
           </button>
         </div>
-        <div id="user_link">
-          <button large ion-button (click)="displayUserSeeds()" icon-only clear>
-            <ion-icon name="hexa-my-seeds" color="link"></ion-icon>
-          </button>
-        </div>
-        <graph (showDetails)="displayDetails()" (rootChange)="rootNodeChange($event)" [width]="graphWidth" [height]="graphHeight"></graph>
+        <graph (showDetails)="displayDetails()" (rootChange)="rootNodeChange($event)"></graph>
       </ion-slide>
       <ion-slide>
         <ion-scroll *ngIf="!loading" scrollY="true">
           <ion-item-group id="inclusions" class="scroll_view {{explorerService.rootNode.category}}" *ngIf="explorerService.rootNode">
             <ion-item-divider color="{{explorerService.rootNode.category}}" class="view_header" text-wrap sticky>
-              <ion-icon *ngIf="explorerService.rootNode.scope == 'private'" name="lock" item-end></ion-icon>
               <button ion-button (click)="shareSeed()" icon-only clear large item-end>
                 <ion-icon name="hexa-share"></ion-icon>
               </button>
@@ -125,7 +121,10 @@
                   <i class="ion-md-custom-{{explorerService.rootNode.category}}"></i>
                 </div>
               </ion-avatar>
-              <h2 text-left>{{explorerService.rootNode.label}}</h2>
+              <h2 text-left>
+                {{explorerService.rootNode.label}}&nbsp;
+                <ion-icon *ngIf="explorerService.rootNode.scope == 'private'" name="lock"></ion-icon>
+              </h2>
             </ion-item-divider>
             <button ion-item *ngFor="let node of explorerService.rootNode.includedSeeds" (click)="navigateTo(node.id, false, false)" text-wrap>
               <ion-icon *ngIf="node.scope == 'private'" name="lock" class="item_lock"></ion-icon>
@@ -148,7 +147,7 @@
     <div>
       <img src="assets/img/flowers-left.png"/>
       <img src="assets/img/flowers-right.png"/>
-      <apiwheel (viewChange)="updateView($event)"></apiwheel>
+      <apiwheel (viewChange)="updateView($event)" (swipe)="wheelSwipe($event)"></apiwheel>
     </div>
   </div>
 </ion-content>

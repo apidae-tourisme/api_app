@@ -33,7 +33,9 @@ export class FormPage {
   }
 
   closeForm(): void {
-    this.navCtrl.pop();
+    this.explorerService.loadNodeData(this.node.id, () => {
+      this.navCtrl.pop();
+    });
   }
 
   dismissForm(): void {

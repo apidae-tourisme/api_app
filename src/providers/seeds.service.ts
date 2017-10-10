@@ -2,21 +2,16 @@ import {Injectable} from "@angular/core";
 import {ApiAppConfig} from "./apiapp.config";
 import {Seed} from "../models/seed.model";
 import PouchDB from 'pouchdb-browser';
-// import PouchAdapterSqlite from 'pouchdb-adapter-cordova-sqlite';
 import {Seeds} from "./seeds";
 import {ProgressHttp} from "angular-progress-http";
 import {Events, Platform} from "ionic-angular";
 import {AuthService} from "./auth.service";
-// import * as DbWorker from "worker-loader!../workers/db.worker";
-// import PromiseWorker from 'promise-worker';
-// import WorkerPouch from 'worker-pouch';
 
 declare var workerPouch: any;
 
 @Injectable()
 export class SeedsService {
 
-  private static readonly USERS_INDEX_DOC = "_local/users_by_email";
   private static readonly CURRENT_USER = "_local/current_user";
   private static readonly SEARCH_DOC = "_design/search_local";
   private static readonly SEARCH_PATH = "search_local/all_fields";
@@ -24,14 +19,14 @@ export class SeedsService {
   private static readonly USER_SEEDS_VIEW = "_design/scopes/_list/get/seeds";
   private static readonly LOOKUP_DOC = "_design/lookup";
   private static readonly LOOKUP_BY_AUTHOR = "lookup/by_author";
+  private static readonly USERS_DOC = "_design/users";
+  private static readonly USERS_BY_EMAIL = "users/by_email";
 
   private localDatabase: any;
   private remoteDatabase: any;
   private sync: any;
   public idxBuilding: boolean;
   private isMobile: boolean;
-  private isSafari: boolean;
-  // private worker: any;
 
   private static readonly CHARMAP = {
     'à': 'a', 'á': 'a', 'â': 'a', 'ä': 'a', 'æ': 'ae', 'œ': 'oe', 'ç': 'c', 'è': 'e', 'é': 'e', 'ê': 'e', 'ë': 'e',
@@ -45,63 +40,48 @@ export class SeedsService {
 
   constructor(private http: ProgressHttp, private evt: Events, private platform: Platform,
               private authService: AuthService) {
-    this.isMobile = this.platform.is('mobile');
-    this.isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
     (<any>PouchDB).adapter('worker', workerPouch);
-
-    // platform.ready().then(() => {
-      // PouchDB.plugin(PouchAdapterSqlite);
-      // this.worker = new PromiseWorker(new DbWorker());
-      this.remoteDatabase = this.getRemoteDb();
-      this.localDatabase = this.getLocalDb(ApiAppConfig.LOCAL_DB, this.isSafari);
-      console.log('Using adapter in main : ' + this.localDatabase.adapter);
-    // });
+    this.isMobile = this.platform.is('mobile');
+    this.remoteDatabase = this.getRemoteDb();
+    this.localDatabase = this.getLocalDb(ApiAppConfig.LOCAL_DB);
   }
 
-  // Todo : es6-related runtime issue... to be investigated
   // Inits local db once the user is logged in
-  // Note : only one local db is maintained - this is to prevent the app from exceeding the browsers space storage limit
   initLocalDb() {
-    let legacyDbName = ApiAppConfig.LOCAL_DB + '_' + btoa(this.authService.userEmail);
-    console.log('isSafari : ' + this.isSafari + ' - platforms : ' + this.platform.platforms());
-    // Clear legacy per-user local databases
-    return this.clearDb(legacyDbName, this.isSafari).then(() => {
-      this.localDatabase.get(SeedsService.CURRENT_USER).then((userDoc) => {
+    return this.localDatabase.get(SeedsService.CURRENT_USER).then((userDoc) => {
         return userDoc.email;
-      }).catch((err) => {
-        console.log('current user doc missing');
-        return this.authService.userEmail;
-      }).then((prevUser) => {
-        if(prevUser !== this.authService.userEmail) {
-          // if new user, clear local db
-          return this.clearDb(ApiAppConfig.LOCAL_DB, this.isSafari).then(() => {
-            this.localDatabase = this.getLocalDb(ApiAppConfig.LOCAL_DB, this.isSafari);
-            return this.localDatabase.put({_id: SeedsService.CURRENT_USER, email: this.authService.userEmail});
-          });
-        } else {
-          // keep existing db otherwise
-          this.localDatabase = this.getLocalDb(ApiAppConfig.LOCAL_DB, this.isSafari);
-          return Promise.resolve();
-        }
-      });
+    }).catch((err) => {
+      console.log('current user doc missing');
+      return this.authService.userEmail;
+    }).then((prevUser) => {
+      if(prevUser !== this.authService.userEmail) {
+        // if new user, clear local db
+        return this.clearDb(ApiAppConfig.LOCAL_DB).then(() => {
+          this.localDatabase = this.getLocalDb(ApiAppConfig.LOCAL_DB);
+          return this.localDatabase.put({_id: SeedsService.CURRENT_USER, email: this.authService.userEmail});
+        });
+      } else {
+        // keep existing db otherwise
+        this.localDatabase = this.getLocalDb(ApiAppConfig.LOCAL_DB);
+        return Promise.resolve();
+      }
     }).catch((err) => {
       console.log('initLocalDb error : ' + JSON.stringify(err));
     });
   }
 
-  clearDb(dbName, isSafari) {
+  clearDb(dbName) {
     console.log('Clearing local database : ' + dbName);
-    return this.getLocalDb(dbName, isSafari).destroy();
+    return this.getLocalDb(dbName).destroy();
   }
 
   clearLocalDb() {
-    this.clearDb(ApiAppConfig.LOCAL_DB, this.isSafari);
+    this.clearDb(ApiAppConfig.LOCAL_DB);
     this.idxBuilding = false;
   }
 
-  getLocalDb(dbName, isSafari) {
+  getLocalDb(dbName) {
     return new PouchDB(dbName, {adapter: 'worker'});
-    // return isSafari ? new PouchDB(dbName, {size: this.isMobile ? 49 : 99, adapter: 'websql'}) : new PouchDB(dbName);
   }
 
   getRemoteDb() {
@@ -187,27 +167,34 @@ export class SeedsService {
   }
 
   buildEmailIndex() {
-    let usersByEmail = {};
-    return this.localDatabase.allDocs({include_docs: true}).then((res) => {
-      let persons = res.rows.filter((row) => {return row.doc && row.doc.type === 'Person' && row.doc.email;});
-      for (let p of persons) {
-        usersByEmail[p.doc.email] = p.id;
+    let usersDoc = {
+      _id: SeedsService.USERS_DOC,
+      views: {
+        by_email: {
+          map: "function (doc) {\n" +
+          "  if(doc.type === 'Person' && doc.email) {\n" +
+          "    emit(doc.email, null);  \n" +
+          "  }\n" +
+          "}"
+        }
       }
-      return this.localDatabase.get(SeedsService.USERS_INDEX_DOC).catch((err) => {
-        console.log('email index doc missing');
-        return this.localDatabase.put({
-          _id: SeedsService.USERS_INDEX_DOC,
-          index: usersByEmail
-        }).catch((err) => {
-          console.log('email index save error : ' + JSON.stringify(err));
-        });
+    };
+    return this.localDatabase.get(SeedsService.USERS_DOC).then(() => {
+      console.log('users doc present');
+      return this.getUsersSeeds(['xxx']);
+    }).catch((err) => {
+      console.log('users doc missing');
+      return this.localDatabase.put(usersDoc).then(() => {
+        console.log('users doc added');
+        return this.getUsersSeeds(['xxx']);
+      }).catch((err) => {
+        console.log("users doc error : " + JSON.stringify(err));
       });
     });
   }
 
-
   buildSearchIndex() {
-    console.log('building search index');
+    console.log('building indexes');
     if(!this.idxBuilding) {
       this.idxBuilding = true;
       let searchDoc = {
@@ -219,21 +206,12 @@ export class SeedsService {
             "  var escapedChars = /[àáâäæçèéêëîïôöùûü\\-_!?.,:;/\"()'`]/g;\n" +
             "  var stopWords = 'aux avec bis ceci cela ces cet cette ceux dans des elle elles est eux etes for ici ils les leur leurs lui mais mes mis moi mon meme nos notre nous oeuvre ont par pas plus pour que quel quelle quelles quels qui sans ses soi sommes son sont suis sur surtout tes the toi ton une vers via vos votre vous'.split(' ');\n" +
             "  \n" +
-            "  var nameTokens = doc.name.toLowerCase().replace(escapedChars, function(char) {return charmap[char];}).split(/\\s+/).filter(function(t) {return t.length > 2 && stopWords.indexOf(t) === -1;});\n" +
-            "  var descTokens = doc.description ? doc.description.toLowerCase().replace(escapedChars, function(char) {return charmap[char];}).split(/\\s+/).filter(function(t) { return t.length > 2 && stopWords.indexOf(t) === -1;}) : [];\n" +
-            "  var addrTokens = doc.address ? doc.address.toLowerCase().replace(escapedChars, function(char) {return charmap[char];}).split(/\\s+/).filter(function(t) {return t.length > 2 && stopWords.indexOf(t) === -1;}) : [];\n" +
-            "  var allTokens = nameTokens.concat(descTokens).concat(addrTokens).join(';');\n" +
+            "  var indexedFields = doc.name + ' ' + (doc.description || '') + ' ' + (doc.address || '');\n" +
+            "  var allTokens = indexedFields.toLowerCase().replace(escapedChars, function(char) {return charmap[char];}).split(/\\s+/).filter(function(t) {return t.length > 2 && stopWords.indexOf(t) === -1;});\n" +
+            "  var joinedTokens = '~' + (doc.scope || 'apidae') + ';' + allTokens.join(';');\n" +
             "  \n" +
-            "  for(var i in nameTokens) {\n" +
-            "    emit(nameTokens[i], allTokens);\n" +
-            "  }\n" +
-            "  \n" +
-            "  for(var k in descTokens) {\n" +
-            "    emit(descTokens[k], allTokens);\n" +
-            "  }  \n" +
-            "    \n" +
-            "  for(var j in addrTokens) {\n" +
-            "    emit(addrTokens[j], allTokens);\n" +
+            "  for(var i in allTokens) {\n" +
+            "    emit(allTokens[i], joinedTokens);\n" +
             "  }  \n" +
             "}"
           }
@@ -244,8 +222,8 @@ export class SeedsService {
         views: {
           by_author: {
             map: "function (doc) {\n" +
-            "  if(doc.author) {\n" +
-            "    emit(doc.author, null);  \n" +
+            "  if(doc.author && doc.updated_at) {\n" +
+            "    emit(doc.author + doc.updated_at, null);\n" +
             "  }\n" +
             "}"
           }
@@ -306,9 +284,12 @@ export class SeedsService {
   lookUpNodes(email) {
     console.time('look up author ' + email);
     return this.localDatabase.query(SeedsService.LOOKUP_BY_AUTHOR, {
-      keys: [email],
+      startkey: email + '9',
+      endkey: email,
       include_docs: true,
-      attachments: true
+      attachments: true,
+      descending: true,
+      limit: 50
     }).then((results) => {
       console.timeEnd('look up author ' + email);
       return results.rows.filter((row) => {return row.id && row.doc;})
@@ -318,7 +299,7 @@ export class SeedsService {
     });
   }
 
-  searchNodes(query, scope) {
+  searchNodes(query, scope): Promise<Array<string>> {
     let tokens = this.tokenize(this.normalize(query));
 
     console.time('search-query');
@@ -328,30 +309,35 @@ export class SeedsService {
     })).then((allResults) => {
       console.timeEnd('search-query');
       console.time('search-filter');
-      let matches = deDup(allResults.map((r) => r['results']).reduce((a, b) => a.concat(b), []));
+      let matches = this.deDup(allResults.map((r) => r['results']).reduce((a, b) => a.concat(b), []),
+        (res) => res.id);
+      // If scope specified, add a scope-related term to match only relevant results
+      if(scope != Seeds.SCOPE_ALL) {
+        tokens.unshift('~' + scope);
+      }
       results = matches
-        .filter((result) => {
-          return tokens.every((t) => result.value.indexOf(t) !== -1)
-        })
+        .filter((result) => { return tokens.every((t) => result.value.indexOf(t) !== -1); })
         .map((result) => result.id);
       console.timeEnd('search-filter');
       console.time('search-results');
-      return this.localDatabase.allDocs({keys: results, include_docs: true, attachments: true});
-    }).then((queryResults) => {
-      console.timeEnd('search-results');
-      return queryResults.rows.map((row) => {return row.doc;})
-        .filter((doc) => {return (scope == Seeds.SCOPE_ALL || doc.scope == scope);});
+      return Promise.resolve(results);
+      // return this.localDatabase.allDocs({keys: results, include_docs: true, attachments: true});
+    // }).then((queryResults) => {
+    //   console.timeEnd('search-results');
+    //   return queryResults.rows.map((row) => {return row.doc;})
+    //     .filter((doc) => {return (scope == Seeds.SCOPE_ALL || doc.scope == scope);})
+    //     .map((doc) => {return new Seed(doc, false, false);});
     }).catch(function (err) {
       console.log('search error : ' + JSON.stringify(err));
     });
+  }
 
-    function deDup(arr) {
-      let arrObject = {};
-      for(let i = 0; i < arr.length; i++) {
-        arrObject[arr[i].id] = arr[i];
-      }
-      return Object.keys(arrObject).map((k) => {return arrObject[k];});
+  deDup(arr, keySelector) {
+    let arrObject = {};
+    for(let i = 0; i < arr.length; i++) {
+      arrObject[keySelector(arr[i])] = arr[i];
     }
+    return Object.keys(arrObject).map((k) => {return arrObject[k];});
   }
 
   searchTerm(term) {
@@ -383,7 +369,9 @@ export class SeedsService {
 
   getCurrentUserSeed() {
     return this.authService.currentUser().then((userEmail) => {
-      return this.getUserSeed(userEmail);
+      return this.getUsersSeeds([userEmail], true).then((seeds) => {
+        return seeds[userEmail];
+      });
     }).then((userSeed) => {
       if(userSeed) {
         return Promise.resolve(userSeed);
@@ -426,34 +414,23 @@ export class SeedsService {
     return new Seed(userFields, false, false);
   }
 
-  getUserSeed(userEmail) {
-    return this.localDatabase.get(SeedsService.USERS_INDEX_DOC).then((doc) => {
-      let userId = doc.index[userEmail];
-      if(userId) {
-        return this.getNodeDetails(userId);
-      } else {
-        Promise.resolve(null);
-      }
-    }).catch((err) => {
-      console.log("getUserSeed error : " + JSON.stringify(err));
-    });
-  }
-
-  getUserSeeds(emails) {
+  getUsersSeeds(emails, attachments = false) {
+    console.time('get ' + emails.length + ' users seeds');
     let usersByEmail = {};
-    return this.localDatabase.get(SeedsService.USERS_INDEX_DOC).then((doc) => {
-      let usersIds = emails.map((email) => doc.index[email]);
-      return this.localDatabase.allDocs({
-        keys: usersIds,
-        include_docs: true
-      });
+    let uniqEmails = this.deDup(emails, (email) => email);
+
+    return this.localDatabase.query(SeedsService.USERS_BY_EMAIL, {
+      keys: uniqEmails,
+      include_docs: true,
+      attachments: attachments,
     }).then((results) => {
       results.rows.map((row) => row.doc).forEach((doc) => {
-        usersByEmail[doc.email] = {id: doc._id, name: doc.name};
+        usersByEmail[doc.email] = new Seed(doc, false, false);
       });
+      console.timeEnd('get ' + emails.length + ' users seeds');
       return usersByEmail;
-    }).catch((err) => {
-      console.log("getUserSeed error : " + JSON.stringify(err));
+    }).catch(function (err) {
+      console.log('getUsersSeeds error : ' + JSON.stringify(err));
     });
   }
 

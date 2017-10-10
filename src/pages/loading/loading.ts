@@ -1,4 +1,4 @@
-import {Component, NgZone} from '@angular/core';
+import {Component} from '@angular/core';
 import {NavController, IonicPage, ModalController, NavParams, Events} from 'ionic-angular';
 import {SeedsService} from "../../providers/seeds.service";
 import {AuthService} from "../../providers/auth.service";
@@ -16,7 +16,7 @@ export class LoadingPage {
   private complete: boolean;
 
   constructor(public navCtrl: NavController, private dataService: SeedsService, private authService: AuthService,
-              private evt: Events, private zone: NgZone, private modalCtrl: ModalController, private navParams: NavParams) {
+              private evt: Events, private modalCtrl: ModalController, private navParams: NavParams) {
   }
 
   ionViewDidEnter() {
@@ -48,24 +48,23 @@ export class LoadingPage {
     this.buildIndexes().then(() => {
       this.msg = "Chargement du profil utilisateur";
       return this.dataService.getCurrentUserSeed();
-    }).then((data) => {
-      this.redirectUser(data);
+    }).then((userSeed) => {
+      this.redirectUser(userSeed);
     });
   }
 
   buildIndexes() {
-    this.msg = "Mise à jour de l'index - 1/2";
+    this.msg = "Chargement des données";
     return this.dataService.buildEmailIndex().then(() => {
-      this.msg = "Mise à jour de l'index - 2/2";
       this.dataService.buildSearchIndex().then(() => {
         this.dataService.idxBuilding = false;
       });
     });
   }
 
-  redirectUser(data) {
-    if(data) {
-      this.authService.userSeed = new Seed(data, false, false);
+  redirectUser(userSeed) {
+    if(userSeed) {
+      this.authService.userSeed = userSeed;
       if(this.authService.userSeed.termsConditions) {
         this.navigateHome();
       } else {
@@ -74,11 +73,8 @@ export class LoadingPage {
     }
   }
 
-  // root change is wrapped in a ng zone call to prevent duplicate controller instances (see https://github.com/driftyco/ionic/issues/5960)
   navigateHome(): void {
-    this.zone.run(() => {
-      this.navCtrl.setRoot('ExplorerPage', {}, {animate: false});
-    });
+    this.navCtrl.setRoot('ExplorerPage', {}, {animate: false});
   }
 
   displayTermsConditions(): void {

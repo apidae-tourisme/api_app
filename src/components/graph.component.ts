@@ -10,9 +10,7 @@ declare var d3: any;
 export class GraphComponent {
 
   private static readonly GRAPH_PATH = 'explorer';
-
-  @Input() width: number;
-  @Input() height: number;
+  private static readonly TOP_MARGIN = 70;
 
   @Output() rootChange = new EventEmitter();
   @Output() showDetails = new EventEmitter();
@@ -29,6 +27,8 @@ export class GraphComponent {
   private simulation;
   private node;
   private link;
+  private width;
+  private height;
 
   constructor(private element: ElementRef) {
     this.htmlElement = this.element.nativeElement;
@@ -49,6 +49,8 @@ export class GraphComponent {
       descLength: 50,
       periphNodesCount: 9
     };
+    this.width = window.innerWidth;
+    this.height = window.innerHeight - GraphComponent.TOP_MARGIN;
   }
 
   ngAfterViewInit() {
@@ -103,12 +105,29 @@ export class GraphComponent {
     }
   }
 
-  render(nodes, edges) {
+  render(nodes, edges, refresh = false) {
     let that = this;
     let layout = this.layout;
 
     setTimeout(function() {
       that.node = that.node.data(nodes, function(d) { return d.id; }).style("opacity", 1);
+      // Current node has been updated - force refresh
+      if(refresh) {
+        that.node.select("use.node_bg").attr("class", function (d) {
+          return d.category + " node_bg bg_" + d.category;
+        });
+        that.node.select("use.icon").attr("class", function (d) {
+          return d.category + " icon";
+        }).attr("xlink:href", function (d) {
+            return d.picture() ? '' : ('#' + d.category);
+        });
+        that.node.select("text.label").attr("class", function (d) {
+          return d.category + " label";
+        });
+        that.node.select("text.icon").text(function (d) {
+          return d.scope == 'private' ? '\uf31d' : ''
+        });
+      }
       that.node.exit().remove();
       that.link = that.link.data(edges, function(d) { return d.source + "-" + d.target; }).style("opacity", 1);
       that.link.exit().remove();
@@ -202,7 +221,7 @@ export class GraphComponent {
 
       let clickedNode = d3.select(this).datum();
       if(clickedNode.isRoot) {
-        // that.showDetails.emit();
+        that.showDetails.emit();
       } else {
         that.rootChange.emit({newRoot: clickedNode.id});
         that.nodesContainer.selectAll("g.node").filter(function (d) {

@@ -71,7 +71,7 @@ export class WheelComponent {
     let that = this;
     allLinks.on("click", translateViews);
 
-    function translateViews() {
+    function translateViews(evt) {
       let selectedView = d3.select(this).datum();
       that.translateViews(allLinks, selectedView);
     }
@@ -89,6 +89,18 @@ export class WheelComponent {
       let allLinks = this.wheelContainer.selectAll(".view");
       this.translateViews(allLinks, (this.currentView == 2 || this.currentView == 4) ? 3 : 0);
     }
+  }
+
+  translateNext() {
+    let allLinks = this.wheelContainer.selectAll(".view");
+    let nextView = (this.currentView + 1) % 6;
+    this.translateViews(allLinks, nextView);
+  }
+
+  translatePrev() {
+    let allLinks = this.wheelContainer.selectAll(".view");
+    let prevView = (this.currentView - 1 + 6) % 6;
+    this.translateViews(allLinks, prevView);
   }
 
   translateViews(allLinks, selectedView) {

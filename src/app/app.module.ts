@@ -1,11 +1,9 @@
 import {NgModule} from '@angular/core';
 import {IonicApp, IonicModule} from 'ionic-angular';
 import {ApiApp} from './app.component';
-import {DataService} from "../providers/data.service";
 import {ExplorerService} from "../providers/explorer.service";
 import {AuthService} from "../providers/auth.service";
 import {IonicStorageModule} from '@ionic/storage';
-import {SearchService} from "../providers/search.service";
 import {Seeds} from "../providers/seeds";
 import {ApiAppConfig} from "../providers/apiapp.config";
 import {BrowserModule} from "@angular/platform-browser";
@@ -56,10 +54,8 @@ import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
     Network,
     ApiAppConfig,
     AuthService,
-    DataService,
     SeedsService,
     ExplorerService,
-    SearchService,
     RemoteDataService,
     Seeds
   ]

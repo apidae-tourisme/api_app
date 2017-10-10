@@ -1,12 +1,12 @@
 import {Component, ViewChild} from '@angular/core';
-import {NavController, Searchbar, NavParams, IonicPage, Content} from 'ionic-angular';
+import {NavController, Searchbar, IonicPage, Content} from 'ionic-angular';
 import {ExplorerService} from "../../providers/explorer.service";
-import {SearchService} from "../../providers/search.service";
 import {FormPage} from "../form/form";
 import {Keyboard} from "@ionic-native/keyboard";
 import {Seeds} from "../../providers/seeds";
 import {SeedsService} from "../../providers/seeds.service";
 import {Seed} from "../../models/seed.model";
+import {AuthService} from "../../providers/auth.service";
 
 @IonicPage({
   segment: 'recherche'
@@ -15,21 +15,27 @@ import {Seed} from "../../models/seed.model";
   templateUrl: 'search.html'
 })
 export class SearchPage {
+  public static readonly BATCH_SIZE = 50;
+
   @ViewChild(Searchbar) searchbar: Searchbar;
   @ViewChild(Content) content: Content;
 
-  private tabIndex: number;
-
+  public searching: boolean;
   public searchQuery: string;
   public searchScope: string;
-  public lastChanges: Array<Seed>;
+  public activityScope: string;
+  public resultsIds: Array<string>;
+  public results: Array<Seed>;
   public changesAuthors: any;
 
-  constructor(public explorerService: ExplorerService, public searchService: SearchService, public seedsService: SeedsService,
-              private keyboard: Keyboard, private navCtrl: NavController, private params: NavParams) {
+  constructor(public explorerService: ExplorerService, public seedsService: SeedsService,
+              private authService: AuthService, private keyboard: Keyboard, private navCtrl: NavController) {
     this.searchQuery = null;
-    this.tabIndex = +params.get('tabIndex');
     this.searchScope = Seeds.SCOPE_ALL;
+    this.results = [];
+    this.resultsIds = [];
+    this.searching = false;
+    this.changesAuthors = {};
   }
 
   ionViewDidEnter() {
@@ -37,38 +43,58 @@ export class SearchPage {
       this.searchbar.setFocus();
       this.keyboard.show();
     }, 200);
-    this.loadChangesFeed();
+    this.activityScope = 'self';
+    this.loadUserActivity();
+  }
+
+  toggleActivity(scope) {
+    this.activityScope = scope;
+    this.changesAuthors = {};
+    if(this.activityScope == 'network') {
+      this.loadChangesFeed();
+    } else {
+      this.loadUserActivity();
+    }
+  }
+
+  loadUserActivity() {
+    this.results = [];
+    this.searching = true;
+    this.seedsService.lookUpNodes(this.authService.userEmail).then((seeds) => {
+      this.results = seeds;
+      this.searching = false;
+    });
   }
 
   loadChangesFeed() {
-    this.lastChanges = [];
-    this.changesAuthors = {};
-    let changesLimit = 20;
+    this.results = [];
+    this.searching = true;
     console.time('changes-feed');
-    let changes = this.seedsService.changesFeed(changesLimit + 5)
+    let changes = this.seedsService.changesFeed(SearchPage.BATCH_SIZE + 5)
       .on('change', (change) => {
-        if(this.lastChanges.length < changesLimit) {
-          if(change.doc.name) {
-            this.lastChanges.push(new Seed(change.doc, false, false));
+        if(this.results.length < SearchPage.BATCH_SIZE) {
+          if(change.doc.name && !change.deleted) {
+            this.results.push(new Seed(change.doc, false, false));
           }
         } else {
           changes.cancel();
         }
       }).on('complete', (info) => {
         console.timeEnd('changes-feed');
-        if(this.lastChanges.length > 0) {
-          let emails = this.lastChanges.reduce((mails, change) => {
+        if(this.results.length > 0) {
+          let emails = this.results.reduce((mails, change) => {
             if(change.author) {
               mails.push(change.author);
             }
             return mails;
           }, []);
           if(emails.length > 0) {
-            this.seedsService.getUserSeeds(emails).then((authorsByEmail) => {
+            this.seedsService.getUsersSeeds(emails).then((authorsByEmail) => {
               this.changesAuthors = authorsByEmail;
             });
           }
         }
+        this.searching = false;
       }).on('error', (err) => {
         console.log("Changes feed error : " + JSON.stringify(err));
         changes.cancel();
@@ -79,12 +105,12 @@ export class SearchPage {
     }, 5000);
   }
 
+  authorInfo(seed) {
+    return this.changesAuthors[seed.author] ? this.changesAuthors[seed.author].label : '';
+  }
+
   updateInfo(seed) {
-    let authorChanges = this.changesAuthors[seed.author];
-    if(authorChanges) {
-      return "Mise à jour le " + this.dateFormat(seed.updateDate || seed.creationDate) + " par " + authorChanges.name;
-    }
-    return '';
+    return "Le " + this.dateFormat(seed.updateDate || seed.creationDate);
   }
 
   dateFormat(date): string {
@@ -104,17 +130,17 @@ export class SearchPage {
     this.explorerService.navigateTo(node, () => {this.navCtrl.popToRoot();});
   }
 
-  loadResults(): void {
-    this.searchService.toggleSearch();
-  }
-
-  clearResults(): void {
-    this.searchService.clearNodes();
+  clearResults(evt): void {
     this.searchQuery = null;
+    this.results = [];
+    this.resultsIds = [];
+    this.searching = false;
+    this.content.resize();
+    this.toggleActivity(this.activityScope);
   }
 
   closeSearch(): void {
-    this.clearResults();
+    this.clearResults({});
     this.navCtrl.pop();
   }
 
@@ -123,9 +149,35 @@ export class SearchPage {
   }
 
   searchNodes(evt): void {
-    this.searchService.searchNodes(this.searchQuery, this.searchScope, () => {
-      this.content.resize();
-    });
+    if (this.validQuery()) {
+      this.results = [];
+      this.searching = true;
+      this.seedsService.searchNodes(this.searchQuery, this.searchScope).then((seedsIds) => {
+        this.resultsIds = seedsIds;
+        this.seedsService.getNodes(seedsIds.slice(0, SearchPage.BATCH_SIZE)).then((seeds) => {
+          this.results = seeds;
+          this.searching = false;
+          this.content.resize();
+        });
+      });
+    }
+  }
+
+  doInfinite() {
+    if(this.resultsIds.length > this.results.length) {
+      return this.seedsService
+        .getNodes(this.resultsIds.slice(this.results.length, this.results.length + SearchPage.BATCH_SIZE))
+        .then((seeds) => {
+          this.results.push(...seeds);
+          return Promise.resolve();
+      });
+    } else {
+      return Promise.resolve();
+    }
+  }
+
+  validQuery(): boolean {
+    return this.searchQuery && this.searchQuery.trim() != '' && this.searchQuery.length > 2;
   }
 
   createSeed() {

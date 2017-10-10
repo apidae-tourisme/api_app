@@ -16,7 +16,7 @@
 
 <ion-content id="list_content">
   <div id="list_wrapper">
-    <div id="loading_spinner" *ngIf="!inclusions" text-center margin-top>
+    <div class="loading_spinner" *ngIf="!inclusions" text-center margin-top>
       <ion-spinner name="dots"></ion-spinner><br/><span>Chargement en cours</span>
     </div>
     <ion-list id="scroll_nodes" *ngIf="inclusions">

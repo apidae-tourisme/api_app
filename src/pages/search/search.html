@@ -6,8 +6,8 @@
       </button>
     </ion-buttons>
     <ion-toolbar no-border>
-      <div id="search_counter">{{(searchQuery && searchQuery.length >= 3) ? (searchService.searching ? '...'  : searchService.nodes.length) : explorerService.networkData.count}}</div>
-      <ion-searchbar #search (ionInput)="searchNodes($event)" (ionFocus)="loadResults()" [(ngModel)]="searchQuery"
+      <div id="search_counter">{{validQuery() ? (searching ? '...'  : resultsIds.length) : explorerService.networkData.count}}</div>
+      <ion-searchbar #search (ionInput)="searchNodes($event)" (ionClear)="clearResults($event)" [(ngModel)]="searchQuery"
                      placeholder="Rechercher" debounce="800"></ion-searchbar>
     </ion-toolbar>
     <ion-buttons right text-center>
@@ -16,7 +16,7 @@
       </button>
     </ion-buttons>
   </ion-navbar>
-  <ion-toolbar *ngIf="searchQuery && searchQuery.length > 3" id="search_filters" color="action" no-padding no-border>
+  <ion-toolbar *ngIf="validQuery()" id="search_filters" color="action" no-padding no-border>
     <ion-segment [(ngModel)]="searchScope" (ionChange)="scopeChanged($event)" no-border>
       <ion-segment-button value="all">
         <span ion-text [color]="searchScope == 'all' ? 'lighter' : 'link'">Tout</span>
@@ -34,31 +34,34 @@
   </ion-toolbar>
 </ion-header>
 <ion-content>
-  <div class="loading_spinner" *ngIf="searchService.searching" text-center>
+  <div class="loading_spinner" *ngIf="searching" text-center>
     <ion-spinner name="dots"></ion-spinner>
-    <p ion-text color="light">Recherche en cours</p>
+    <p ion-text color="text_alt">Recherche en cours</p>
   </div>
   <div class="loading_spinner" *ngIf="seedsService.idxBuilding" text-center>
     <ion-spinner name="dots"></ion-spinner>
-    <p ion-text color="light">Indexation en cours, veuillez patienter quelques instants</p>
+    <p ion-text color="text_alt">Indexation en cours, veuillez patienter quelques instants</p>
   </div>
-  <ion-list *ngIf="!searchQuery || searchQuery.length < 3">
-    <ion-list-header icon-left color="action" text-center no-margin>
-      <ion-icon name="pulse"></ion-icon>
-      Activité du réseau
-    </ion-list-header>
-    <button ion-item *ngFor="let node of lastChanges" text-wrap (click)="navigateTo(node.id)">
+  <ion-item-group *ngIf="!seedsService.idxBuilding && !validQuery()">
+    <ion-item-divider color="action" no-margin sticky>
+      <ion-label id="search_activity" text-center>
+        <button ion-button clear [color]="activityScope == 'self' ? 'lighter' : 'link'" (click)="toggleActivity('self')">Mon activité</button>
+        <ion-icon name="pulse" color="link"></ion-icon>
+        <button ion-button clear [color]="activityScope == 'network' ? 'lighter' : 'link'" (click)="toggleActivity('network')">Activité du réseau</button>
+      </ion-label>
+    </ion-item-divider>
+    <button ion-item *ngFor="let node of results" text-wrap (click)="navigateTo(node.id)">
       <ion-icon *ngIf="node.scope == 'private'" name="lock" class="item_lock"></ion-icon>
       <ion-avatar item-left class="bg_seed {{node.category}}">
         <img *ngIf="node.picture()" src="{{node.pictureData()}}"/>
         <div *ngIf="!node.picture()" text-center><i class="ion-md-custom-{{node.category}}"></i></div>
       </ion-avatar>
       <h2>{{node.label}}</h2>
-      <p *ngIf="node.author" text-nowrap>{{updateInfo(node)}}</p>
+      <p text-nowrap>{{updateInfo(node)}}<br/>{{authorInfo(node)}}</p>
     </button>
-  </ion-list>
-  <ion-list *ngIf="searchService.nodes.length > 0" id="search_results">
-    <button ion-item *ngFor="let node of searchService.nodes" text-wrap (click)="navigateTo(node.id)">
+  </ion-item-group>
+  <ion-list *ngIf="validQuery() && results.length > 0" id="search_results">
+    <button ion-item *ngFor="let node of results" text-wrap (click)="navigateTo(node.id)">
       <ion-icon *ngIf="node.scope == 'private'" name="lock" class="item_lock"></ion-icon>
       <ion-avatar item-left class="bg_seed {{node.category}}">
         <img *ngIf="node.picture()" src="{{node.pictureData()}}"/>
@@ -68,4 +71,10 @@
       <p text-nowrap>{{node.description}}</p>
     </button>
   </ion-list>
+  <ion-infinite-scroll (ionInfinite)="$event.waitFor(doInfinite())">
+    <ion-infinite-scroll-content></ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+  <div class="loading_spinner" *ngIf="!seedsService.idxBuilding && validQuery() && results.length == 0" text-center>
+    <p ion-text color="text_alt">Aucun résultat</p>
+  </div>
 </ion-content>

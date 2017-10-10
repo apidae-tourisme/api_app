@@ -2,3 +2,8 @@
 
 # Frequent issues
 - Uncaught syntax error with "<" token and main.js chunk not loaded : check path strategy and base href in index.html
+
+# Reasons for not using WKWebView for the moment
+- Not supported by PouchDB
+- Also behaves strangely in regards to web workers
+- Still requires a local webserver, which makes pretty much everything more complex to implement

@@ -26,11 +26,11 @@ export class SharePage {
     this.sortBy = WidgetPage.SORT_ALPHABET;
     this.sharingModes = [
       {icon: 'open', label: 'Partager sur le web', url: ''},
-      {icon: 'at', label: 'Envoyer par email', url: 'mailto:?subject=Partage ApiApp&body='},
+      {icon: 'at', label: 'Envoyer par email', url: 'mailto:?subject=Apidae Tourisme - Partage depuis ApiApp&body='},
       {icon: 'chatbubbles', label: 'Envoyer par SMS', url: 'sms:&body='},
       {icon: 'logo-facebook', label: 'Partager sur Facebook', url: 'https://www.facebook.com/sharer/sharer.php?u='},
-      {icon: 'logo-twitter', label: 'Partager sur Twitter', url: 'https://twitter.com/intent/tweet/?text=ApiApp&url='},
-      {icon: 'logo-linkedin', label: 'Partager sur LinkedIn', url: 'https://www.linkedin.com/shareArticle?mini=true&url='},
+      {icon: 'logo-twitter', label: 'Partager sur Twitter', url: 'https://twitter.com/intent/tweet/?text=Partage #ApiApp réseau @apidaetourisme&url='},
+      {icon: 'logo-linkedin', label: 'Partager sur LinkedIn', url: 'https://www.linkedin.com/shareArticle?mini=true&title=Apidae Tourisme - Partage depuis ApiApp&url='},
     ]
   }
 
@@ -43,7 +43,7 @@ export class SharePage {
   }
 
   shareWidget(mode) {
-    this.openUrl(mode.url + this.widgetUrl());
+    this.openUrl(encodeURI(mode.url + this.widgetUrl()).replace(/#/g, '%23'));
   }
 
   openUrl(url): void {

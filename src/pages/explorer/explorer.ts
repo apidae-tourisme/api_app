@@ -1,7 +1,6 @@
 import {Component, ViewChild} from '@angular/core';
 import {AlertController, App, Content, IonicPage, NavController, Platform, Slides} from 'ionic-angular';
 import {ExplorerService} from "../../providers/explorer.service";
-import {SearchService} from "../../providers/search.service";
 import {GraphComponent} from "../../components/graph.component";
 import {SeedsService} from "../../providers/seeds.service";
 import {AuthService} from "../../providers/auth.service";
@@ -22,15 +21,16 @@ export class ExplorerPage {
   @ViewChild(GraphComponent) graph: GraphComponent;
 
   public loading: boolean;
-  public graphWidth: number;
-  public graphHeight: number;
   public authorName;
   public authorId;
 
-  constructor(public explorerService: ExplorerService, public searchService: SearchService, public dataService: SeedsService,
+  private refresh: boolean;
+
+  constructor(public explorerService: ExplorerService, public dataService: SeedsService,
               public authService: AuthService, private navCtrl: NavController, private platform: Platform,
               private alertCtrl: AlertController, private app: App, private iab: InAppBrowser) {
     this.loading = true;
+    this.refresh = false;
   }
 
   rootNodeChange(event): void {
@@ -52,14 +52,12 @@ export class ExplorerPage {
 
   ionViewDidEnter(): void {
     if(!this.authService.userSeed) {
-      this.dataService.getCurrentUserSeed().then((data) => {
-        if(data) {
-          this.authService.userSeed = new Seed(data, false, false);
+      this.dataService.getCurrentUserSeed().then((userSeed) => {
+        if(userSeed) {
+          this.authService.userSeed = userSeed;
         }
       });
     }
-    this.graphWidth = this.content.contentWidth;
-    this.graphHeight = this.content.contentHeight;
 
     this.registerBack();
     if(!this.explorerService.rootNode) {
@@ -68,6 +66,17 @@ export class ExplorerPage {
       this.updateViews();
     }
     this.viewSlides.lockSwipes(true);
+  }
+
+  wheelSwipe(evt) {
+    // Left to right
+    if(evt.direction == '4') {
+      this.wheel.translateNext();
+    }
+    // Right to left
+    else if(evt.direction == '2') {
+      this.wheel.translatePrev();
+    }
   }
 
   navigateTo(node): void {
@@ -89,10 +98,11 @@ export class ExplorerPage {
   }
 
   displayDetails() {
-    this.navCtrl.push('DetailsPage', {id: this.explorerService.rootNode.id});
+    this.wheel.translateNext();
   }
 
   editSeed(): void {
+    this.refresh = true;
     this.navCtrl.push('FormPage', {id: this.explorerService.rootNode.id, node: this.explorerService.rootNode});
   }
 
@@ -103,8 +113,9 @@ export class ExplorerPage {
   updateViews() {
     if(this.graph) {
       this.content.resize();
-      this.graph.render(this.explorerService.networkData.nodes, this.explorerService.networkData.edges);
+      this.graph.render(this.explorerService.networkData.nodes, this.explorerService.networkData.edges, this.refresh);
       this.loading = false;
+      this.refresh = false;
     }
     if(this.wheel) {
       this.wheel.render(this.explorerService.rootNode);
@@ -118,10 +129,11 @@ export class ExplorerPage {
 
   loadAuthor() {
     if(this.explorerService.rootNode.author) {
-      this.dataService.getUserSeed(this.explorerService.rootNode.author).then((user) => {
-        if(user) {
-          this.authorName = user.name;
-          this.authorId = user._id;
+      this.dataService.getUsersSeeds([this.explorerService.rootNode.author]).then((seeds) => {
+        let userSeed = seeds[this.explorerService.rootNode.author];
+        if(userSeed) {
+          this.authorName = userSeed.label;
+          this.authorId = userSeed. id;
         }
       });
     } else {
@@ -181,10 +193,6 @@ export class ExplorerPage {
 
   displayHistory() {
     this.navCtrl.push('HistoryPage');
-  }
-
-  displayUserSeeds() {
-    this.navCtrl.push('UserSeedsPage');
   }
 
   registerBack() {

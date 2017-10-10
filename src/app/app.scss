@@ -354,13 +354,24 @@ ion-searchbar.searchbar-md .searchbar-search-icon {
   color: map-get($colors, lighter);
 }
 
-#search_filters span {
+#search_filters span,
+#search_activity button span {
   text-transform: initial;
   font-size: 1.1em;
 }
 
 #search_filters.toolbar .segment-md .segment-button:first-child span {
   text-transform: uppercase;
+}
+
+#search_activity {
+  margin: 5px 0;
+}
+
+#search_activity ion-icon {
+  vertical-align: middle;
+  font-size: 1.6em;
+  padding-top: 0.3em;
 }
 
 .loading_spinner {
@@ -393,6 +404,14 @@ ion-searchbar.searchbar-md .searchbar-search-icon {
   -moz-user-select: text;
   -ms-user-select: text;
   user-select: text;
+}
+
+ion-list .item ion-icon.item_lock,
+ion-item-group .item ion-icon.item_lock {
+  position: absolute;
+  top: 4px;
+  left: 39px;
+  font-size: 14px;
 }
 
 ion-list ion-item.item-block {
