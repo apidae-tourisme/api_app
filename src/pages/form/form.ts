@@ -92,10 +92,6 @@ export class FormPage {
     });
   }
 
-  getActiveList() {
-    return this.activeList == 'inclusions' ? this.node.includedSeeds : this.node.connectedSeeds;
-  }
-
   editStartDate(): void {
     if(!this.node.startDate) {
       this.node.startDate = new Date().toISOString();
@@ -142,11 +138,11 @@ export class FormPage {
   }
 
   archiveIcon(): string {
-    return this.node.archived ? 'filing' : 'pulse';
+    return this.node.archived ? 'trash' : 'pulse';
   }
 
   archiveLabel(): string {
-    return this.node.archived ? 'Graine à archiver' : 'Graine active';
+    return this.node.archived ? 'Graine à supprimer' : 'Graine active';
   }
 
   archiveColor(): string {
@@ -164,17 +160,6 @@ export class FormPage {
   addSeed(): void {
     let seedsModal = this.modalCtrl.create('InternalLinksPage', {node: this.node});
     seedsModal.present();
-  }
-
-  removeSeed(seed): void {
-    if(this.activeList == 'connections') {
-      this.node.removeConnection(seed);
-    } else if(this.activeList == 'inclusions') {
-      if(this.node.inclusions.indexOf(seed.id) != -1) {
-        this.node.includedSeeds.splice(this.node.includedSeeds.indexOf(seed), 1);
-        this.node.inclusions.splice(this.node.inclusions.indexOf(seed.id), 1);
-      }
-    }
   }
 
   addUrl(): void {

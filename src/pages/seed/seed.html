@@ -26,10 +26,10 @@
         <p class="label_sm">{{seed.address}}</p>
       </button>
     </ion-item>
-    <ion-item *ngFor="let url of seed.formattedUrls()" class="selectable" text-wrap>
-      <button ion-button full large icon-left (click)="openUrl(url.link)" color="product">
-        <ion-icon [name]="url.icon"></ion-icon>
-        <p class="label_sm">{{url.label}}</p>
+    <ion-item *ngFor="let url of seed.urls" class="selectable" text-wrap>
+      <button ion-button full large icon-left (click)="openUrl(url)" color="product">
+        <ion-icon [name]="linkIcon(url)"></ion-icon>
+        <p class="label_sm">{{linkLabel(url)}}</p>
       </button>
     </ion-item>
     <ion-item *ngIf="seed.startDate" class="selectable date_item">

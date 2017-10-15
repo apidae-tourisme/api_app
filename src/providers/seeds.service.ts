@@ -321,12 +321,6 @@ export class SeedsService {
       console.timeEnd('search-filter');
       console.time('search-results');
       return Promise.resolve(results);
-      // return this.localDatabase.allDocs({keys: results, include_docs: true, attachments: true});
-    // }).then((queryResults) => {
-    //   console.timeEnd('search-results');
-    //   return queryResults.rows.map((row) => {return row.doc;})
-    //     .filter((doc) => {return (scope == Seeds.SCOPE_ALL || doc.scope == scope);})
-    //     .map((doc) => {return new Seed(doc, false, false);});
     }).catch(function (err) {
       console.log('search error : ' + JSON.stringify(err));
     });

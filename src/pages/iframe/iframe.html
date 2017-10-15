@@ -1,0 +1,17 @@
+<ion-header>
+  <ion-navbar color="lighter" hideBackButton="true">
+    <ion-buttons left>
+      <button ion-button icon-only color="link" (click)="dismiss()" large>
+        <ion-icon name="hexa-left" color="link"></ion-icon>
+      </button>
+    </ion-buttons>
+    <ion-title text-center>Intégration web</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content>
+  <div padding>
+    <p>Vous pouvez utiliser le code ci-dessous pour partager la graine sur votre site web :</p>
+    <p id="iframe_code" class="selectable">{{iframeCode()}}</p>
+  </div>
+</ion-content>

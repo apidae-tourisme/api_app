@@ -48,6 +48,14 @@ export class SeedPage {
     return d < 10 ? ('0' + d) : d;
   }
 
+  linkIcon(url): string {
+    return Seed.formattedUrl(url).icon;
+  }
+
+  linkLabel(url): string {
+    return Seed.trimmed(url);
+  }
+
   openUrl(url): void {
     this.iab.create(url, '_system');
   }
