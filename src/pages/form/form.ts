@@ -8,6 +8,8 @@ import {InternalLinksPage} from "../internal-links/internal-links";
 import {EditAvatar} from "../edit-avatar/edit-avatar";
 import {Seeds} from "../../providers/seeds";
 import {AuthService} from "../../providers/auth.service";
+import {GoogleAnalytics} from "@ionic-native/google-analytics";
+import {TrackingService} from "../../providers/tracking.service";
 
 @IonicPage({
   segment: 'edition'
@@ -21,15 +23,17 @@ export class FormPage {
 
   public node: Seed;
   public disabled: boolean;
-  public activeList: string;
 
   constructor(private navCtrl: NavController, private params: NavParams, public modalCtrl: ModalController,
               private authService: AuthService, public dataService: SeedsService, private explorerService: ExplorerService,
-              private loadingCtrl: LoadingController, private toastCtrl: ToastController) {
+              private loadingCtrl: LoadingController, private toastCtrl: ToastController, private tracker: TrackingService) {
     let seedName = params.get('name');
     this.node = params.get('node') || new Seed({name: seedName, scope: Seeds.SCOPE_PRIVATE, archived: false}, false, false);
     this.node.author = this.authService.userEmail;
-    this.activeList = 'connections';
+  }
+
+  ionViewDidEnter() {
+    this.tracker.trackView('Formulaire - ' + this.node.label);
   }
 
   closeForm(): void {

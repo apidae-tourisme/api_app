@@ -3,6 +3,8 @@ import {ViewController, IonicPage, NavController} from "ionic-angular";
 import {ExplorerService} from "../../providers/explorer.service";
 import {SeedsService} from "../../providers/seeds.service";
 import {Seed} from "../../models/seed.model";
+import {GoogleAnalytics} from "@ionic-native/google-analytics";
+import {TrackingService} from "../../providers/tracking.service";
 
 @IonicPage()
 @Component({
@@ -13,14 +15,15 @@ export class HistoryPage {
   public history: Array<Seed>;
 
   constructor(public viewCtrl: ViewController, private navCtrl: NavController, private seedsService: SeedsService,
-              private explorerService: ExplorerService) {
+              private explorerService: ExplorerService, private tracker: TrackingService) {
     this.history = [];
   }
 
   ionViewDidEnter() {
     this.seedsService.getNodes(this.explorerService.history()).then((seeds) => {
       this.history = seeds;
-    })
+    });
+    this.tracker.trackView('Historique');
   }
 
   dismiss() {

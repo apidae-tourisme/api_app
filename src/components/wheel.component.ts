@@ -1,5 +1,6 @@
 import {Component, ElementRef, EventEmitter, Output} from "@angular/core";
 import {ComponentUtils} from "./component.utils";
+import {TrackingService} from "../providers/tracking.service";
 
 declare var d3: any;
 
@@ -11,6 +12,7 @@ export class WheelComponent {
 
   private static readonly VIEWS = [0, 1, 2, 3, 4, 5];
   private static readonly ICONS = ['\ue903', '\uf22a', '\ue906'];
+  private static readonly NAMES = ['Connexions', 'Liens externes', 'Inclusions'];
 
   @Output() viewChange = new EventEmitter();
 
@@ -23,8 +25,9 @@ export class WheelComponent {
   private padding;
   private currentView;
   private views;
+  private currentSeed;
 
-  constructor(private element: ElementRef) {
+  constructor(private element: ElementRef, private tracker: TrackingService) {
     this.htmlElement = this.element.nativeElement;
     this.host = d3.select(this.element.nativeElement);
     this.unitX = 70;
@@ -74,10 +77,12 @@ export class WheelComponent {
     function translateViews(evt) {
       let selectedView = d3.select(this).datum();
       that.translateViews(allLinks, selectedView);
+      that.tracker.trackView(that.currentSeed + ' - ' + WheelComponent.NAMES[selectedView % 3]);
     }
   }
 
   render(seed) {
+    this.currentSeed = seed.label;
     this.views.selectAll("text.counter").text((d) => {
       let viewIdx = d % 3;
       return viewIdx == 0 ? seed.connectedSeeds.length : (viewIdx == 1 ? seed.urls.length : seed.includedSeeds.length);
@@ -89,6 +94,7 @@ export class WheelComponent {
       let allLinks = this.wheelContainer.selectAll(".view");
       this.translateViews(allLinks, (this.currentView == 2 || this.currentView == 4) ? 3 : 0);
     }
+    this.tracker.trackView(this.currentSeed + ' - ' + WheelComponent.NAMES[this.currentView]);
   }
 
   translateNext() {

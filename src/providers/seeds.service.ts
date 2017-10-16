@@ -52,7 +52,7 @@ export class SeedsService {
         return userDoc.email;
     }).catch((err) => {
       console.log('current user doc missing');
-      return this.authService.userEmail;
+      return 'unknown';
     }).then((prevUser) => {
       if(prevUser !== this.authService.userEmail) {
         // if new user, clear local db
@@ -113,7 +113,6 @@ export class SeedsService {
             console.log('download err : ' + JSON.stringify(err));
           });
         });
-
       } else {
         this.initReplication();
       }
@@ -144,13 +143,15 @@ export class SeedsService {
     if(lastSeq) {
       options['since'] = 'now';
     }
-    return this.localDatabase.sync(this.remoteDatabase, options).on('paused', (res) => {
+    this.sync = this.localDatabase.sync(this.remoteDatabase, options).on('paused', (res) => {
       this.evt.publish("replication:paused");
     });
+    return this.sync;
   }
 
   cancelReplication() {
     if(this.sync) {
+      console.log('Cancelling replication');
       this.sync.cancel();
     }
   }

@@ -7,6 +7,8 @@ import {Seeds} from "../../providers/seeds";
 import {SeedsService} from "../../providers/seeds.service";
 import {Seed} from "../../models/seed.model";
 import {AuthService} from "../../providers/auth.service";
+import {GoogleAnalytics} from "@ionic-native/google-analytics";
+import {TrackingService} from "../../providers/tracking.service";
 
 @IonicPage({
   segment: 'recherche'
@@ -28,7 +30,7 @@ export class SearchPage {
   public results: Array<Seed>;
   public changesAuthors: any;
 
-  constructor(public explorerService: ExplorerService, public seedsService: SeedsService,
+  constructor(public explorerService: ExplorerService, public seedsService: SeedsService, private tracker: TrackingService,
               private authService: AuthService, private keyboard: Keyboard, private navCtrl: NavController) {
     this.searchQuery = null;
     this.searchScope = Seeds.SCOPE_ALL;
@@ -64,6 +66,7 @@ export class SearchPage {
       this.results = seeds;
       this.searching = false;
     });
+    this.tracker.trackView('Mon activité');
   }
 
   loadChangesFeed() {
@@ -103,6 +106,7 @@ export class SearchPage {
     setTimeout(function() {
       changes.cancel();
     }, 5000);
+    this.tracker.trackView('Activité du réseau');
   }
 
   authorInfo(seed) {
@@ -160,6 +164,7 @@ export class SearchPage {
           this.content.resize();
         });
       });
+      this.tracker.trackView('Recherche : ' + this.searchQuery);
     }
   }
 

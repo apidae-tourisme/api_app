@@ -15,9 +15,11 @@ import {Network} from "@ionic-native/network";
 import {Keyboard} from "@ionic-native/keyboard";
 import {StatusBar} from "@ionic-native/status-bar";
 import {SplashScreen} from "@ionic-native/splash-screen";
+import {GoogleAnalytics} from "@ionic-native/google-analytics";
 import {SeedsService} from "../providers/seeds.service";
 import {ProgressHttpModule} from "angular-progress-http";
 import {RemoteDataService} from "../providers/remote.service";
+import {TrackingService} from "../providers/tracking.service";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 
 @NgModule({
@@ -48,6 +50,7 @@ import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
     Keyboard,
     StatusBar,
     SplashScreen,
+    GoogleAnalytics,
     InAppBrowser,
     Camera,
     File,
@@ -57,6 +60,7 @@ import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
     SeedsService,
     ExplorerService,
     RemoteDataService,
+    TrackingService,
     Seeds
   ]
 })

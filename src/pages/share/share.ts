@@ -4,6 +4,8 @@ import {ApiAppConfig} from "../../providers/apiapp.config";
 import {WidgetPage} from "../widget/widget";
 import {IframePage} from "../iframe/iframe";
 import {InAppBrowser} from "@ionic-native/in-app-browser";
+import {GoogleAnalytics} from "@ionic-native/google-analytics";
+import {TrackingService} from "../../providers/tracking.service";
 
 
 @IonicPage({
@@ -22,7 +24,7 @@ export class SharePage {
   public sharingModes: Array<any>;
 
   constructor(private navParams: NavParams, private navCtrl: NavController, private iab: InAppBrowser,
-              private modalCtrl: ModalController) {
+              private modalCtrl: ModalController, private tracker: TrackingService) {
     this.seedId = this.navParams.get('id');
     this.directLink = ApiAppConfig.SHARING_HOST + '/graines/' + this.seedId;
     this.sortBy = WidgetPage.SORT_ALPHABET;
@@ -34,6 +36,10 @@ export class SharePage {
       {icon: 'logo-linkedin', label: 'Partager sur LinkedIn', url: 'https://www.linkedin.com/shareArticle?mini=true&title=Apidae Tourisme - Partage depuis ApiApp&url='},
       {icon: 'open', label: 'Partager sur le web', url: 'iframe'}
     ]
+  }
+
+  ionViewDidEnter() {
+    this.tracker.trackView('Partage');
   }
 
   setSortBy(sort) {
