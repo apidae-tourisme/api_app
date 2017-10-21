@@ -2,7 +2,6 @@ import {Component} from '@angular/core';
 import {NavController, IonicPage, ModalController, NavParams, Events} from 'ionic-angular';
 import {SeedsService} from "../../providers/seeds.service";
 import {AuthService} from "../../providers/auth.service";
-import {Seed} from "../../models/seed.model";
 
 @IonicPage({
   segment: 'initialisation'
@@ -13,7 +12,6 @@ import {Seed} from "../../models/seed.model";
 export class LoadingPage {
 
   public msg: string;
-  private complete: boolean;
 
   constructor(public navCtrl: NavController, private dataService: SeedsService, private authService: AuthService,
               private evt: Events, private modalCtrl: ModalController, private navParams: NavParams) {
@@ -22,26 +20,18 @@ export class LoadingPage {
   ionViewDidEnter() {
     let isOnline = this.navParams.get('isOnline');
     this.msg = 'Initialisation de la base de données';
-    this.complete = false;
-    this.evt.subscribe("replication:paused", () => {
-      if(!this.complete) {
-        this.complete = true;
-        this.completeSetUp();
-      }
-    });
 
     this.dataService.initLocalDb().then(() => {
       if(isOnline) {
-        this.dataService.initDbData((progress) => {this.msg = progress;});
+        return this.dataService.initDbData((progress) => {this.msg = progress;}).then((lastSeq) => {
+          this.dataService.initReplication(lastSeq);
+        });
       } else {
-        this.complete = true;
-        this.completeSetUp();
+        return Promise.resolve();
       }
+    }).then(() => {
+      this.completeSetUp();
     });
-  }
-
-  ionViewWillLeave() {
-    this.evt.unsubscribe("replication:paused");
   }
 
   completeSetUp() {
@@ -95,9 +85,7 @@ export class LoadingPage {
   cancel() {
     this.dataService.cancelReplication();
     this.authService.logOut().then(() => {
-      if(!this.complete) {
-        this.dataService.clearLocalDb();
-      }
+      this.dataService.clearLocalDb();
       this.navCtrl.pop();
     });
   }

@@ -105,10 +105,9 @@ export class AuthService {
     return this.storage.ready().then(() => {
       return this.getUserProfile().then((prev) => {
         if(prev && prev.email) {
-          console.log('setting previous user to : ' + prev.email);
           return this.storage.set('previousUser', prev.email);
         } else {
-          return Promise.resolve();
+          return this.storage.set('previousUser', userProfile.email);
         }
       }).then(() => {
         return this.storage.set('userProfile', userProfile);

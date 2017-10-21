@@ -7,10 +7,13 @@ import {ProgressHttp} from "angular-progress-http";
 import {Events, Platform} from "ionic-angular";
 import {AuthService} from "./auth.service";
 
-import * as DbWorker from "worker-loader!../workers/db.worker";
-import * as pouchClient from "worker-pouch/client";
+// worker-pouch with worker in external file - iOS only
+// import * as DbWorker from "worker-loader!../workers/db.worker";
+// import * as pouchClient from "worker-pouch/client";
+// import DatabaseConfiguration = PouchDB.Configuration.DatabaseConfiguration;
 
-import DatabaseConfiguration = PouchDB.Configuration.DatabaseConfiguration;
+// worker-pouch with inline worker - browser & Android
+import * as WorkerPouch from "worker-pouch";
 
 @Injectable()
 export class SeedsService {
@@ -29,7 +32,7 @@ export class SeedsService {
   private sync: any;
   public idxBuilding: boolean;
   private supportsIDB: boolean;
-  private worker: Worker;
+  // private worker: Worker;
 
   private static readonly CHARMAP = {
     'à': 'a', 'á': 'a', 'â': 'a', 'ä': 'a', 'æ': 'ae', 'œ': 'oe', 'ç': 'c', 'è': 'e', 'é': 'e', 'ê': 'e', 'ë': 'e',
@@ -43,10 +46,17 @@ export class SeedsService {
 
   constructor(private http: ProgressHttp, private evt: Events, private platform: Platform,
               private authService: AuthService) {
-    (<any>PouchDB).adapter('worker', pouchClient);
+    // worker-pouch with external worker - iOS only
+    // (<any>PouchDB).adapter('worker', pouchClient);
+    // this.worker = new DbWorker();
+
+    // worker-pouch with inline worker - browser & Android
+    (<any>PouchDB).adapter('worker', WorkerPouch);
+
+    // PouchDB debug logs
     // PouchDB.debug.enable('pouchdb:worker:*');
+
     this.supportsIDB = !this.platform.is('ios');
-    this.worker = new DbWorker();
     this.remoteDatabase = this.getRemoteDb();
     this.localDatabase = this.getLocalDb(ApiAppConfig.LOCAL_DB);
   }
@@ -82,9 +92,11 @@ export class SeedsService {
     this.idxBuilding = false;
   }
 
+  // Two differents strategies for iOS vs Android & browser - extract as a LocalDbProvider ?
   getLocalDb(dbName) {
-    let adapter = '|adapter|' + (this.supportsIDB ? 'idb' : 'memory');
-    return new PouchDB(dbName + adapter, (<DatabaseConfiguration>{adapter: 'worker', worker: () => {return this.worker;}}));
+    // let adapter = '|adapter|' + (this.supportsIDB ? 'idb' : 'memory');
+    // return new PouchDB(dbName + adapter, (<DatabaseConfiguration>{adapter: 'worker', worker: () => {return this.worker;}}));
+    return new PouchDB(dbName, {adapter: 'worker'});
   }
 
   getRemoteDb() {
@@ -93,20 +105,20 @@ export class SeedsService {
 
   initDbData(onProgress) {
     onProgress("Téléchargement des données de l'application en cours (0%)");
-    this.localDatabase.info().then((localInfo) => {
+    return this.localDatabase.info().then((localInfo) => {
       if(localInfo.doc_count === 0) {
         let remote: any = {};
-        this.remoteDatabase.info().then((remoteInfo) => {
+        return this.remoteDatabase.info().then((remoteInfo) => {
           remote.lastSeq = remoteInfo.update_seq;
-          this.http.withDownloadProgressListener((progress) => {
+          return this.http.withDownloadProgressListener((progress) => {
             onProgress("Téléchargement des données de l'application en cours (" + Math.ceil(progress.loaded / 1024) + "Ko)");
           }).get(this.userSeedsUrl())
             .map(res => res.json()).toPromise()
             .then((data) => {
               onProgress("Import des données téléchargées");
-              this.localDatabase.bulkDocs(data.docs, {new_edits: false}).then((res) => {
+              return this.localDatabase.bulkDocs(data.docs, {new_edits: false}).then((res) => {
                 onProgress("Import terminé.");
-                this.initReplication(remote.lastSeq);
+                return remote.lastSeq;
               }).catch((err) => {
                 onProgress("L'import des données a échoué.");
                 console.log('bulk docs err : ' + JSON.stringify(err));
@@ -117,7 +129,7 @@ export class SeedsService {
           });
         });
       } else {
-        this.initReplication();
+        return Promise.resolve();
       }
     }).catch((err) => {
       console.log('initDbData error : ' + JSON.stringify(err));
@@ -149,7 +161,6 @@ export class SeedsService {
     this.sync = this.localDatabase.sync(this.remoteDatabase, options).on('paused', (res) => {
       this.evt.publish("replication:paused");
     });
-    return this.sync;
   }
 
   cancelReplication() {
