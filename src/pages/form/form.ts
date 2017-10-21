@@ -8,7 +8,6 @@ import {InternalLinksPage} from "../internal-links/internal-links";
 import {EditAvatar} from "../edit-avatar/edit-avatar";
 import {Seeds} from "../../providers/seeds";
 import {AuthService} from "../../providers/auth.service";
-import {GoogleAnalytics} from "@ionic-native/google-analytics";
 import {TrackingService} from "../../providers/tracking.service";
 
 @IonicPage({

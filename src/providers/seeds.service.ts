@@ -7,12 +7,14 @@ import {ProgressHttp} from "angular-progress-http";
 import {Events, Platform} from "ionic-angular";
 import {AuthService} from "./auth.service";
 
-declare var workerPouch: any;
+import * as DbWorker from "worker-loader!../workers/db.worker";
+import * as pouchClient from "worker-pouch/client";
+
+import DatabaseConfiguration = PouchDB.Configuration.DatabaseConfiguration;
 
 @Injectable()
 export class SeedsService {
 
-  private static readonly CURRENT_USER = "_local/current_user";
   private static readonly SEARCH_DOC = "_design/search_local";
   private static readonly SEARCH_PATH = "search_local/all_fields";
   private static readonly USER_SEEDS_FILTER = "seeds/by_user";
@@ -26,7 +28,8 @@ export class SeedsService {
   private remoteDatabase: any;
   private sync: any;
   public idxBuilding: boolean;
-  private isMobile: boolean;
+  private supportsIDB: boolean;
+  private worker: Worker;
 
   private static readonly CHARMAP = {
     'à': 'a', 'á': 'a', 'â': 'a', 'ä': 'a', 'æ': 'ae', 'œ': 'oe', 'ç': 'c', 'è': 'e', 'é': 'e', 'ê': 'e', 'ë': 'e',
@@ -40,25 +43,24 @@ export class SeedsService {
 
   constructor(private http: ProgressHttp, private evt: Events, private platform: Platform,
               private authService: AuthService) {
-    (<any>PouchDB).adapter('worker', workerPouch);
-    this.isMobile = this.platform.is('mobile');
+    (<any>PouchDB).adapter('worker', pouchClient);
+    // PouchDB.debug.enable('pouchdb:worker:*');
+    this.supportsIDB = !this.platform.is('ios');
+    this.worker = new DbWorker();
     this.remoteDatabase = this.getRemoteDb();
     this.localDatabase = this.getLocalDb(ApiAppConfig.LOCAL_DB);
   }
 
   // Inits local db once the user is logged in
   initLocalDb() {
-    return this.localDatabase.get(SeedsService.CURRENT_USER).then((userDoc) => {
-        return userDoc.email;
-    }).catch((err) => {
-      console.log('current user doc missing');
-      return 'unknown';
+    return this.authService.getPreviousUser().then((prevUserEmail) => {
+      return prevUserEmail || 'unknown';
     }).then((prevUser) => {
       if(prevUser !== this.authService.userEmail) {
         // if new user, clear local db
         return this.clearDb(ApiAppConfig.LOCAL_DB).then(() => {
           this.localDatabase = this.getLocalDb(ApiAppConfig.LOCAL_DB);
-          return this.localDatabase.put({_id: SeedsService.CURRENT_USER, email: this.authService.userEmail});
+          return Promise.resolve();
         });
       } else {
         // keep existing db otherwise
@@ -81,7 +83,8 @@ export class SeedsService {
   }
 
   getLocalDb(dbName) {
-    return new PouchDB(dbName, {adapter: 'worker'});
+    let adapter = '|adapter|' + (this.supportsIDB ? 'idb' : 'memory');
+    return new PouchDB(dbName + adapter, (<DatabaseConfiguration>{adapter: 'worker', worker: () => {return this.worker;}}));
   }
 
   getRemoteDb() {
@@ -282,7 +285,7 @@ export class SeedsService {
     });
   }
 
-  lookUpNodes(email) {
+  lookUpNodes(email, stale?) {
     console.time('look up author ' + email);
     return this.localDatabase.query(SeedsService.LOOKUP_BY_AUTHOR, {
       startkey: email + '9',
@@ -290,7 +293,8 @@ export class SeedsService {
       include_docs: true,
       attachments: true,
       descending: true,
-      limit: 50
+      limit: 50,
+      stale: stale
     }).then((results) => {
       console.timeEnd('look up author ' + email);
       return results.rows.filter((row) => {return row.id && row.doc;})
@@ -300,13 +304,13 @@ export class SeedsService {
     });
   }
 
-  searchNodes(query, scope): Promise<Array<string>> {
+  searchNodes(query, scope, stale?): Promise<Array<string>> {
     let tokens = this.tokenize(this.normalize(query));
 
     console.time('search-query');
     let results = [];
     return Promise.all(tokens.map((term) => {
-      return this.searchTerm(term);
+      return this.searchTerm(term, stale);
     })).then((allResults) => {
       console.timeEnd('search-query');
       console.time('search-filter');
@@ -335,10 +339,11 @@ export class SeedsService {
     return Object.keys(arrObject).map((k) => {return arrObject[k];});
   }
 
-  searchTerm(term) {
+  searchTerm(term, stale?) {
     return this.localDatabase.query(SeedsService.SEARCH_PATH, {
-      startkey     : term,
-      endkey       : term + '\uffff'
+      startkey: term,
+      endkey: term + '\uffff',
+      stale: stale
     }).then((results) => {
       return {
         term: term,

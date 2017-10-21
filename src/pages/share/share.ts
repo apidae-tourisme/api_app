@@ -4,7 +4,6 @@ import {ApiAppConfig} from "../../providers/apiapp.config";
 import {WidgetPage} from "../widget/widget";
 import {IframePage} from "../iframe/iframe";
 import {InAppBrowser} from "@ionic-native/in-app-browser";
-import {GoogleAnalytics} from "@ionic-native/google-analytics";
 import {TrackingService} from "../../providers/tracking.service";
 
 

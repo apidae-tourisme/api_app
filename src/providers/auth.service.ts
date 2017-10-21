@@ -95,9 +95,24 @@ export class AuthService {
     });
   }
 
+  getPreviousUser(): Promise<string> {
+    return this.storage.ready().then(() => {
+      return this.storage.get('previousUser');
+    });
+  }
+
   setUserProfile(userProfile) {
     return this.storage.ready().then(() => {
-      return this.storage.set('userProfile', userProfile);
+      return this.getUserProfile().then((prev) => {
+        if(prev && prev.email) {
+          console.log('setting previous user to : ' + prev.email);
+          return this.storage.set('previousUser', prev.email);
+        } else {
+          return Promise.resolve();
+        }
+      }).then(() => {
+        return this.storage.set('userProfile', userProfile);
+      });
     });
   }
 }

@@ -1,8 +1,7 @@
-import {Component, NgZone} from '@angular/core';
+import {Component} from '@angular/core';
 import {NavController, Platform, AlertController, IonicPage} from 'ionic-angular';
 import {AuthService} from "../../providers/auth.service";
 import {Network} from "@ionic-native/network";
-import {SeedsService} from "../../providers/seeds.service";
 
 @IonicPage()
 @Component({
@@ -15,7 +14,7 @@ export class LoginPage {
   private connectionType: string;
 
   constructor(public navCtrl: NavController, public authService: AuthService, private platform: Platform,
-              private network: Network, private dataService: SeedsService, private alertCtrl: AlertController) {
+              private network: Network, private alertCtrl: AlertController) {
     this.connectionType = 'web';
 
     // Subscribe to connectivity changes on mobile devices

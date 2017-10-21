@@ -3,7 +3,6 @@ import {ViewController, IonicPage, NavController} from "ionic-angular";
 import {ExplorerService} from "../../providers/explorer.service";
 import {SeedsService} from "../../providers/seeds.service";
 import {Seed} from "../../models/seed.model";
-import {GoogleAnalytics} from "@ionic-native/google-analytics";
 import {TrackingService} from "../../providers/tracking.service";
 
 @IonicPage()

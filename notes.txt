@@ -7,3 +7,13 @@
 - Not supported by PouchDB
 - Also behaves strangely in regards to web workers
 - Still requires a local webserver, which makes pretty much everything more complex to implement
+
+# Patched for Promise ES5 compatibility
+node_modules/worker-pouch/lib/worker/core.js => var Promise = require('pouchdb-promise').default;
+node_modules/worker-pouch/lib/shared/utils.js => var Promise = require('pouchdb-promise').default;
+node_modules/pouchdb-browser/lib/index.es.js => comment 'db.type() is deprecated' warning
+
+# PouchDB changes API
+the API times out (30 secs) when no changes are detected - this seems to be ok as long as the called URL is the good one
+worker-pouch tries to apply the filter locally when getting user changes => remoteDb is kept out of the worker to avoid this
+

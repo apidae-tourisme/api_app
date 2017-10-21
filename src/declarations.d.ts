@@ -12,3 +12,17 @@
   https://www.typescriptlang.org/docs/handbook/declaration-files/introduction.html
 */
 declare module '*';
+
+// declare module "worker-loader!./workers/db.worker" {
+//   const content: any;
+//   export = content;
+// }
+
+declare module "worker-loader!./workers/db.worker" {
+  class WebpackWorker extends Worker {
+    constructor();
+  }
+  export = WebpackWorker;
+}
+
+// declare module 'worker-pouch';
