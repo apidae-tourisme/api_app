@@ -1,0 +1,28 @@
+<ion-header>
+  <ion-navbar color="lighter" hideBackButton="true">
+    <ion-buttons left>
+      <button ion-button icon-only color="link" (click)="dismiss()" large>
+        <ion-icon name="hexa-left" color="link"></ion-icon>
+      </button>
+    </ion-buttons>
+    <ion-title text-center>Authentification</ion-title>
+  </ion-navbar>
+</ion-header>
+<ion-content id="login">
+  <div id="login_form_panel">
+    <form (submit)="doLogin()">
+      <ion-list no-margin>
+        <ion-list-header text-center>
+          Veuillez indiquer votre adresse email pour vous connecter à l'application.
+        </ion-list-header>
+        <ion-item>
+          <ion-input type="email" [(ngModel)]="loginForm.email" name="email" placeholder="Adresse email"></ion-input>
+          <ion-icon name="mail" item-right color="grey"></ion-icon>
+        </ion-item>
+        <div text-center padding-top>
+          <button ion-button large color="link">Valider</button>
+        </div>
+      </ion-list>
+    </form>
+  </div>
+</ion-content>

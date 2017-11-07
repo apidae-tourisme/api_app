@@ -6,7 +6,7 @@ import {SeedsService} from "./seeds.service";
 @Injectable()
 export class ExplorerService {
 
-  private static readonly DEFAULT_SEED = "eb9e3271-f969-4e37-b2da-5955a003fa96";
+  private static readonly DEFAULT_SEED = "b0502ec3-56f2-4e15-a0ed-878f6131d6ef";
   private static readonly MAX_STEPS = 50;
 
   public networkData: any;

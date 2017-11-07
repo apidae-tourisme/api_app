@@ -304,8 +304,7 @@ export class SeedsService {
       include_docs: true,
       attachments: true,
       descending: true,
-      limit: 50,
-      stale: stale
+      limit: 50
     }).then((results) => {
       console.timeEnd('look up author ' + email);
       return results.rows.filter((row) => {return row.id && row.doc;})
@@ -353,8 +352,7 @@ export class SeedsService {
   searchTerm(term, stale?) {
     return this.localDatabase.query(SeedsService.SEARCH_PATH, {
       startkey: term,
-      endkey: term + '\uffff',
-      stale: stale
+      endkey: term + '\uffff'
     }).then((results) => {
       return {
         term: term,
@@ -391,7 +389,10 @@ export class SeedsService {
           let newUser = this.buildUserSeed(userProfile);
           return this.localDatabase.put(newUser.submitParams()).then(data => {
             if (data.ok) {
-              return this.getNodeDetails(data.id);
+              // Todo : report fix in master
+              return this.getNodeDetails(data.id).then(data => {
+                return new Seed(data, false, false);
+              });
             } else {
               console.log('New user seed creation failed : ' + JSON.stringify(data));
               return null;
@@ -411,8 +412,8 @@ export class SeedsService {
       name: (userProfile.firstName || 'Prénom') + ' ' + (userProfile.lastName || 'Nom'),
       email: userProfile.email,
       author: userProfile.email,
-      external_id: userProfile.id.toString(),
-      description: userProfile.profession,
+      // external_id: userProfile.id.toString(),
+      description: userProfile.profession || 'A renseigner',
       urls: [],
       type: Seeds.PERSON,
       scope: Seeds.SCOPE_APIDAE

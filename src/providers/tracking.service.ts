@@ -18,17 +18,17 @@ export class TrackingService {
     if(this.isWeb) {
       //  Skipping, already started in index
     } else {
-      this.gaTracker.startTrackerWithId(ApiAppConfig.TRACKING_CODE).then(() => {
-        console.log('started GA tracker');
-      }).catch(e => console.log('Could not start GoogleAnalytics tracker', e));
+      // this.gaTracker.startTrackerWithId(ApiAppConfig.TRACKING_CODE).then(() => {
+      //   console.log('started GA tracker');
+      // }).catch(e => console.log('Could not start GoogleAnalytics tracker', e));
     }
   }
 
   public trackView(viewTitle): void {
-    if(this.isWeb && typeof(ga) != "undefined") {
-      ga('send', 'screenview', {screenName: viewTitle});
-    } else {
-      this.gaTracker.trackView(viewTitle);
-    }
+    // if(this.isWeb && typeof(ga) != "undefined") {
+    //   ga('send', 'screenview', {screenName: viewTitle});
+    // } else {
+    //   this.gaTracker.trackView(viewTitle);
+    // }
   }
 }

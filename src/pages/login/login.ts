@@ -1,5 +1,5 @@
 import {Component} from '@angular/core';
-import {NavController, Platform, AlertController, IonicPage} from 'ionic-angular';
+import {NavController, Platform, AlertController, IonicPage, ModalController} from 'ionic-angular';
 import {AuthService} from "../../providers/auth.service";
 import {Network} from "@ionic-native/network";
 
@@ -14,7 +14,7 @@ export class LoginPage {
   private connectionType: string;
 
   constructor(public navCtrl: NavController, public authService: AuthService, private platform: Platform,
-              private network: Network, private alertCtrl: AlertController) {
+              private network: Network, private alertCtrl: AlertController, private modalCtrl: ModalController) {
     this.connectionType = 'web';
 
     // Subscribe to connectivity changes on mobile devices
@@ -32,22 +32,22 @@ export class LoginPage {
   }
 
   ionViewDidEnter() {
-    let url = window.location.href;
-    if(url.indexOf('code') != -1) {
-      // callback in browser - Apidae SSO from browser
-      this.authService.handleAuthCallback(url, () => {
-        this.loggedInRedirect();
-        }, () => {
-          console.log('handleAuthCallback error');
-        });
-    } else {
+    // let url = window.location.href;
+    // if(url.indexOf('code') != -1) {
+    //   // callback in browser - Apidae SSO from browser
+    //   this.authService.handleAuthCallback(url, () => {
+    //     this.loggedInRedirect();
+    //     }, () => {
+    //       console.log('handleAuthCallback error');
+    //     });
+    // } else {
       this.loggedInRedirect();
-    }
+    // }
   }
 
   authenticateUser(): void {
     if(this.hasConnectivity()) {
-      this.authService.authenticate(() => this.loggedInRedirect(), () => {});
+      this.navCtrl.push('LoginFormPage');
     } else {
       this.displayOfflineAlert();
     }
