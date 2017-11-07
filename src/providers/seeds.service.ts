@@ -391,7 +391,9 @@ export class SeedsService {
           let newUser = this.buildUserSeed(userProfile);
           return this.localDatabase.put(newUser.submitParams()).then(data => {
             if (data.ok) {
-              return this.getNodeDetails(data.id);
+              return this.getNodeDetails(data.id).then(data => {
+                return new Seed(data, false, false);
+              });
             } else {
               console.log('New user seed creation failed : ' + JSON.stringify(data));
               return null;
