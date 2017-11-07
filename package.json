@@ -56,7 +56,6 @@
         "ionic-angular": "3.7.1",
         "ionic-plugin-keyboard": "~2.2.1",
         "ionicons": "3.0.0",
-        "pouchdb-adapter-fruitdown": "^6.3.4",
         "pouchdb-adapter-memory": "^6.3.4",
         "pouchdb-browser": "6.3.4",
         "promise-worker": "^1.1.1",
@@ -68,7 +67,7 @@
         "zone.js": "0.8.18"
     },
     "devDependencies": {
-        "@ionic/app-scripts": "^3.0.0",
+        "@ionic/app-scripts": "3.0.0",
         "@types/jasmine": "^2.5.53",
         "@types/node": "^8.0.3",
         "angular2-template-loader": "^0.6.2",
