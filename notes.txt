@@ -17,3 +17,5 @@ node_modules/pouchdb-browser/lib/index.es.js => comment 'db.type() is deprecated
 the API times out (30 secs) when no changes are detected - this seems to be ok as long as the called URL is the good one
 worker-pouch tries to apply the filter locally when getting user changes => remoteDb is kept out of the worker to avoid this
 
+# D3 and TS
+nice TS2 + D3 demo repo on https://github.com/tomwanzek/d3-ng2-demo && https://github.com/tomwanzek/d3-ng2-service
