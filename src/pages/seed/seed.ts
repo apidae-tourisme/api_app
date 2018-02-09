@@ -57,7 +57,7 @@ export class SeedPage {
   }
 
   openUrl(url): void {
-    this.iab.create(url, '_system');
+    this.iab.create(Seed.formattedUrl(url).link, '_system');
   }
 
   openAddress(address) {

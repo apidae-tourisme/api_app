@@ -24,7 +24,7 @@ export class WidgetPage {
 
   ionViewDidEnter(): void {
     let seedId = this.navParams.get('id');
-    let sorting = this.navParams.get('sort');;
+    let sorting = this.navParams.get('sort');
     if(seedId) {
       this.dataService.getSeedWithInclusions(seedId, Seeds.SCOPE_APIDAE).then((data) => {
         this.root = new Seed(data.root, false, false);

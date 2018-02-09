@@ -37,7 +37,7 @@ import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
         autoFocusAssist: false,
         mode: 'md',
         // Web only
-        // locationStrategy: 'path'
+        locationStrategy: 'path'
       }
     ),
     IonicStorageModule.forRoot()
