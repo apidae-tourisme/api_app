@@ -210,10 +210,6 @@ export class GraphComponent {
 
       that.simulation.force("center", d3.forceCenter(that.width / 2, (that.height - layout.unitY / 2) / 2));
       that.simulation.alpha(1).restart();
-
-      // Fix svg display issue on FF when using <base> tag (see https://gist.github.com/leonderijke/c5cf7c5b2e424c0061d2)
-      // Web only
-      // prependBaseUrl();
     }, 350);
 
     function changeRootNode() {

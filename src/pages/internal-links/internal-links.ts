@@ -70,7 +70,7 @@ export class InternalLinksPage {
     if (this.validQuery()) {
       this.results = [];
       this.searching = true;
-      this.seedsService.searchNodes(this.searchQuery, this.searchScope, 'ok').then((seedsIds) => {
+      this.seedsService.searchNodes(this.searchQuery, this.searchScope).then((seedsIds) => {
         this.resultsIds = seedsIds;
         this.seedsService.getNodes(seedsIds.slice(0, SearchPage.BATCH_SIZE)).then((seeds) => {
           this.results = seeds;

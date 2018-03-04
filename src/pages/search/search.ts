@@ -61,7 +61,7 @@ export class SearchPage {
   loadUserActivity() {
     this.results = [];
     this.searching = true;
-    this.seedsService.lookUpNodes(this.authService.userEmail, 'ok').then((seeds) => {
+    this.seedsService.lookUpNodes(this.authService.userEmail).then((seeds) => {
       this.results = seeds;
       this.searching = false;
     });
@@ -155,7 +155,7 @@ export class SearchPage {
     if (this.validQuery()) {
       this.results = [];
       this.searching = true;
-      this.seedsService.searchNodes(this.searchQuery, this.searchScope, 'ok').then((seedsIds) => {
+      this.seedsService.searchNodes(this.searchQuery, this.searchScope).then((seedsIds) => {
         this.resultsIds = seedsIds;
         this.seedsService.getNodes(seedsIds.slice(0, SearchPage.BATCH_SIZE)).then((seeds) => {
           this.results = seeds;
